@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:stretchColumns="0,1,2"
+    tools:context=".ui.group.list.GroupListFragment"
+    android:orientation="horizontal">
+    <TableRow>
+
+        <TextView
+            android:id="@+id/group_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:lines="2"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@+id/group_list_pattern"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAlignment="textStart"
+            android:autoSizeTextType="uniform"
+            android:textAppearance="?attr/textAppearanceListItemSecondary" />
+
+        <ImageView
+            android:id="@+id/group_list_menu_popup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/title_group_detail"
+            android:src="@drawable/ic_action_name"
+            android:text="Show Popup Menu" />
+    </TableRow>
+</TableLayout>

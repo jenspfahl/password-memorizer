@@ -1,0 +1,9 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header
+        android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$SecurityPreferenceFragment"
+        android:icon="@drawable/ic_security_black_24dp"
+        android:title="@string/pref_header_security" />
+
+
+</preference-headers>

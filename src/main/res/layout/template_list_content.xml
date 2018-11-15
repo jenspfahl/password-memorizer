@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:stretchColumns="0,1,2"
+    tools:context=".ui.template.list.TemplateListFragment"
+    android:orientation="horizontal">
+    <TableRow>
+
+        <TextView
+            android:id="@+id/template_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@+id/template_list_pattern"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAlignment="textStart"
+            android:autoSizeTextType="uniform"
+            android:textAppearance="?attr/textAppearanceListItemSecondary" />
+
+        <ImageView
+            android:id="@+id/template_list_menu_popup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/title_template_detail"
+            android:src="@drawable/ic_action_name"
+            android:text="Show Popup Menu" />
+    </TableRow>
+</TableLayout>

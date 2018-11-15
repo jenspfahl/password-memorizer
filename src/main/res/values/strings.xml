@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">Obfusser</string>
+    <string name="title_credential_detail">Credential Detail</string>
+    <string name="title_activity_credential_input">New Credential</string>
+    <string name="title_template_detail">Template Detail</string>
+    <string name="title_activity_template_input">New Template</string>
+    <string name="title_group_detail">Group Detail</string>
+    <string name="title_activity_group_input">New Group</string>
+
+    <!-- Strings related to credentail -->
+    <string name="prompt_name">Name</string>
+    <string name="prompt_info">Additional info</string>
+    <string name="prompt_password">Pattern/Password</string>
+    <string name="action_sign_in_next">Next step</string>
+    <string name="action_sign_in">Create Credential</string>
+    <string name="action_sign_in_short">Create</string>
+    <string name="error_invalid_pattern">This pattern is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="change_credential">Change</string>
+    <string name="delete_credential">Delete</string>
+    <string name="change_template">Change</string>
+    <string name="delete_template">Delete</string>
+    <string name="change_group">Change</string>
+    <string name="delete_group">Delete</string>
+    <string name="hint">Hint</string>
+
+    <string name="title_credentials">Credentials</string>
+    <string name="title_templates">Templates</string>
+    <string name="title_groups">Groups</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_security">Security</string>
+    <string name="pref_title_enable_password">Ensure data with password</string>
+    <string name="pref_description_enable_password">It is recommend to ensure your data with a password. Note: a wrong password will also show your data, but other data.</string>
+
+    <string name="pref_title_reference_password">Reference check pattern</string>
+    <string name="pref_description_reference_password">Input a word or whatever which indicates you the correct password. Note: This will decrease security</string>
+
+</resources>

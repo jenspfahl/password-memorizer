@@ -28,9 +28,9 @@ import de.jepfa.obfusser.viewmodel.credential.CredentialListViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 
-public class CredentialListFragment extends CredentialListFragmentBase {
+public class CredentialExpandableListFragment extends CredentialListFragmentBase {
 
-    public CredentialListFragment() {
-        super(false);
+    public CredentialExpandableListFragment() {
+        super(true);
     }
 }

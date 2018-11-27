@@ -26,7 +26,7 @@ public class Secret {
     /**
      * After this period of time of inactivity the secret is outdated.
      */
-    private static final long SECRET_KEEP_VALID = TimeUnit.SECONDS.toMillis(10);
+    private static final long SECRET_KEEP_VALID = TimeUnit.SECONDS.toMillis(60);
 
     private static Secret _instance = null;
 

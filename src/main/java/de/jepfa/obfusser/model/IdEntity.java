@@ -36,7 +36,7 @@ public abstract class IdEntity {
         if (this == o) return true;
         if (!(o instanceof IdEntity)) return false;
         IdEntity idEntity = (IdEntity) o;
-        return id == idEntity.id;
+        return id == idEntity.id && getClass() == o.getClass(); //also same class
     }
 
     @Override

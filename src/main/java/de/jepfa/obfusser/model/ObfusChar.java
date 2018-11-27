@@ -1,5 +1,7 @@
 package de.jepfa.obfusser.model;
 
+import android.os.Build;
+
 import java.util.Arrays;
 
 import de.jepfa.obfusser.util.Loop;
@@ -9,12 +11,12 @@ import de.jepfa.obfusser.util.Loop;
  * Each type is represented in a nice way.
  */
 public enum ObfusChar {
-    LOWER_CASE_CHAR('\u2584', 'x', 0.4), // "\u2584" '▄'
-    UPPER_CASE_CHAR('\u2588', 'X', 0.3), // "\u2588" '█'
-    DIGIT('\u2B24', '0', 0.2),           // "\u2B2E" '⬤'
-    SPECIAL_CHAR('\u2580', '!', 0.1),    // "\u2580" '▀'
-    ANY_CHAR('\u25A0', '*', null),       // "\u25A0" '■'
-    PLACEHOLDER('\u25EF', '?', null),    // "\u25EF" '◯'
+    LOWER_CASE_CHAR('\u2584', '\u2584', 'x', 0.4), // "\u2584" '▄'
+    UPPER_CASE_CHAR('\u2588', '\u2588', 'X', 0.3), // "\u2588" '█'
+    DIGIT('\u2B24', '\u25CF', '0', 0.2),           // "\u2B24" '⬤' alt '●'
+    SPECIAL_CHAR('\u2580', '\u2580', '!', 0.1),    // "\u2580" '▀'
+    ANY_CHAR('\u25A0', '\u25A0', '*', null),       // "\u25A0" '■'
+    PLACEHOLDER('\u25EF', '\u25EF', '?', null),    // "\u25EF" '◯'
     ;
 
 
@@ -78,12 +80,14 @@ public enum ObfusChar {
 
 
     private char representation;
+    private char alternativeRepresentation;
     private char exchangeValue;
     private Double useLikelihood;
 
 
-    ObfusChar(char representation, char exchangeValue, Double useLikelihood) {
+    ObfusChar(char representation, char alternativeRepresentation, char exchangeValue, Double useLikelihood) {
         this.representation = representation;
+        this.alternativeRepresentation = alternativeRepresentation;
         this.exchangeValue = exchangeValue;
         this.useLikelihood = useLikelihood;
     }
@@ -94,7 +98,11 @@ public enum ObfusChar {
      * @return
      */
     public char getRepresentation() {
-        return representation;
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+            return alternativeRepresentation;
+        } else{
+            return representation;
+        }
     }
 
     /**

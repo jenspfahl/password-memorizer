@@ -105,11 +105,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                             }
                             else {
                                 secret.setDigest(EncryptUtil.generateKey(pwd));
+                                activity.refresh(false); // show correct encrypted data
                             }
-                            secret.renew();
                             secretDialogOpen = false;
-
-                            activity.refresh(false); // show correct encrypted data
 
                         }
                     })

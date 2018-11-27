@@ -23,8 +23,7 @@ import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAdapter.ViewHolder> {
 
-    private final CredentialListFragment fragment;
-    private final GroupListViewModel groupListViewModel;
+    private final CredentialListFragmentBase fragment;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView nameView;
@@ -54,10 +53,9 @@ public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAd
         }
     };
 
-    CredentialListAdapter(GroupListViewModel groupListViewModel, CredentialListFragment fragment) {
+    CredentialListAdapter(CredentialListFragmentBase fragment) {
         inflater = LayoutInflater.from(fragment.getContext());
         this.fragment = fragment;
-        this.groupListViewModel = groupListViewModel;
 
     }
 
@@ -75,20 +73,6 @@ public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAd
             Credential credential = credentials.get(position);
 
             holder.nameView.setText(credential.getName());
-            groupListViewModel
-                    .getRepo()
-                    .getGroupFromPattern(credential)
-                    .observe(fragment, new Observer<Group>() {
-
-                        @Override
-                        public void onChanged(@Nullable Group group) {
-                            if (group != null) {
-                                holder.nameView.setText(group.getName() + "/" + holder.nameView.getText());
-                            }
-                        }
-                    });
-
-
             holder.patternView.setText(credential.getPatternRepresentationHinted(
                     BaseActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
 

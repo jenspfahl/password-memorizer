@@ -1,28 +1,24 @@
 package de.jepfa.obfusser.ui.navigation;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.service.SecretCheckService;
 import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.BaseFragment;
+import de.jepfa.obfusser.ui.credential.list.CredentialExpandableListFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialListFragment;
+import de.jepfa.obfusser.ui.credential.list.CredentialListFragmentBase;
 import de.jepfa.obfusser.ui.group.list.GroupListFragment;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.list.TemplateListFragment;
+import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 public class NavigationActivity extends BaseActivity {
 
@@ -38,7 +34,7 @@ public class NavigationActivity extends BaseActivity {
                     getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.navigation_tab_container, new CredentialListFragment())
+                            .replace(R.id.navigation_tab_container, getCredentialListFragmentImpl())
                             .commit();
                     return true;
                 case R.id.navigation_templates:
@@ -64,16 +60,6 @@ public class NavigationActivity extends BaseActivity {
             return false;
         }
     };
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Intent startServiceIntent = new Intent(this, SecretCheckService.class);
-        startService(startServiceIntent);
-
-        scheduleSecretChecker();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,27 +92,29 @@ public class NavigationActivity extends BaseActivity {
         }
     }
 
-    private void scheduleSecretChecker() {
-
-        ComponentName serviceComponent = new ComponentName(this, SecretCheckService.class);
-
-        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setPeriodic(2000);
-        JobScheduler jobScheduler = getSystemService(JobScheduler.class);
-        jobScheduler.schedule(builder.build());
-    }
-
     private Fragment getSelectedFragment(int selectedNavId) {
         switch (selectedNavId) {
             case R.id.navigation_credentials:
-                return new CredentialListFragment();
+                return getCredentialListFragmentImpl();
             case R.id.navigation_templates:
                 return new TemplateListFragment();
             case R.id.navigation_groups:
                 return new GroupListFragment();
         }
 
-        return new CredentialListFragment();
+        return getCredentialListFragmentImpl();
+    }
+
+    private CredentialListFragmentBase getCredentialListFragmentImpl() {
+        boolean expandableList = PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, false);
+        if (expandableList) {
+            return new CredentialExpandableListFragment();
+        }
+        else {
+            return new CredentialListFragment();
+        }
     }
 
 }

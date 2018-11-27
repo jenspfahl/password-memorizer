@@ -43,6 +43,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ENABLE_PASSWORD = "pref_enable_password";
     public static final String PREF_SECURITY_PASSWORD = "pref_enable_password";
     public static final String PREF_REFERENCE_PASSWORD = "pref_reference_password";
+    public static final String PREF_EXPANDABLE_CREDENTIAL_LIST = "pref_expandable_credential_list";
 
     private static class EnablePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
 

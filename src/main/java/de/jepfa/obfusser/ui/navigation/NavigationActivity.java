@@ -1,24 +1,25 @@
 package de.jepfa.obfusser.ui.navigation;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.BaseFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialExpandableListFragment;
-import de.jepfa.obfusser.ui.credential.list.CredentialListFragment;
+import de.jepfa.obfusser.ui.credential.list.CredentialFlatListFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialListFragmentBase;
 import de.jepfa.obfusser.ui.group.list.GroupListFragment;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.list.TemplateListFragment;
-import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 public class NavigationActivity extends BaseActivity {
 
@@ -66,6 +67,9 @@ public class NavigationActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
 
+        Toolbar toolbar = findViewById(R.id.activity_navigation_toolbar);
+        setSupportActionBar(toolbar);
+
         int selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -82,6 +86,34 @@ public class NavigationActivity extends BaseActivity {
                     .commit();
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sort_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_group_items) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(this);
+
+            boolean expandableList = defaultSharedPreferences
+                    .getBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, false);
+
+            SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+            editor.putBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, !expandableList);
+            editor.commit();
+
+            recreate();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     protected void refresh(boolean before) {
@@ -113,7 +145,7 @@ public class NavigationActivity extends BaseActivity {
             return new CredentialExpandableListFragment();
         }
         else {
-            return new CredentialListFragment();
+            return new CredentialFlatListFragment();
         }
     }
 

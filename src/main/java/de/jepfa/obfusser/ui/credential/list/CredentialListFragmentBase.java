@@ -30,16 +30,11 @@ import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 public abstract class CredentialListFragmentBase extends BaseFragment implements View.OnClickListener{
 
-    private CredentialListViewModel credentialListViewModel;
-    private GroupListViewModel groupListViewModel;
-    private CredentialExpandableListAdapter expandableAdapter;
-    private CredentialListAdapter listAdapter;
+    protected CredentialListViewModel credentialListViewModel;
+    protected GroupListViewModel groupListViewModel;
 
-    private boolean expandable = true;
 
-    public CredentialListFragmentBase(boolean expandable) {
-        this.expandable = expandable;
-    }
+    protected abstract int getViewId();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +54,7 @@ public abstract class CredentialListFragmentBase extends BaseFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        int viewId = expandable ?
-                R.layout.navtab_credential_expandable_list :
-                R.layout.navtab_credential_list;
-        View view = inflater.inflate(viewId, container, false);
+        View view = inflater.inflate(getViewId(), container, false);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -76,56 +68,9 @@ public abstract class CredentialListFragmentBase extends BaseFragment implements
 
         getActivity().setTitle("Credentials");
 
-        if (expandable) {
-
-            ExpandableListView listView = view.findViewById(R.id.credential_expandable_list);
-            assert listView != null;
-
-            expandableAdapter = new CredentialExpandableListAdapter(this);
-            listView.setAdapter(expandableAdapter);
-
-            //TODO wrong rendering
-            groupListViewModel
-                    .getRepo()
-                    .getAllGroupsSortByName()
-                    .observe(this, new Observer<List<Group>>() {
-                        @Override
-                        public void onChanged(@Nullable final List<Group> groups) {
-                            expandableAdapter.setGroups(groups);
-                        }
-                    });
-
-            credentialListViewModel
-                    .getRepo()
-                    .getAllCredentialsSortByGroupAndName()
-                    .observe(this, new Observer<List<Credential>>() {
-                        @Override
-                        public void onChanged(@Nullable final List<Credential> credentials) {
-                            expandableAdapter.setCredentials(credentials);
-                        }
-                    });
-        }
-        else {
-            RecyclerView recyclerView = view.findViewById(R.id.credential_list);
-            assert recyclerView != null;
-
-            listAdapter = new CredentialListAdapter(this);
-            recyclerView.setAdapter(listAdapter);
-
-
-            credentialListViewModel
-                    .getRepo()
-                    .getAllCredentialsSortByGroupAndName()
-                    .observe(this, new Observer<List<Credential>>() {
-                        @Override
-                        public void onChanged(@Nullable final List<Credential> credentials) {
-                            listAdapter.setCredentials(credentials);
-                        }
-                    });
-        }
-
         return view;
     }
+
 
     @Override
     public void onClick(final View v) {
@@ -157,13 +102,4 @@ public abstract class CredentialListFragmentBase extends BaseFragment implements
         popup.show();
     }
 
-    @Override
-    public void refresh() {
-        if (expandable) {
-            expandableAdapter.notifyDataSetChanged();
-        }
-        else {
-            listAdapter.notifyDataSetChanged();
-        }
-    }
 }

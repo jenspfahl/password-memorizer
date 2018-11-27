@@ -1,6 +1,9 @@
 package de.jepfa.obfusser.ui.credential.list;
 
+import android.arch.core.util.Function;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +33,61 @@ import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 public class CredentialExpandableListFragment extends CredentialListFragmentBase {
 
-    public CredentialExpandableListFragment() {
-        super(true);
+    private CredentialExpandableListAdapter expandableAdapter;
+
+
+    @Override
+    protected int getViewId() {
+        return R.layout.navtab_credential_expandable_list;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        final ExpandableListView listView = view.findViewById(R.id.credential_expandable_list);
+        assert listView != null;
+
+        expandableAdapter = new CredentialExpandableListAdapter(this);
+        listView.setAdapter(expandableAdapter);
+
+
+        //TODO wrong rendering
+        groupListViewModel
+                .getRepo()
+                .getAllGroupsSortByName()
+                .observe(this, new Observer<List<Group>>() {
+                    @Override
+                    public void onChanged(@Nullable final List<Group> groups) {
+                        expandableAdapter.setGroups(groups);
+                        expandAllGroups(listView);
+                    }
+                });
+
+        credentialListViewModel
+                .getRepo()
+                .getAllCredentialsSortByGroupAndName()
+                .observe(this, new Observer<List<Credential>>() {
+                    @Override
+                    public void onChanged(@Nullable final List<Credential> credentials) {
+                        expandableAdapter.setCredentials(credentials);
+                        expandAllGroups(listView);
+                    }
+                });
+
+        return view;
+    }
+
+    private void expandAllGroups(ExpandableListView listView) {
+        if (listView != null) {
+            int count = expandableAdapter.getGroupCount();
+            for (int position = 1; position <= count; position++)
+                listView.expandGroup(position - 1);
+        }
+    }
+
+    @Override
+    public void refresh() {
+        expandableAdapter.notifyDataSetChanged();
     }
 }

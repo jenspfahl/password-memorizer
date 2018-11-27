@@ -1,9 +1,7 @@
 package de.jepfa.obfusser.ui.credential.list;
 
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +13,11 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
-import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
-public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAdapter.ViewHolder> {
+public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder> {
 
     private final CredentialListFragmentBase fragment;
 
@@ -53,7 +49,7 @@ public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAd
         }
     };
 
-    CredentialListAdapter(CredentialListFragmentBase fragment) {
+    CredentialFlatListAdapter(CredentialListFragmentBase fragment) {
         inflater = LayoutInflater.from(fragment.getContext());
         this.fragment = fragment;
 
@@ -61,7 +57,7 @@ public class CredentialListAdapter extends RecyclerView.Adapter<CredentialListAd
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = inflater.inflate(R.layout.credential_list_content,
+        View itemView = inflater.inflate(R.layout.credential_flat_list_content,
                 parent, false);
         return new ViewHolder(itemView);
     }

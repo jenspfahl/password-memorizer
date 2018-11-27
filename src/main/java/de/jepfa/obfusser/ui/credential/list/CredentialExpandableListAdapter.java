@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -83,11 +84,13 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        Group group = (Group) getGroup(groupPosition);
-        if (group != null) {
-            List<Credential> credentials = groupIdCredentials.get(group.getId());
-            if (credentials != null) {
-                return credentials.size();
+        if (groupIdCredentials != null) {
+            Group group = (Group) getGroup(groupPosition);
+            if (group != null) {
+                List<Credential> credentials = groupIdCredentials.get(group.getId());
+                if (credentials != null) {
+                    return credentials.size();
+                }
             }
         }
         return 0;
@@ -152,7 +155,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         Credential credential = (Credential) getChild(groupPosition, childPosition);
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.credential_list_content,
+            convertView = inflater.inflate(R.layout.credential_flat_list_content,
                     parent, false);
         }
 

@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.navigation.NavigationActivity">
+
+    <item
+        android:id="@+id/menu_group_items"
+        android:icon="@drawable/ic_sort_white_24dp"
+        android:title="Group items"
+        app:showAsAction="ifRoom">
+    </item>
+
+</menu>

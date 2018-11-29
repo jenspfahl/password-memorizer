@@ -1,6 +1,5 @@
 package de.jepfa.obfusser.ui.credential.detail;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,8 +14,7 @@ import android.view.MenuItem;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
-import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -27,7 +24,7 @@ import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
 
 
-public class CredentialDetailActivity extends BaseActivity {
+public class CredentialDetailActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
     private TemplateListViewModel templateListViewModel;

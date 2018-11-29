@@ -1,6 +1,5 @@
 package de.jepfa.obfusser.ui.credential.input;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +9,15 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 
 public class SelectTemplateAdapter extends BaseAdapter {
 
-    private final BaseActivity activity;
+    private final SecureActivity activity;
     private List<Template> templates;
     private Context context;
 
-    public SelectTemplateAdapter(Context context, BaseActivity activity) {
+    public SelectTemplateAdapter(Context context, SecureActivity activity) {
         this.context = context;
         this.activity = activity;
     }
@@ -47,7 +46,7 @@ public class SelectTemplateAdapter extends BaseAdapter {
         Template template = templates.get(position);
         textView.setText(template.getName() +
                 " " + template.getPatternRepresentationWithNumberedPlaceholder(
-                BaseActivity.SecretChecker.getOrAskForSecret(activity)
+                SecureActivity.SecretChecker.getOrAskForSecret(activity)
         ));
         return textView;
     }

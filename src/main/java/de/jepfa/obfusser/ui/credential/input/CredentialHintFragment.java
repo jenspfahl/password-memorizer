@@ -3,9 +3,6 @@ package de.jepfa.obfusser.ui.credential.input;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,16 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Secret;
-import de.jepfa.obfusser.ui.BaseActivity;
-import de.jepfa.obfusser.ui.BaseFragment;
+import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 
-import java.util.List;
-
-
-public class CredentialHintFragment extends BaseFragment {
+public class CredentialHintFragment extends SecureFragment {
 
     private CredentialViewModel credentialViewModel;
     private CredentialHintRecyclerViewAdapter adapter;

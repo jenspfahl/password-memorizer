@@ -3,7 +3,6 @@ package de.jepfa.obfusser.ui.template.input;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -16,13 +15,13 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
 
-public class TemplateInputNameActivity extends BaseActivity {
+public class TemplateInputNameActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
     private EditText nameView;

@@ -3,6 +3,8 @@ package de.jepfa.obfusser.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
@@ -48,7 +50,8 @@ public class EncryptUtilTest {
             ObfusString user = ObfusString.fromExchangeFormat("0!xxxX?0!X0");
 
             String pin = String.valueOf(i);
-            byte[] key = EncryptUtil.generateKey(pin);
+            byte[] salt = UUID.randomUUID().toString().getBytes();
+            byte[] key = EncryptUtil.generateKey(pin, salt);
             String origin = user.toRepresentation();
             ObfusString encryptedOS = user.encrypt(key);
             String encrypted = encryptedOS.toRepresentation();
@@ -83,7 +86,8 @@ public class EncryptUtilTest {
 
         for (int i = 0; i < 10000; i++) {
             String pin = String.valueOf(i);
-            byte[] key = EncryptUtil.generateKey(pin);
+            byte[] salt = null;
+            byte[] key = EncryptUtil.generateKey(pin, salt);
 
             String encrypted = EncryptUtil.encryptPlainString(string, key);
             String decrypted = EncryptUtil.decryptPlainString(encrypted, key);
@@ -101,7 +105,7 @@ public class EncryptUtilTest {
         pattern.setPotentialHint(2, "test", null);
         String originalPattern = pattern.toString();
 
-        byte[] key = EncryptUtil.generateKey("1234");
+        byte[] key = EncryptUtil.generateKey("1234", null);
         pattern.encrypt(key);
         System.out.println(pattern);
         pattern.decrypt(key);

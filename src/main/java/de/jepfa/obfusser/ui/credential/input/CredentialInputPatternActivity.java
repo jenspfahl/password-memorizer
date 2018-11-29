@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 
-public class CredentialInputPatternActivity extends BaseActivity {
+public class CredentialInputPatternActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
     private EditText mPatternView;

@@ -10,13 +10,13 @@ import android.widget.Button;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
-public class CredentialInputHintsTextActivity extends BaseActivity {
+public class CredentialInputHintsTextActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
 

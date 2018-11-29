@@ -12,8 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.ui.BaseActivity;
-import de.jepfa.obfusser.ui.BaseFragment;
+import de.jepfa.obfusser.model.Secret;
+import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialExpandableListFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialFlatListFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialListFragmentBase;
@@ -21,7 +22,7 @@ import de.jepfa.obfusser.ui.group.list.GroupListFragment;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.list.TemplateListFragment;
 
-public class NavigationActivity extends BaseActivity {
+public class NavigationActivity extends SecureActivity {
 
     public static final String SELECTED_NAVTAB = "selected_navtab";
 
@@ -91,6 +92,11 @@ public class NavigationActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sort_menu, menu);
+        MenuItem item = menu.findItem(R.id.menu_lock_items);
+        if (item != null) {
+            Secret secret = Secret.getOrCreate();
+            item.setVisible(secret.hasDigest());
+        }
         return true;
     }
 
@@ -109,7 +115,15 @@ public class NavigationActivity extends BaseActivity {
             editor.putBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, !expandableList);
             editor.commit();
 
-            recreate();
+            recreate();//TODO maybe to much?
+            return true;
+        }
+        if (id == R.id.menu_lock_items) {
+            Secret secret = Secret.getOrCreate();
+            if (secret.hasDigest()) {
+                secret.invalidate();
+                recreate();//TODO maybe to much?
+            }
             return true;
         }
 
@@ -118,8 +132,8 @@ public class NavigationActivity extends BaseActivity {
 
     protected void refresh(boolean before) {
         for (Fragment currentFragment : getSupportFragmentManager().getFragments()) {
-            if (currentFragment instanceof BaseFragment && currentFragment.isVisible()) {
-                ((BaseFragment)currentFragment).refresh();
+            if (currentFragment instanceof SecureFragment && currentFragment.isVisible()) {
+                ((SecureFragment)currentFragment).refresh();
             }
         }
     }

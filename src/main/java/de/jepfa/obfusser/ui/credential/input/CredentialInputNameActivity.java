@@ -2,7 +2,6 @@ package de.jepfa.obfusser.ui.credential.input;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,13 +16,13 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 
-public class CredentialInputNameActivity extends BaseActivity {
+public class CredentialInputNameActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
     private EditText nameView;

@@ -1,5 +1,7 @@
 package de.jepfa.obfusser.util;
 
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
+import de.jepfa.obfusser.ui.settings.SettingsActivity;
 
 /**
  * Utils to help with en-/decrypt data and generate keys from user secrets like passwords or pins.
@@ -34,15 +37,18 @@ public class EncryptUtil {
 
 
     /**
-     * Generates a key as byte array from a user seret like password or pin.
+     * Generates a key as byte array from a user secret like password or pin.
      *
      * @param pin
      * @return
      */
-    public static byte[] generateKey(String pin) {
+    public static byte[] generateKey(String pin, byte[] salt) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update(pin.getBytes());
+            if (salt != null) {
+                //messageDigest.update(salt); TODO activate this when it is useful
+            }
             return messageDigest.digest();
         } catch (NoSuchAlgorithmException e) {
             Log.e("KEY", "Cannot get ", e);

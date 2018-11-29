@@ -13,7 +13,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
@@ -70,7 +70,7 @@ public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFl
 
             holder.nameView.setText(credential.getName());
             holder.patternView.setText(credential.getPatternRepresentationHinted(
-                    BaseActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
+                    SecureActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
 
             holder.iconView.setTag(credential);
             holder.nameView.setOnClickListener(onClickListener);

@@ -3,7 +3,6 @@ package de.jepfa.obfusser.ui.group.input;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -16,12 +15,12 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 
-public class GroupInputNameActivity extends BaseActivity {
+public class GroupInputNameActivity extends SecureActivity {
 
     private GroupViewModel groupViewModel;
     private EditText nameView;

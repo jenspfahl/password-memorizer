@@ -4,22 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
-import de.jepfa.obfusser.ui.template.detail.TemplateDetailFragment;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
 
-public class TemplateDetailActivity extends BaseActivity {
+public class TemplateDetailActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
 

@@ -1,6 +1,5 @@
 package de.jepfa.obfusser.ui.template.input;
 
-import android.app.Activity;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -14,14 +13,14 @@ import android.widget.TextView;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 
 public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<TemplateHintRecyclerViewAdapter.ViewHolder> {
 
     private final Template template;
-    private final BaseActivity activity;
+    private final SecureActivity activity;
 
-    public TemplateHintRecyclerViewAdapter(Template template, BaseActivity activity) {
+    public TemplateHintRecyclerViewAdapter(Template template, SecureActivity activity) {
         this.template = template;
         this.activity = activity;
     }
@@ -36,7 +35,7 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        holder.hintData = template.getHintDataByPosition(position, BaseActivity.SecretChecker.getOrAskForSecret(activity));
+        holder.hintData = template.getHintDataByPosition(position, SecureActivity.SecretChecker.getOrAskForSecret(activity));
         NumberedPlaceholder numberedPlaceholder = NumberedPlaceholder.fromPlaceholderNumber(position + 1);
         holder.placeholder.setText(numberedPlaceholder.toRepresentation());
         holder.hint.setText(holder.hintData.second != null ? holder.hintData.second : "");
@@ -57,7 +56,7 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
                     template.setPotentialHint(
                             holder.hintData.first,
                             holder.hint.getText().toString(),
-                            BaseActivity.SecretChecker.getOrAskForSecret(activity));
+                            SecureActivity.SecretChecker.getOrAskForSecret(activity));
                 }
             });
         }

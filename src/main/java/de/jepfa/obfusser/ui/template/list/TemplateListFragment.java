@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,13 +18,13 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseFragment;
+import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
 
 
-public class TemplateListFragment extends BaseFragment implements View.OnClickListener{
+public class TemplateListFragment extends SecureFragment implements View.OnClickListener{
 
     private TemplateListViewModel templateListViewModel;
     private TemplateListAdapter adapter;

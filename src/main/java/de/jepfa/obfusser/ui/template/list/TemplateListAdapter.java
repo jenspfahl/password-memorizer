@@ -1,6 +1,5 @@
 package de.jepfa.obfusser.ui.template.list;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -14,14 +13,14 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapter.ViewHolder> {
 
     private final View.OnClickListener listener;
-    private final BaseActivity activity;
+    private final SecureActivity activity;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView nameView;
@@ -51,7 +50,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
         }
     };
 
-    public TemplateListAdapter(View.OnClickListener listener, Context context, BaseActivity activity) {
+    public TemplateListAdapter(View.OnClickListener listener, Context context, SecureActivity activity) {
         inflater = LayoutInflater.from(context);
         this.listener = listener;
         this.activity = activity;
@@ -70,7 +69,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
             holder.nameView.setText(templates.get(position).getName());
             holder.patternView.setText(
                     templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
-                            BaseActivity.SecretChecker.getOrAskForSecret(activity)
+                            SecureActivity.SecretChecker.getOrAskForSecret(activity)
                     ));
 
             holder.iconView.setTag(templates.get(position));

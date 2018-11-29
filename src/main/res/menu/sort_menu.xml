@@ -4,6 +4,13 @@
     tools:context=".ui.navigation.NavigationActivity">
 
     <item
+        android:id="@+id/menu_lock_items"
+        android:icon="@drawable/ic_lock_outline_white_24dp"
+        android:title="Lock items"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
         android:id="@+id/menu_group_items"
         android:icon="@drawable/ic_sort_white_24dp"
         android:title="Group items"

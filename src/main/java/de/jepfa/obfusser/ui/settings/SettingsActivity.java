@@ -23,6 +23,7 @@ import android.widget.EditText;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
 
 import java.util.List;
@@ -87,7 +88,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         }
                         else {
 
-                            byte[] key = EncryptUtil.generateKey(pwd);
+                            byte[] key = EncryptUtil.generateKey(pwd, SecureActivity.SecretChecker.getApplicationSalt(preference.getContext()));
 
                             if (encrypt) {
                                 SecurityService.startEncryptAll(preference.getContext(), key);

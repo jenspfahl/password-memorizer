@@ -1,14 +1,6 @@
 package de.jepfa.obfusser.model;
 
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.widget.EditText;
-
 import java.util.concurrent.TimeUnit;
-
-import de.jepfa.obfusser.util.EncryptUtil;
 
 /**
  * This singleton holds the current user secret ({@link #digest}) delivered
@@ -32,12 +24,11 @@ public class Secret {
 
     private volatile byte[] digest;
     private volatile long timestamp;
-    private boolean secretDialogOpen;
 
 
     public byte[] getDigest() {
         if (isOutdated()) {
-            setInvalidDigest();
+            invalidate();
         }
 
         return digest;
@@ -48,7 +39,7 @@ public class Secret {
         renew();
     }
 
-    public void setInvalidDigest() {
+    public void invalidate() {
         digest = INVALID_DIGEST;
     }
 
@@ -56,7 +47,7 @@ public class Secret {
         return timestamp;
     }
 
-    public boolean isFilled() {
+    public boolean hasDigest() {
         return digest != null && digest.length > 0;
     }
 

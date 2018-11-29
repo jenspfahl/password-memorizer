@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,7 +17,7 @@ import java.util.Map;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
@@ -165,7 +164,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
 
         nameView.setText(credential.getName());
         patternView.setText(credential.getPatternRepresentationHinted(
-                BaseActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
+                SecureActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
 
         iconView.setTag(credential);
         nameView.setOnClickListener(onClickListener);

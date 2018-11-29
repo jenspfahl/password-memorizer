@@ -2,21 +2,19 @@ package de.jepfa.obfusser.ui.credential.input;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailFragment;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
-public class CredentialInputHintsActivity extends BaseActivity {
+public class CredentialInputHintsActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
 

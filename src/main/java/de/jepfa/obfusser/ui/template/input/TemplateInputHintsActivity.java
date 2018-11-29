@@ -10,12 +10,12 @@ import android.widget.Button;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailFragment;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
-public class TemplateInputHintsActivity extends BaseActivity {
+public class TemplateInputHintsActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
 

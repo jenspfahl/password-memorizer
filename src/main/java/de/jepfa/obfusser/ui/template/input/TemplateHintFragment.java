@@ -3,7 +3,6 @@ package de.jepfa.obfusser.ui.template.input;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.ui.BaseFragment;
+import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
 
-public class TemplateHintFragment extends BaseFragment {
+public class TemplateHintFragment extends SecureFragment {
 
     private TemplateViewModel templateViewModel;
     private TemplateHintRecyclerViewAdapter adapter;

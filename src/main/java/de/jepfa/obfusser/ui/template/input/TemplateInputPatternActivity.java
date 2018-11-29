@@ -14,12 +14,12 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.BaseActivity;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
 
-public class TemplateInputPatternActivity extends BaseActivity {
+public class TemplateInputPatternActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
     private EditText mPatternView;

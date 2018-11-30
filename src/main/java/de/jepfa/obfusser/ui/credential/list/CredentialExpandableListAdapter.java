@@ -164,7 +164,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
 
         nameView.setText(credential.getName());
         patternView.setText(credential.getPatternRepresentationHinted(
-                SecureActivity.SecretChecker.getOrAskForSecret(fragment.getBaseActivity())));
+                SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity())));
 
         iconView.setTag(credential);
         nameView.setOnClickListener(onClickListener);

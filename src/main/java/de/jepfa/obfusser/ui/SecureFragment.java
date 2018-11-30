@@ -11,22 +11,22 @@ public abstract class SecureFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getBaseActivity().securityCheck();
+        getSecureActivity().securityCheck();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        getBaseActivity().securityCheck();
+        getSecureActivity().securityCheck();
     }
 
-    public SecureActivity getBaseActivity() {
+    public SecureActivity getSecureActivity() {
         FragmentActivity activity = getActivity();
         if (activity instanceof SecureActivity) {
             return (SecureActivity) activity;
         }
-        throw new IllegalStateException("Programming Error, all BaseFragmens should belong to SecureActivity class");
+        throw new IllegalStateException("Programming Error, all SecureFragmens should belong to SecureActivity class");
     }
 
     public abstract void refresh();

@@ -43,7 +43,7 @@ public class CredentialHintFragment extends SecureFragment {
 
             adapter = new CredentialHintRecyclerViewAdapter(
                     credentialViewModel.getCredential().getValue(),
-                    getBaseActivity());
+                    getSecureActivity());
 
             recyclerView.setAdapter(
                     adapter);

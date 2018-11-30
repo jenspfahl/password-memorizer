@@ -64,7 +64,7 @@ public class TemplateListFragment extends SecureFragment implements View.OnClick
         RecyclerView recyclerView = view.findViewById(R.id.template_list);
         assert recyclerView != null;
 
-        adapter = new TemplateListAdapter(this, this.getContext(), getBaseActivity());
+        adapter = new TemplateListAdapter(this, this.getContext(), getSecureActivity());
         recyclerView.setAdapter(adapter);
 
 

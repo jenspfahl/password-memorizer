@@ -41,7 +41,7 @@ public class TemplateHintFragment extends SecureFragment {
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             adapter = new TemplateHintRecyclerViewAdapter(
-                    templateViewModel.getTemplate().getValue(), getBaseActivity());
+                    templateViewModel.getTemplate().getValue(), getSecureActivity());
             recyclerView.setAdapter(adapter);
         }
         return view;

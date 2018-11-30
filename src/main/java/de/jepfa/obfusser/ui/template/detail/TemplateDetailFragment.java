@@ -79,7 +79,7 @@ public class TemplateDetailFragment extends SecureFragment {
 
     private void onCreateForShowTemplateDetails(final Template template, final TextView obfusTextView) {
         String patternString = buildPatternString(template,
-                template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())),
+                template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
                 false);
         SpannableString span = getSpannableString(template, patternString);
 
@@ -95,12 +95,12 @@ public class TemplateDetailFragment extends SecureFragment {
                 String finalPatternString;
                 if (counter % 2 == 0) {
                     finalPatternString = buildPatternString(template,
-                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())),
+                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
                             false);
                 }
                 else {
                     finalPatternString = buildPatternString(template,
-                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())),
+                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
                             true);
                 }
 
@@ -113,21 +113,21 @@ public class TemplateDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewTemplateInputHints(Template template, TextView obfusTextView) {
-        String patternString = template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+        String patternString = template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
         SpannableString span = getSpannableString(template, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
     }
 
     private void onCreateForNewTemplateSelectHints(final Template template, final TextView obfusTextView) {
-        String patternString = template.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+        String patternString = template.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
         final SpannableString span = new SpannableString(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {
             int j = i + 1;
 
             final boolean fenabled;
-            String hint = template.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+            String hint = template.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
             if (hint != null) {
                 fenabled = true;
             }
@@ -191,7 +191,7 @@ public class TemplateDetailFragment extends SecureFragment {
             //TODO move this in anotherUI component, so pattern can be fit automatically to the screen size w/o hints
             sb.append(System.lineSeparator());
             int counter = 0;
-            for (String hint : template.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())).values()) {
+            for (String hint : template.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())).values()) {
                 counter++;
                 sb.append(System.lineSeparator());
                 sb.append(NumberedPlaceholder.fromPlaceholderNumber(counter).toRepresentation());
@@ -212,7 +212,7 @@ public class TemplateDetailFragment extends SecureFragment {
         int size = template.getPatternLength();
         for (int i = 0; i < size; i++) {
             int j = i + 1;
-            String hint = template.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+            String hint = template.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
             if (hint != null) {
                 span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), i, j, Spanned.SPAN_MARK_MARK);
             }

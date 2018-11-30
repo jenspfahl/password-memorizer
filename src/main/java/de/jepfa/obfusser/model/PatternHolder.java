@@ -129,6 +129,9 @@ public abstract class PatternHolder extends IdEntity {
 
     @Ignore
     public int getPatternLength() {
+        if (patternInternal == null) {
+            return 0;
+        }
         return patternInternal.length();
     }
 

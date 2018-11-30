@@ -95,7 +95,7 @@ public class NavigationActivity extends SecureActivity {
         MenuItem item = menu.findItem(R.id.menu_lock_items);
         if (item != null) {
             Secret secret = Secret.getOrCreate();
-            item.setVisible(secret.hasDigest());
+            item.setVisible(secret.hasDigest());//TODO use also unlock-icon
         }
         return true;
     }
@@ -131,10 +131,15 @@ public class NavigationActivity extends SecureActivity {
     }
 
     protected void refresh(boolean before) {
-        for (Fragment currentFragment : getSupportFragmentManager().getFragments()) {
-            if (currentFragment instanceof SecureFragment && currentFragment.isVisible()) {
-                ((SecureFragment)currentFragment).refresh();
+        if (before) {
+            for (Fragment currentFragment : getSupportFragmentManager().getFragments()) {
+                if (currentFragment instanceof SecureFragment && currentFragment.isVisible()) {
+                    ((SecureFragment) currentFragment).refresh();
+                }
             }
+        }
+        else {
+            recreate();
         }
     }
 

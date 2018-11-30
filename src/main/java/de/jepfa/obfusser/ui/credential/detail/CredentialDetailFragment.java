@@ -34,6 +34,7 @@ public class CredentialDetailFragment extends SecureFragment {
     public static final int SHOW_CREDENTIAL_DETAIL = 1;
     public static final int NEW_CREDENTIAL_SELECT_HINTS = 2;
     public static final int NEW_CREDENTIAL_INPUT_HINTS = 3;
+    public static final int NEW_CREDENTIAL_BUILDER = 4;
 
     private int mode;
     private CredentialViewModel credentialViewModel;
@@ -69,6 +70,9 @@ public class CredentialDetailFragment extends SecureFragment {
                 case SHOW_CREDENTIAL_DETAIL :
                     onCreateForShowCredentialDetails(credential, obfusTextView);
                     break;
+                case NEW_CREDENTIAL_BUILDER:
+                    onCreateForNewCredentialBuilder(credential, obfusTextView);
+                    break;
             }
 
             //TODO fitSizeToScreen(obfusTextView);
@@ -80,7 +84,7 @@ public class CredentialDetailFragment extends SecureFragment {
     private void onCreateForShowCredentialDetails(final Credential credential, final TextView obfusTextView) {
         String patternString = buildPatternString(
                 credential, 
-                credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())),
+                credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
                 false);
         SpannableString span = getSpannableString(credential, patternString);
 
@@ -95,13 +99,13 @@ public class CredentialDetailFragment extends SecureFragment {
 
                 String finalPatternString;
                 if (counter % 3 == 0) {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())), false);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), false);
                 }
                 else if (counter % 3 == 1) {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())), true);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), true);
                 }
                 else {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())), false);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), false);
                 }
 
                 SpannableString span = getSpannableString(credential, finalPatternString);
@@ -113,21 +117,26 @@ public class CredentialDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewCredentialInputHints(Credential credential, TextView obfusTextView) {
-        String patternString = credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+        String patternString = credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
         SpannableString span = getSpannableString(credential, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
     }
 
+    private void onCreateForNewCredentialBuilder(Credential credential, TextView obfusTextView) {
+        String patternString = credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        obfusTextView.setText(patternString);
+    }
+
     private void onCreateForNewCredentialSelectHints(final Credential credential, final TextView obfusTextView) {
-        String patternString = credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+        String patternString = credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
         final SpannableString span = new SpannableString(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {
             int j = i + 1;
 
             final boolean fenabled;
-            String hint = credential.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+            String hint = credential.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
             if (hint != null) {
                 fenabled = true;
             }
@@ -191,7 +200,7 @@ public class CredentialDetailFragment extends SecureFragment {
             //TODO move this in anotherUI component, so pattern can be fit automatically to the screen size w/o hints
             sb.append(System.lineSeparator());
             int counter = 0;
-            for (String hint : credential.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity())).values()) {
+            for (String hint : credential.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())).values()) {
                 counter++;
                 sb.append(System.lineSeparator());
                 sb.append(NumberedPlaceholder.fromPlaceholderNumber(counter).toRepresentation());
@@ -209,7 +218,7 @@ public class CredentialDetailFragment extends SecureFragment {
         int size = credential.getPatternLength();
         for (int i = 0; i < size; i++) {
             int j = i + 1;
-            String hint = credential.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getBaseActivity()));
+            String hint = credential.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
             if (hint != null) {
                 span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), i, j, Spanned.SPAN_MARK_MARK);
             }

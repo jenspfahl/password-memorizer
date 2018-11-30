@@ -65,6 +65,18 @@ public class CredentialInputPatternActivity extends SecureActivity {
             }
         });
 
+        View buildPattern = findViewById(R.id.link_to_pattern_builder);
+        buildPattern.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getBaseContext(), CredentialBuildPatternActivity.class);
+                IntentUtil.setCredentialExtra(intent, credential);
+                startActivity(intent);
+            }
+        });
+
+
         Button nextStepButton = findViewById(R.id.credential_next_step);
         nextStepButton.setOnClickListener(new OnClickListener() {
             @Override

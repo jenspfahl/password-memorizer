@@ -26,6 +26,7 @@ import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 public class CredentialBuildPatternActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
+    private String originPattern;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class CredentialBuildPatternActivity extends SecureActivity {
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         final Credential credential = credentialViewModel.getCredential().getValue();
-
+        originPattern = credential.getPatternInternal();
         if (savedInstanceState == null) {
 
             Bundle arguments = new Bundle();
@@ -99,6 +100,7 @@ public class CredentialBuildPatternActivity extends SecureActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             Credential credential = credentialViewModel.getCredential().getValue();
+            credential.setPatternInternal(originPattern);
             Intent intent = new Intent(this, CredentialInputPatternActivity.class);
             IntentUtil.setCredentialExtra(intent, credential);
             navigateUpTo(intent);

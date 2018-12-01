@@ -15,12 +15,13 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 
-public class GroupInputNameActivity extends SecureActivity {
+public class GroupInputNameActivity extends BaseActivity {
 
     private GroupViewModel groupViewModel;
     private EditText nameView;
@@ -121,10 +122,6 @@ public class GroupInputNameActivity extends SecureActivity {
             navigateUpTo(upIntent);
 
         }
-    }
-
-    @Override
-    public void refresh(boolean before) {
     }
 
 }

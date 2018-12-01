@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.ui.group.input.GroupInputNameActivity;
@@ -17,7 +18,7 @@ import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 
-public class GroupDetailActivity extends SecureActivity {
+public class GroupDetailActivity extends BaseActivity {
 
     private GroupViewModel groupViewModel;
 
@@ -88,10 +89,6 @@ public class GroupDetailActivity extends SecureActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void refresh(boolean before) {
     }
 
 }

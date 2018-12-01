@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -26,42 +27,8 @@ public class NavigationActivity extends SecureActivity {
 
     public static final String SELECTED_NAVTAB = "selected_navtab";
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+    private int selectedNavId;
 
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_credentials:
-                    getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.navigation_tab_container, getCredentialListFragmentImpl())
-                            .commit();
-                    return true;
-                case R.id.navigation_templates:
-                    getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_templates);
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.navigation_tab_container, new TemplateListFragment())
-                            .commit();
-                    return true;
-                case R.id.navigation_groups:
-                    getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_groups);
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.navigation_tab_container, new GroupListFragment())
-                            .commit();
-                    return true;
-                case R.id.navigation_settings:
-                    Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
-                    startActivity(intent);
-
-                    return true;
-            }
-            return false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +38,17 @@ public class NavigationActivity extends SecureActivity {
         Toolbar toolbar = findViewById(R.id.activity_navigation_toolbar);
         setSupportActionBar(toolbar);
 
-        int selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
+        selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                return refreshContainerFragment(item.getItemId());
+            }
+        });
         navigation.setSelectedItemId(selectedNavId);
 
         if (savedInstanceState == null) {
@@ -89,47 +63,6 @@ public class NavigationActivity extends SecureActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sort_menu, menu);
-        MenuItem item = menu.findItem(R.id.menu_lock_items);
-        if (item != null) {
-            Secret secret = Secret.getOrCreate();
-            item.setVisible(secret.hasDigest());//TODO use also unlock-icon
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.menu_group_items) {
-            SharedPreferences defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-
-            boolean expandableList = defaultSharedPreferences
-                    .getBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, false);
-
-            SharedPreferences.Editor editor = defaultSharedPreferences.edit();
-            editor.putBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, !expandableList);
-            editor.commit();
-
-            recreate();//TODO maybe to much?
-            return true;
-        }
-        if (id == R.id.menu_lock_items) {
-            Secret secret = Secret.getOrCreate();
-            if (secret.hasDigest()) {
-                secret.invalidate();
-                recreate();//TODO maybe to much?
-            }
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     protected void refresh(boolean before) {
         if (before) {
             for (Fragment currentFragment : getSupportFragmentManager().getFragments()) {
@@ -141,6 +74,42 @@ public class NavigationActivity extends SecureActivity {
         else {
             recreate();
         }
+    }
+
+    public boolean refreshContainerFragment() {
+        return refreshContainerFragment(selectedNavId);
+    }
+
+    private boolean refreshContainerFragment(int selectedNavId) {
+        switch (selectedNavId) {
+            case R.id.navigation_credentials:
+                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.navigation_tab_container, getCredentialListFragmentImpl())
+                        .commit();
+                return true;
+            case R.id.navigation_templates:
+                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_templates);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.navigation_tab_container, new TemplateListFragment())
+                        .commit();
+                return true;
+            case R.id.navigation_groups:
+                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_groups);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.navigation_tab_container, new GroupListFragment())
+                        .commit();
+                return true;
+            case R.id.navigation_settings:
+                Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
+                startActivity(intent);
+
+                return true;
+        }
+        return false;
     }
 
     private Fragment getSelectedFragment(int selectedNavId) {

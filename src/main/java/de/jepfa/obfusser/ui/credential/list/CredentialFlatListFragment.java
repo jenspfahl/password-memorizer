@@ -21,8 +21,9 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
 
     @Override
     protected int getViewId() {
-        return R.layout.navtab_credential_list;
+        return R.layout.navtab_credential_flat_list;
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

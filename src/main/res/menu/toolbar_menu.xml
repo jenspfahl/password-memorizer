@@ -4,6 +4,13 @@
     tools:context=".ui.navigation.NavigationActivity">
 
     <item
+        android:id="@+id/menu_help"
+        android:icon="@drawable/ic_help_outline_white_24dp"
+        android:title="Help"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
         android:id="@+id/menu_lock_items"
         android:icon="@drawable/ic_lock_outline_white_24dp"
         android:title="Lock items"

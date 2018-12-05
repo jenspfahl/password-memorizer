@@ -122,9 +122,15 @@ public abstract class SecureActivity extends BaseActivity {
             final EditText input = new EditText(activity);
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-            builder.setTitle("Enter PIN")
-                    .setMessage("Login!")
+            builder.setTitle("Password required")
+                    .setMessage("Please enter your password to encrypt your patterns.")
                     .setView(input)
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            secretDialogOpen = false;
+                        }
+                    })
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             String pwd = input.getText().toString();
@@ -135,8 +141,8 @@ public abstract class SecureActivity extends BaseActivity {
                                 secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
                                 activity.refresh(false); // show correct encrypted data
                             }
-                            secretDialogOpen = false;
 
+                            secretDialogOpen = false;
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)

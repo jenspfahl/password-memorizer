@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.ui.settings;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,12 +18,17 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
+import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
 
@@ -48,66 +54,105 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static class EnablePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
 
+        private final Activity activity;
+
+        public EnablePasswordPreferenceListener(Activity activity) {
+            this.activity = activity;
+        }
 
         @Override
-        public boolean onPreferenceChange(final Preference preference, Object value) {
+        public boolean onPreferenceChange(Preference preference, Object value) {
             boolean enabled = Boolean.parseBoolean(value.toString());
 
-            inputPasswordAndCrypt(preference, enabled);
+            inputPasswordAndCrypt(activity, preference, enabled);
 
             return true;
         }
     }
 
-    private static void inputPasswordAndCrypt(final Preference preference, final boolean encrypt) {
+    private static void inputPasswordAndCrypt(Activity activity, final Preference preference, final boolean encrypt) {
+        LayoutInflater inflater = activity.getLayoutInflater();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
-
-        final EditText input = new EditText(preference.getContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-        String message = encrypt ? "For encryption" : "For decryption";
-        builder.setTitle("Enter a password")
+        String message = encrypt
+                ? "Your password is used to encrypt all data. It is important to remember this password, there is no recovery. It can be an easy one, since wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns look like."
+                : "Enter your password to disable pattern encryption. It is important to type it correctly, otherwise the patterns will be decrypted in a different way. This is not undo-able.";
+        final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
+        final AlertDialog dialog = builder.setTitle("Enter and confirm a password")
                 .setMessage(message)
-                .setView(input)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setView(passwordView)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                buttonPositive.setOnClickListener(new View.OnClickListener() {
+
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(View view) {
+                        TextView firstPassword = passwordView.findViewById(R.id.first_password);
+                        String pwd = firstPassword.getText().toString();
+                        if (TextUtils.isEmpty(pwd)) {
+                            firstPassword.setError("Password required");
+                            return;
+                        }
+
+                        TextView secondPassword = passwordView.findViewById(R.id.second_password);
+                        String pwd2 = secondPassword.getText().toString();
+                        if (TextUtils.isEmpty(pwd2)) {
+                            secondPassword.setError("Password confirmation required");
+                            return;
+                        }
+
+                        if (!TextUtils.equals(pwd, pwd2)) {
+                            secondPassword.setError("Password not equal");
+                            return;
+                        }
+
+
+                        byte[] key = EncryptUtil.generateKey(pwd, SecureActivity.SecretChecker.getApplicationSalt(preference.getContext()));
+
+                        if (encrypt) {
+                            SecurityService.startEncryptAll(preference.getContext(), key);
+
+                            Secret secret = Secret.getOrCreate();
+                            secret.setDigest(key);
+                        }
+                        else {
+                            SecurityService.startDecryptAll(preference.getContext(), key);
+                            Secret secret = Secret.getOrCreate();
+                            secret.setDigest(null);
+                        }
+
+                        dialog.dismiss();
+                    }
+                });
+
+                Button buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                buttonNegative.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
                         SharedPreferences.Editor editor = preference.getEditor();
                         editor.putBoolean(PREF_ENABLE_PASSWORD, !encrypt);
                         editor.commit();
                         SwitchPreference switchPreference = (SwitchPreference) preference;
                         switchPreference.setChecked(!encrypt);
 
+                        dialog.dismiss();
                     }
-                })
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pwd = input.getText().toString();
-                        if (TextUtils.isEmpty(pwd)) {
-                            input.setError("Password required");
-                        }
-                        else {
-
-                            byte[] key = EncryptUtil.generateKey(pwd, SecureActivity.SecretChecker.getApplicationSalt(preference.getContext()));
-
-                            if (encrypt) {
-                                SecurityService.startEncryptAll(preference.getContext(), key);
-
-                                Secret secret = Secret.getOrCreate();
-                                secret.setDigest(key);
-                            }
-                            else {
-                                SecurityService.startDecryptAll(preference.getContext(), key);
-                                Secret secret = Secret.getOrCreate();
-                                secret.setDigest(null);
-                            }
-                        }
+                });
+            }
+        });
+        dialog.show();
 
 
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 
     private static class ReferencePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
@@ -191,7 +236,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
             Preference passwordEnablePref = findPreference(PREF_ENABLE_PASSWORD);
-            passwordEnablePref.setOnPreferenceChangeListener(new EnablePasswordPreferenceListener());
+            passwordEnablePref.setOnPreferenceChangeListener(
+                    new EnablePasswordPreferenceListener(getActivity()));
 
             Preference referencePasswordPref = findPreference(PREF_REFERENCE_PASSWORD);
             referencePasswordPref.setOnPreferenceChangeListener(new ReferencePasswordPreferenceListener());

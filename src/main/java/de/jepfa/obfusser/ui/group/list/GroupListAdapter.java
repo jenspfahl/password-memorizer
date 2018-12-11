@@ -18,7 +18,7 @@ import de.jepfa.obfusser.util.IntentUtil;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
 
-    private final View.OnClickListener listener;
+    private final View.OnClickListener onClickOptionsListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView nameView;
@@ -29,13 +29,13 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             nameView = view.findViewById(R.id.group_list_name);
             iconView = view.findViewById(R.id.group_list_menu_popup);
 
-            iconView.setOnClickListener(listener);
+            iconView.setOnClickListener(onClickOptionsListener);
         }
     }
 
     private final LayoutInflater inflater;
     private List<Group> groups; // Cached copy of groups
-    private final View.OnClickListener onClickListener = new View.OnClickListener() {
+    private final View.OnClickListener onClickShowDetailListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Group item = (Group) view.getTag();
@@ -46,9 +46,9 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         }
     };
 
-    public GroupListAdapter(View.OnClickListener listener, Context context) {
+    public GroupListAdapter(View.OnClickListener onClickOptionsListener, Context context) {
         inflater = LayoutInflater.from(context);
-        this.listener = listener;
+        this.onClickOptionsListener = onClickOptionsListener;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             holder.nameView.setText(groups.get(position).getName());
 
             holder.iconView.setTag(groups.get(position));
-            holder.nameView.setOnClickListener(onClickListener);
+            holder.nameView.setOnClickListener(onClickShowDetailListener);
             holder.nameView.setTag(groups.get(position));
         }
     }

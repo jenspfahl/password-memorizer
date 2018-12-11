@@ -3,27 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:stretchColumns="0,1"
     tools:context=".ui.group.list.GroupListFragment"
     android:orientation="horizontal">
     <TableRow>
 
+        <ImageView
+            android:id="@+id/group_selection_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_radio_button_unchecked_black_24dp"/>
+
         <TextView
-            android:id="@+id/group_list_name"
+            android:id="@+id/group_selection_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:lines="2"
             android:textAppearance="?attr/textAppearanceListItem" />
-
-        <ImageView
-            android:id="@+id/group_list_menu_popup"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/title_group_detail"
-            android:src="@drawable/ic_action_name"
-            android:text="Show Popup Menu" />
     </TableRow>
 </TableLayout>

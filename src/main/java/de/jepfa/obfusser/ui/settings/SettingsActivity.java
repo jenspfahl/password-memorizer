@@ -48,8 +48,6 @@ import java.util.List;
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static final String PREF_ENABLE_PASSWORD = "pref_enable_password";
-    public static final String PREF_SECURITY_PASSWORD = "pref_enable_password";
-    public static final String PREF_REFERENCE_PASSWORD = "pref_reference_password";
     public static final String PREF_EXPANDABLE_CREDENTIAL_LIST = "pref_expandable_credential_list";
 
     private static class EnablePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
@@ -238,14 +236,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Preference passwordEnablePref = findPreference(PREF_ENABLE_PASSWORD);
             passwordEnablePref.setOnPreferenceChangeListener(
                     new EnablePasswordPreferenceListener(getActivity()));
-
-            Preference referencePasswordPref = findPreference(PREF_REFERENCE_PASSWORD);
-            referencePasswordPref.setOnPreferenceChangeListener(new ReferencePasswordPreferenceListener());
-            Object referencePasswordValue = PreferenceManager
-                    .getDefaultSharedPreferences(referencePasswordPref.getContext())
-                    .getString(referencePasswordPref.getKey(), "");
-            referencePasswordPref.setSummary(referencePasswordValue.toString());
-
 
         }
 

@@ -6,14 +6,4 @@
         android:summary="@string/pref_description_enable_password"
         android:title="@string/pref_title_enable_password" />
 
-    <EditTextPreference
-        android:dependency="pref_enable_password"
-        android:summary="@string/pref_description_reference_password"
-        android:key="pref_reference_password"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/pref_title_reference_password" />
-
-
 </PreferenceScreen>

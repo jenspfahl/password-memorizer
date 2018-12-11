@@ -6,11 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.Spinner;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 public class SelectGroupForCredentialActivity extends SecureActivity
-implements AdapterView.OnItemSelectedListener{
+implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
 
     private GroupListViewModel groupListViewModel;
     private CredentialViewModel credentialViewModel;
@@ -46,11 +46,11 @@ implements AdapterView.OnItemSelectedListener{
                 .of(this)
                 .get(GroupListViewModel.class);
 
-        final Spinner spinner = findViewById(R.id.select_group);
+        final RecyclerView view = findViewById(R.id.group_selection);
 
         final SelectGroupAdapter adapter = new SelectGroupAdapter(getBaseContext());
 
-        spinner.setAdapter(adapter);
+        view.setAdapter(adapter);
 
         groupListViewModel
                 .getRepo()
@@ -58,21 +58,17 @@ implements AdapterView.OnItemSelectedListener{
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {
-                        adapter.setGroups(groups);
 
-                        spinner.setSelected(false);
+                        Integer selectedGroupId = null;
                         if (credential.getGroupId() != null) {
-                            Integer position = adapter.getPositionForGroupId(credential.getGroupId());
-                            if (position != null) {
-                                spinner.setSelection(position);
-                            }
+                            selectedGroupId  = credential.getGroupId();
                         }
+
+                        adapter.setGroupsAndSelection(groups, selectedGroupId);
 
                     }
                 });
 
-
-        spinner.setOnItemSelectedListener(this);
 
         Button nextStepButton = findViewById(R.id.credential_next_step);
         nextStepButton.setOnClickListener(new View.OnClickListener() {

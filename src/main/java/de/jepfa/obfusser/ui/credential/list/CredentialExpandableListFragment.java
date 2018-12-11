@@ -35,27 +35,22 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
         expandableAdapter = new CredentialExpandableListAdapter(this);
         listView.setAdapter(expandableAdapter);
 
-
-        //TODO wrong rendering
-        groupListViewModel
-                .getRepo()
-                .getAllGroupsSortByName()
-                .observe(this, new Observer<List<Group>>() {
-                    @Override
-                    public void onChanged(@Nullable final List<Group> groups) {
-                        expandableAdapter.setGroups(groups);
-                        expandAllGroups(listView);
-                    }
-                });
-
         credentialListViewModel
                 .getRepo()
                 .getAllCredentialsSortByGroupAndName()
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {
-                        expandableAdapter.setCredentials(credentials);
-                        expandAllGroups(listView);
+                        groupListViewModel
+                                .getRepo()
+                                .getAllGroupsSortByName()
+                                .observe(CredentialExpandableListFragment.this, new Observer<List<Group>>() {
+                                    @Override
+                                    public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call
+                                        expandableAdapter.setCredentials(groups, credentials);
+                                        expandAllGroups(listView);
+                                    }
+                                });
                     }
                 });
 

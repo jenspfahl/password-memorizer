@@ -49,17 +49,9 @@ public class NavigationActivity extends SecureActivity {
                 return refreshContainerFragment(item.getItemId());
             }
         });
+
         navigation.setSelectedItemId(selectedNavId);
-
-        if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
-
-            Fragment fragment = getSelectedFragment(selectedNavId);
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.navigation_tab_container, fragment)
-                    .commit();
-        }
+        refreshContainerFragment();
 
     }
 

@@ -11,9 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import java.util.List;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
@@ -22,8 +25,7 @@ import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
-public class SelectGroupForCredentialActivity extends SecureActivity
-implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
+public class SelectGroupForCredentialActivity extends SecureActivity implements AdapterView.OnItemSelectedListener{
 
     private GroupListViewModel groupListViewModel;
     private CredentialViewModel credentialViewModel;
@@ -35,7 +37,7 @@ implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         final Credential credential = credentialViewModel.getCredential().getValue();
-        setTitle("Assign group for " + credential.getName());
+        setTitle("Assign to group for " + credential.getName());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -46,11 +48,14 @@ implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
                 .of(this)
                 .get(GroupListViewModel.class);
 
-        final RecyclerView view = findViewById(R.id.group_selection);
+        final RadioGroup view = findViewById(R.id.group_selection);
 
-        final SelectGroupAdapter adapter = new SelectGroupAdapter(getBaseContext());
-
-        view.setAdapter(adapter);
+        view.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                credential.setGroupId(checkedId != Constants.NO_GROUP_ID ? checkedId : null);
+            }
+        });
 
         groupListViewModel
                 .getRepo()
@@ -64,8 +69,23 @@ implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
                             selectedGroupId  = credential.getGroupId();
                         }
 
-                        adapter.setGroupsAndSelection(groups, selectedGroupId);
+                        RadioButton noGroupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
+                        noGroupRadioButton.setId(Constants.NO_GROUP_ID);
+                        noGroupRadioButton.setText(Constants.NO_GROUP_NAME);
+                        if (selectedGroupId == null) {
+                            noGroupRadioButton.setChecked(true);
+                        }
+                        view.addView(noGroupRadioButton);
 
+                        for (Group group : groups) {
+                            RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
+                            groupRadioButton.setId(group.getId());
+                            groupRadioButton.setText(group.getName());
+                            if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
+                                groupRadioButton.setChecked(true);
+                            }
+                            view.addView(groupRadioButton);
+                        }
                     }
                 });
 
@@ -77,10 +97,8 @@ implements AdapterView.OnItemSelectedListener{  //TODO change to full dialog
                 Credential credential = credentialViewModel.getCredential().getValue();
                 credentialViewModel.getRepo().update(credential);
 
-                //Intent replyIntent = new Intent(getBaseContext(), NavigationActivity.class);
-                //startActivity(replyIntent);
                 Intent upIntent = new Intent(getBaseContext(), NavigationActivity.class);
-                upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials);
+                upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials); //TODO destination should be dynamic
                 navigateUpTo(upIntent);
             }
         });

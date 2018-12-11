@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
@@ -22,8 +23,6 @@ import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
-
-    public static final int NO_GROUP_ID = Integer.MIN_VALUE;
 
     private final CredentialListFragmentBase fragment;
     private final LayoutInflater inflater;
@@ -47,24 +46,31 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
         this.fragment = fragment;
     }
 
-    void setGroups(List<Group> groups) {
-        this.groups = new ArrayList<>(groups);
-        Group noGroupGroup = new Group();
-        noGroupGroup.setId(NO_GROUP_ID);
-        noGroupGroup.setName("-no group-");
-        this.groups.add(0, noGroupGroup);
-        notifyDataSetChanged();
-    }
-
-    void setCredentials(List<Credential> credentials) {
+    void setCredentials(List<Group> allGroups, List<Credential> credentials) {
+        groups = new ArrayList<>(allGroups.size());
         groupIdCredentials = new HashMap<>();
+
+
         for (Credential credential : credentials) {
-            Integer groupId = credential.getGroupId();
-            if (groupId == null) {
-                groupId = NO_GROUP_ID;
+            int groupId;
+            if (credential.getGroupId() != null) {
+                groupId = credential.getGroupId();
+            }
+            else {
+                groupId = Constants.NO_GROUP_ID;
             }
             if (!groupIdCredentials.containsKey(groupId)) {
                 groupIdCredentials.put(groupId, new ArrayList<Credential>());
+                Group assocGroup = findGroup(allGroups, groupId);
+                if (assocGroup != null) {
+                    groups.add(assocGroup);
+                }
+                else {
+                    Group noGroupGroup = new Group();
+                    noGroupGroup.setId(Constants.NO_GROUP_ID);
+                    noGroupGroup.setName(Constants.NO_GROUP_NAME);
+                    groups.add(0, noGroupGroup);
+                }
             }
             List<Credential> credentialsForGroup = groupIdCredentials.get(groupId);
             credentialsForGroup.add(credential);
@@ -76,8 +82,8 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        if (groupIdCredentials != null)
-            return groupIdCredentials.keySet().size();
+        if (groups != null)
+            return groups.size();
         else return 0;
     }
 
@@ -179,6 +185,16 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+
+
+    private Group findGroup(List<Group> groups, int groupId) {
+        for (Group group : groups) {
+            if (group.getId() == groupId) {
+                return group;
+            }
+        }
+        return null;
     }
 
 }

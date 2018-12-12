@@ -153,19 +153,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     }
 
-    private static class ReferencePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
-
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-            preference.setSummary(stringValue); //TODO really needed to show this in settings overview?
-
-            return true;
-        }
-    }
-
-
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.

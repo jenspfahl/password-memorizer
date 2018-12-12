@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
@@ -28,6 +29,7 @@ public class NavigationActivity extends SecureActivity {
     public static final String SELECTED_NAVTAB = "selected_navtab";
 
     private int selectedNavId;
+    private BottomNavigationView navigation;
 
 
     @Override
@@ -40,7 +42,7 @@ public class NavigationActivity extends SecureActivity {
 
         selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -50,9 +52,16 @@ public class NavigationActivity extends SecureActivity {
             }
         });
 
-        navigation.setSelectedItemId(selectedNavId);
         refreshContainerFragment();
+        navigation.setSelectedItemId(selectedNavId);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
+        navigation.setSelectedItemId(selectedNavId);
     }
 
     protected void refresh(boolean before) {
@@ -75,24 +84,12 @@ public class NavigationActivity extends SecureActivity {
     private boolean refreshContainerFragment(int selectedNavId) {
         switch (selectedNavId) {
             case R.id.navigation_credentials:
-                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.navigation_tab_container, getCredentialListFragmentImpl())
-                        .commit();
-                return true;
             case R.id.navigation_templates:
-                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_templates);
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.navigation_tab_container, new TemplateListFragment())
-                        .commit();
-                return true;
             case R.id.navigation_groups:
-                getIntent().putExtra(SELECTED_NAVTAB, R.id.navigation_groups);
+                getIntent().putExtra(SELECTED_NAVTAB, selectedNavId);
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.navigation_tab_container, new GroupListFragment())
+                        .replace(R.id.navigation_tab_container, getSelectedFragment(selectedNavId))
                         .commit();
                 return true;
             case R.id.navigation_settings:

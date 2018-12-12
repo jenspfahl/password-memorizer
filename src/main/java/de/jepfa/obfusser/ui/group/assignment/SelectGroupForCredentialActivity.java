@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -25,7 +23,7 @@ import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
-public class SelectGroupForCredentialActivity extends SecureActivity implements AdapterView.OnItemSelectedListener{
+public class SelectGroupForCredentialActivity extends SecureActivity {
 
     private GroupListViewModel groupListViewModel;
     private CredentialViewModel credentialViewModel;
@@ -48,12 +46,12 @@ public class SelectGroupForCredentialActivity extends SecureActivity implements 
                 .of(this)
                 .get(GroupListViewModel.class);
 
-        final RadioGroup view = findViewById(R.id.group_selection);
+        final RadioGroup radioGroup = findViewById(R.id.group_selection);
 
-        view.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                credential.setGroupId(checkedId != Constants.NO_GROUP_ID ? checkedId : null);
+                credential.setGroupId(checkedId != Constants.NO_ID ? checkedId : null);
             }
         });
 
@@ -70,12 +68,12 @@ public class SelectGroupForCredentialActivity extends SecureActivity implements 
                         }
 
                         RadioButton noGroupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
-                        noGroupRadioButton.setId(Constants.NO_GROUP_ID);
+                        noGroupRadioButton.setId(Constants.NO_ID);
                         noGroupRadioButton.setText(Constants.NO_GROUP_NAME);
                         if (selectedGroupId == null) {
                             noGroupRadioButton.setChecked(true);
                         }
-                        view.addView(noGroupRadioButton);
+                        radioGroup.addView(noGroupRadioButton);
 
                         for (Group group : groups) {
                             RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
@@ -84,7 +82,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity implements 
                             if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
                                 groupRadioButton.setChecked(true);
                             }
-                            view.addView(groupRadioButton);
+                            radioGroup.addView(groupRadioButton);
                         }
                     }
                 });
@@ -115,18 +113,6 @@ public class SelectGroupForCredentialActivity extends SecureActivity implements 
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Credential credential = credentialViewModel.getCredential().getValue();
-        credential.setGroupId((int)id);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        Credential credential = credentialViewModel.getCredential().getValue();
-        credential.setGroupId(null);
     }
 
     @Override

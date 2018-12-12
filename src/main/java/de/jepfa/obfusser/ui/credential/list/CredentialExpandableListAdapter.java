@@ -57,7 +57,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
                 groupId = credential.getGroupId();
             }
             else {
-                groupId = Constants.NO_GROUP_ID;
+                groupId = Constants.NO_ID;
             }
             if (!groupIdCredentials.containsKey(groupId)) {
                 groupIdCredentials.put(groupId, new ArrayList<Credential>());
@@ -67,7 +67,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
                 }
                 else {
                     Group noGroupGroup = new Group();
-                    noGroupGroup.setId(Constants.NO_GROUP_ID);
+                    noGroupGroup.setId(Constants.NO_ID);
                     noGroupGroup.setName(Constants.NO_GROUP_NAME);
                     groups.add(0, noGroupGroup);
                 }

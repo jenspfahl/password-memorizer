@@ -139,7 +139,7 @@ public abstract class PatternHolder extends IdEntity {
     public void copyFrom(PatternHolder other) {
         setPatternInternal(other.getPatternInternal());
         setHints(mergeHints(other.getHints()));
-        setGroupId(other.getGroupId());
+        //setGroupId(other.getGroupId()); TODO activate if group is part of the cretion/change process
     }
 
     public void mergeHintsIntoPattern() {

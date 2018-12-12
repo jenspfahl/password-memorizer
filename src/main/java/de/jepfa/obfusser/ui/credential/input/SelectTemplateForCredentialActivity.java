@@ -8,12 +8,13 @@ import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import java.util.List;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Template;
@@ -22,12 +23,12 @@ import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
 
-public class SelectTemplateForCredentialActivity extends SecureActivity
-implements AdapterView.OnItemSelectedListener{
+public class SelectTemplateForCredentialActivity extends SecureActivity {
 
     private TemplateListViewModel templateListViewModel;
     private CredentialViewModel credentialViewModel;
-    private SelectTemplateAdapter adapter;
+    private RadioGroup radioGroup;
+    private Credential credential;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ implements AdapterView.OnItemSelectedListener{
         setContentView(R.layout.activity_select_template_for_credential);
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
-        Credential credential = credentialViewModel.getCredential().getValue();
+        credential = credentialViewModel.getCredential().getValue();
         if (credential.isPersisted()) {
             setTitle("Change credential");
         }
@@ -48,23 +49,35 @@ implements AdapterView.OnItemSelectedListener{
                 .of(this)
                 .get(TemplateListViewModel.class);
 
-        Spinner templateSpinner = findViewById(R.id.select_template);
+        radioGroup = findViewById(R.id.select_template);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == Constants.NO_ID) {
+                    credential.setTemplateId(null);
+                }
+                else {
+                    //copy from template
+                    templateListViewModel
+                            .getRepo()
+                            .getTemplateById(checkedId)
+                            .observe(SelectTemplateForCredentialActivity.this, new Observer<Template>() {
 
-        adapter = new SelectTemplateAdapter(
-                getBaseContext(), this);
-        templateSpinner.setAdapter(adapter);
+                                @Override
+                                public void onChanged(@Nullable Template template) {
+                                    if (template != null) {
+                                        Credential credential = credentialViewModel.getCredential().getValue();
+                                        credential.copyFrom(template);
+                                    }
+                                }
+                            });
+                }
+            }
+        });
 
-        templateListViewModel
-                .getRepo()
-                .getAllTemplatesSortByGroupAndName()
-                .observe(this, new Observer<List<Template>>() {
-                    @Override
-                    public void onChanged(@Nullable final List<Template> templates) {
-                        adapter.setTemplates(templates);
-                    }
-                });
 
-        templateSpinner.setOnItemSelectedListener(this);
+        createRadioButtons();
+
 
         Button nextStepButton = findViewById(R.id.credential_next_step);
         nextStepButton.setOnClickListener(new View.OnClickListener() {
@@ -95,30 +108,29 @@ implements AdapterView.OnItemSelectedListener{
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    public void refresh(boolean before) {
+        radioGroup.removeAllViews();
+        createRadioButtons();
+    }
+
+
+    private void createRadioButtons() {
         templateListViewModel
                 .getRepo()
-                .getTemplateById((int) id)
-                .observe(this, new Observer<Template>() {
-
+                .getAllTemplatesSortByName()
+                .observe(this, new Observer<List<Template>>() {
                     @Override
-                    public void onChanged(@Nullable Template template) {
-                        if (template != null) {
-                            Credential credential = credentialViewModel.getCredential().getValue();
-                            credential.copyFrom(template);
+                    public void onChanged(@Nullable final List<Template> templates) {
+
+                        for (Template template : templates) {
+                            RadioButton groupRadioButton = new RadioButton(SelectTemplateForCredentialActivity.this);
+                            groupRadioButton.setId(template.getId());
+                            String pattern = template.getPatternRepresentationWithNumberedPlaceholder(
+                                    SecretChecker.getOrAskForSecret(SelectTemplateForCredentialActivity.this));
+                            groupRadioButton.setText(template.getName() + " " + pattern);
+                            radioGroup.addView(groupRadioButton);
                         }
                     }
                 });
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        Credential credential = credentialViewModel.getCredential().getValue();
-        credential.setTemplateId(null);
-    }
-
-    @Override
-    public void refresh(boolean before) {
-        adapter.notifyDataSetChanged();
     }
 }

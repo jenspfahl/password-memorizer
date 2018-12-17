@@ -12,7 +12,8 @@ import de.jepfa.obfusser.repository.credential.CredentialRepository;
 import de.jepfa.obfusser.repository.template.TemplateRepository;
 
 /**
- * Service to do some crypto actions to all {@link Credential}s and {@link Template}s.
+ * Service to do some crypto actions for {@link Credential}s and {@link Template}s.
+ *
  * @author Jens Pfahl
  */
 public class SecurityService extends IntentService {

@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.ColorSpace;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Secret;
@@ -161,11 +165,20 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
         }
 
         if (id == R.id.menu_help) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://jepfa.de"));
+            startActivity(browserIntent);
+
+            return true;
+        }
+
+        if (id == R.id.menu_about) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-            builder.setTitle("How it works")
-                    .setMessage("Blabla")
-                    .setIcon(android.R.drawable.ic_dialog_info)
+            Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
+            builder.setTitle("About the app")
+                    .setMessage(getString(R.string.app_name) + ", Version " + Constants.VERSION +
+                            Constants.NL + " (c) Jens Pfahl 2018")
+                    .setIcon(icon)
                     .show();
 
             return true;

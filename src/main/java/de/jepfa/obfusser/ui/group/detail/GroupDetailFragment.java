@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.model.Group;
@@ -50,7 +51,7 @@ public class GroupDetailFragment extends Fragment {
         if (groupViewModel.getGroup() != null) {
             Group group = groupViewModel.getGroup().getValue();
             TextView textView = rootView.findViewById(R.id.group_detail_textview);
-            textView.setText(group.getName() + " " + group.getInfo());
+            textView.setText(group.getName() + Constants.NL + " " + group.getInfo());
 
         }
 

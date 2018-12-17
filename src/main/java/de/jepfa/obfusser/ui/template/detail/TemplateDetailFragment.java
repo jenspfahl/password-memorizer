@@ -34,6 +34,7 @@ public class TemplateDetailFragment extends SecureFragment {
     public static final int SHOW_CREDENTIAL_DETAIL = 1;
     public static final int NEW_CREDENTIAL_SELECT_HINTS = 2;
     public static final int NEW_CREDENTIAL_INPUT_HINTS = 3;
+    public static final int NEW_CREDENTIAL_BUILDER = 4;
 
     private int mode;
     private TemplateViewModel templateViewModel;
@@ -68,6 +69,9 @@ public class TemplateDetailFragment extends SecureFragment {
                     break;
                 case SHOW_CREDENTIAL_DETAIL :
                     onCreateForShowTemplateDetails(template, obfusTextView);
+                    break;
+                case NEW_CREDENTIAL_BUILDER:
+                    onCreateForNewTemplateBuilder(template, obfusTextView);
                     break;
             }
 
@@ -110,6 +114,11 @@ public class TemplateDetailFragment extends SecureFragment {
             }
 
         });
+    }
+
+    private void onCreateForNewTemplateBuilder(Template template, TextView obfusTextView) {
+        String patternString = template.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        obfusTextView.setText(patternString);
     }
 
     private void onCreateForNewTemplateInputHints(Template template, TextView obfusTextView) {

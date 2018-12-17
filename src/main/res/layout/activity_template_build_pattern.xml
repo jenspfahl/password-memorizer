@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ui.credential.input.CredentialBuildPatternActivity">
+    tools:context=".ui.template.input.TemplateBuildPatternActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
 
 
             <android.support.v4.widget.NestedScrollView
-                android:id="@+id/credential_detail_container_for_builder"
+                android:id="@+id/template_detail_container_for_builder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
@@ -107,7 +107,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/credential_next_step"
+                android:id="@+id/template_next_step"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

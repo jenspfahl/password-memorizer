@@ -40,6 +40,19 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:id="@+id/link_to_pattern_builder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:autoLink="web"
+                android:clickable="true"
+                android:text="I don't want to type my password here -->"
+                android:textStyle="italic"
+                android:textColor="@color/colorPrimaryDark"
+                android:textAppearance="?attr/textAppearanceListItem"/>
+
             <Button
                 android:id="@+id/template_next_step"
                 style="?android:textAppearanceSmall"

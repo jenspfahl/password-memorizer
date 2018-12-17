@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
@@ -57,7 +58,8 @@ public abstract class SecureActivity extends BaseActivity {
 
 
         private static final String PREF_APPLICATION_UUID = "application.salt";
-        private static volatile boolean secretDialogOpen;
+        private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
+        private static volatile long secretDialogOpened;
 
         public static byte[] getOrAskForSecret(SecureActivity activity) {
             boolean passwordCheckEnabled = PreferenceManager
@@ -110,10 +112,10 @@ public abstract class SecureActivity extends BaseActivity {
 
         private synchronized static void openDialog(final Secret secret, final SecureActivity activity) {
 
-            if (secretDialogOpen) {
+            if (isRecentlyOpened(secretDialogOpened)) {
                 return;
             }
-            secretDialogOpen = true;
+            secretDialogOpened = System.currentTimeMillis();
 
             activity.refresh(true); // show all data as invalid
 
@@ -121,14 +123,14 @@ public abstract class SecureActivity extends BaseActivity {
 
             final EditText input = new EditText(activity);
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-            builder.setTitle("Password required")
+            input.requestFocus();
+            AlertDialog dialog = builder.setTitle("Password required")
                     .setMessage("Please enter your password to encrypt your patterns.")
                     .setView(input)
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            secretDialogOpen = false;
+                            secretDialogOpened = 0;
                         }
                     })
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -136,19 +138,27 @@ public abstract class SecureActivity extends BaseActivity {
                             String pwd = input.getText().toString();
                             if (TextUtils.isEmpty(pwd)) {
                                 secret.setDigest(null);
-                            }
-                            else {
+                            } else {
                                 secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
                                 activity.refresh(false); // show correct encrypted data
                             }
 
-                            secretDialogOpen = false;
+                            secretDialogOpened = 0;
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setCancelable(false)
-                    .show();
+                    .create();
 
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            dialog.show();
+
+        }
+
+        private static boolean isRecentlyOpened(long secretDialogOpened) {
+            long current = System.currentTimeMillis();
+
+            return secretDialogOpened >= current - DELTA_DIALOG_OPENED;
         }
     }
 

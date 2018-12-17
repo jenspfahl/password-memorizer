@@ -30,7 +30,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
         setContentView(R.layout.activity_template_input_pattern);
 
         templateViewModel = TemplateViewModel.getFromIntent(this, getIntent());
-        Template template = templateViewModel.getTemplate().getValue();
+        final Template template = templateViewModel.getTemplate().getValue();
 
         mPatternView = findViewById(R.id.template_pattern);
         String pattern = template.getPatternAsExchangeFormatHinted(SecretChecker.getOrAskForSecret(this));
@@ -50,6 +50,17 @@ public class TemplateInputPatternActivity extends SecureActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+
+        View buildPattern = findViewById(R.id.link_to_pattern_builder);
+        buildPattern.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getBaseContext(), TemplateBuildPatternActivity.class);
+                IntentUtil.setTemplateExtra(intent, template);
+                startActivity(intent);
             }
         });
 

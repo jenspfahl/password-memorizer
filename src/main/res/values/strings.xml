@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Obfusser</string>
+    <string name="app_name">Password Memorizer</string>
     <string name="title_credential_detail">Credential Detail</string>
     <string name="title_activity_credential_input">New Credential</string>
     <string name="title_template_detail">Template Detail</string>
@@ -27,7 +27,7 @@
     <string name="delete_template">Delete</string>
     <string name="change_group">Change</string>
     <string name="delete_group">Delete</string>
-    <string name="hint">Hint</string>
+    <string name="hint">Revealed</string>
 
     <string name="title_credentials">Credentials</string>
     <string name="title_templates">Templates</string>

@@ -89,6 +89,14 @@
                 android:value="de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity" />
         </activity>
         <activity
+            android:name=".ui.template.input.TemplateBuildPatternActivity"
+            android:label="@string/title_activity_template_input"
+            android:parentActivityName=".ui.template.input.TemplateInputPatternActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.jepfa.obfusser.ui.template.input.TemplateInputPatternActivity" />
+        </activity>
+        <activity
             android:name=".ui.template.input.TemplateInputHintsActivity"
             android:label="@string/title_activity_template_input"
             android:parentActivityName=".ui.template.input.TemplateInputPatternActivity">

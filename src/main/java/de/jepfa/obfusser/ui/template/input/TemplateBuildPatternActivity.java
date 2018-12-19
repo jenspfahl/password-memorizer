@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.ui.template.input;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
@@ -62,6 +63,10 @@ public class TemplateBuildPatternActivity extends SecureActivity {
         createObfusCharButton(template, specialCharButton, ObfusChar.SPECIAL_CHAR);
 
         Button buttonBackspace = findViewById(R.id.button_pattern_backspace);
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            buttonBackspace.setText("<X");
+        }
+
         buttonBackspace.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

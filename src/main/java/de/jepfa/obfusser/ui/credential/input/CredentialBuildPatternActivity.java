@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.credential.input;
 
 import android.arch.core.util.Function;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.KeyEvent;
@@ -66,6 +67,10 @@ public class CredentialBuildPatternActivity extends SecureActivity {
         createObfusCharButton(credential, specialCharButton, ObfusChar.SPECIAL_CHAR);
 
         Button buttonBackspace = findViewById(R.id.button_pattern_backspace);
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            buttonBackspace.setText("<X");
+        }
+
         buttonBackspace.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

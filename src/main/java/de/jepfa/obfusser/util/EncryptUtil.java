@@ -22,7 +22,7 @@ import de.jepfa.obfusser.ui.settings.SettingsActivity;
  */
 public class EncryptUtil {
 
-    public static final int BYTE_COUNT = 256;
+    private static final int BYTE_COUNT = 256;
 
     /**
      * To encypt single chars, we need to define which chars are common in credentials.

@@ -9,29 +9,28 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
-import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +48,43 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static final String PREF_ENABLE_PASSWORD = "pref_enable_password";
     public static final String PREF_EXPANDABLE_CREDENTIAL_LIST = "pref_expandable_credential_list";
+    public static final String PREF_PATTERN_STYLE = "pref_pattern_style";
+
+
+    private static class PatternStylePreferenceListener implements Preference.OnPreferenceChangeListener {
+
+        private final Activity activity;
+
+        public PatternStylePreferenceListener(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            String representationValue = value == null ? null : value.toString();
+            try {
+                Representation.valueOf(representationValue);
+            } catch (Exception e) {
+                representationValue = Representation.DEFAULT_BLOCKS.name();
+            }
+
+            ListPreference listPreference = (ListPreference) preference;
+            int index = listPreference.findIndexOfValue(representationValue);
+
+            // Set the summary to reflect the new value.
+            preference.setSummary(
+                    index >= 0
+                            ? listPreference.getEntries()[index]
+                            : null);
+
+            SharedPreferences.Editor editor = preference.getPreferenceManager().getDefaultSharedPreferences(preference.getContext()).edit();
+            editor.putString(
+                    PREF_PATTERN_STYLE, representationValue);
+            editor.commit();
+
+            return true;
+        }
+    }
 
     private static class EnablePasswordPreferenceListener implements Preference.OnPreferenceChangeListener {
 
@@ -203,7 +239,48 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || SecurityPreferenceFragment.class.getName().equals(fragmentName);
+                || SecurityPreferenceFragment.class.getName().equals(fragmentName)
+                || GeneralPreferenceFragment.class.getName().equals(fragmentName);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class GeneralPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_general);
+            setHasOptionsMenu(true);
+
+            ListPreference patternStylePref = (ListPreference) findPreference(PREF_PATTERN_STYLE);
+            List<String> entries = new ArrayList<>();
+            List<String> entryValues = new ArrayList<>();
+            for (Representation representation : Representation.values()) {
+                if (representation.isAvailable()) {
+                    entries.add(representation.getTitle());
+                    entryValues.add(representation.name());
+                }
+            }
+
+            String currRepresentation = patternStylePref.getPreferenceManager().getDefaultSharedPreferences(this.getActivity()).getString(
+                    PREF_PATTERN_STYLE, Representation.DEFAULT_BLOCKS.name());
+
+            patternStylePref.setEntries(entries.toArray(new String[entries.size()]));
+            patternStylePref.setEntryValues(entryValues.toArray(new String[entryValues.size()]));
+            patternStylePref.setDefaultValue(currRepresentation);
+
+            PatternStylePreferenceListener onPreferenceChangeListener = new PatternStylePreferenceListener(getActivity());
+            patternStylePref.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            onPreferenceChangeListener.onPreferenceChange(patternStylePref, currRepresentation);
+        }
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class)); //TODO
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -230,7 +307,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                startActivity(new Intent(getActivity(), SettingsActivity.class)); //TODO
                 return true;
             }
             return super.onOptionsItemSelected(item);

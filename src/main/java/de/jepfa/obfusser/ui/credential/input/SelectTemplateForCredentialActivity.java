@@ -126,7 +126,8 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                             RadioButton groupRadioButton = new RadioButton(SelectTemplateForCredentialActivity.this);
                             groupRadioButton.setId(template.getId());
                             String pattern = template.getPatternRepresentationWithNumberedPlaceholder(
-                                    SecretChecker.getOrAskForSecret(SelectTemplateForCredentialActivity.this));
+                                    SecretChecker.getOrAskForSecret(SelectTemplateForCredentialActivity.this),
+                                    getPatternRepresentation());
                             groupRadioButton.setText(template.getName() + " — " + pattern);
                             radioGroup.addView(groupRadioButton);
                         }

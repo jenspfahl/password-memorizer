@@ -1,10 +1,6 @@
 package de.jepfa.obfusser.model;
 
-import android.os.Build;
-
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.jepfa.obfusser.util.Loop;
 
@@ -95,8 +91,8 @@ public enum ObfusChar {
      *
      * @return
      */
-    public char getRepresentation() {
-        return RepresentationHolder.BLOCKS.getRepresentation(this);
+    public char getRepresentation(Representation representation) {
+        return representation.getRepresentation(this);
      }
 
     /**
@@ -153,8 +149,8 @@ public enum ObfusChar {
         return new String(new char[]{getExchangeValue()});
     }
 
-    public String toRepresentation() {
-        return new String(new char[]{getRepresentation()});
+    public String toRepresentation(Representation representation) {
+        return new String(new char[]{getRepresentation(representation)});
     }
 
     @Override

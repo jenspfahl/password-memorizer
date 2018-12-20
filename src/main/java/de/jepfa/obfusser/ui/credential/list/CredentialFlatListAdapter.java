@@ -70,7 +70,8 @@ public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFl
 
             holder.nameView.setText(credential.getName());
             holder.patternView.setText(credential.getPatternRepresentationHinted(
-                    SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity())));
+                    SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
+                    fragment.getSecureActivity().getPatternRepresentation()));
 
             holder.iconView.setTag(credential);
             holder.nameView.setOnClickListener(onClickListener);

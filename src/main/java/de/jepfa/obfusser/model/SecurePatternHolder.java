@@ -19,20 +19,6 @@ import de.jepfa.obfusser.util.EncryptUtil;
  */
 public abstract class SecurePatternHolder extends PatternHolder {
 
-    private static final String HIDDEN_PATTERN_PRESENTATION = new ObfusString(
-            Arrays.asList(new ObfusChar[] {
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR,
-                    ObfusChar.ANY_CHAR
-            })).toRepresentation();
-
 
     public String getPatternAsExchangeFormatHinted(byte[] key) {
         StringBuilder sb = new StringBuilder();
@@ -54,12 +40,12 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationWithNumberedPlaceholder(byte[] key) {
+    public String getPatternRepresentationWithNumberedPlaceholder(byte[] key, Representation representation) {
         if (key == Secret.INVALID_DIGEST) {
-            return HIDDEN_PATTERN_PRESENTATION;
+            return getHiddenPatternRepresentation(representation);
         }
 
-        StringBuilder sb = new StringBuilder(getPattern(key).toRepresentation());
+        StringBuilder sb = new StringBuilder(getPattern(key).toRepresentation(representation));
         int placeholder = 1;
         for (Map.Entry<Integer, String> entry : getHints(key).entrySet()) {
             int index = entry.getKey();
@@ -70,20 +56,20 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationHinted(byte[] key) {
+    public String getPatternRepresentationHinted(byte[] key, Representation representation) {
         if (key == Secret.INVALID_DIGEST) {
-            return HIDDEN_PATTERN_PRESENTATION;
+            return getHiddenPatternRepresentation(representation);
         }
 
         StringBuilder sb = new StringBuilder();
         int index = 0;
         if (getPattern(key) != null && getPattern(key).getObfusChars() != null) {
             for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
-                String s = obfusChar.toRepresentation();
+                String s = obfusChar.toRepresentation(representation);
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        s = ObfusString.obfuscate(hint).toRepresentation();
+                        s = ObfusString.obfuscate(hint).toRepresentation(representation);
                     }
                 }
                 sb.append(s);
@@ -94,15 +80,15 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationRevealed(byte[] key) {
+    public String getPatternRepresentationRevealed(byte[] key, Representation representation) {
         if (key == Secret.INVALID_DIGEST) {
-            return HIDDEN_PATTERN_PRESENTATION;
+            return getHiddenPatternRepresentation(representation);
         }
 
         StringBuilder sb = new StringBuilder();
         int index = 0;
         for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
-            String s = obfusChar.toRepresentation();
+            String s = obfusChar.toRepresentation(representation);
             if (obfusChar.isPlaceholder()) {
                 String hint = getHint(index, key);
                 if (hint != null) {
@@ -213,4 +199,19 @@ public abstract class SecurePatternHolder extends PatternHolder {
         }
     }
 
+    private String getHiddenPatternRepresentation(Representation representation) {
+        return new ObfusString(
+                Arrays.asList(new ObfusChar[]{
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR,
+                        ObfusChar.ANY_CHAR
+                })).toRepresentation(representation);
+    }
 }

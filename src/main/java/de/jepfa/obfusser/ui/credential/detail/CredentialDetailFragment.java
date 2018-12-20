@@ -84,7 +84,9 @@ public class CredentialDetailFragment extends SecureFragment {
     private void onCreateForShowCredentialDetails(final Credential credential, final TextView obfusTextView) {
         String patternString = buildPatternString(
                 credential, 
-                credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
+                credential.getPatternRepresentationHinted(
+                        SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                        getSecureActivity().getPatternRepresentation()),
                 false);
         SpannableString span = getSpannableString(credential, patternString);
 
@@ -99,13 +101,19 @@ public class CredentialDetailFragment extends SecureFragment {
 
                 String finalPatternString;
                 if (counter % 3 == 0) {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), false);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationHinted(
+                            SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                            getSecureActivity().getPatternRepresentation()), false);
                 }
                 else if (counter % 3 == 1) {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), true);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationWithNumberedPlaceholder(
+                            SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                            getSecureActivity().getPatternRepresentation()), true);
                 }
                 else {
-                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())), false);
+                    finalPatternString = buildPatternString(credential, credential.getPatternRepresentationRevealed(
+                            SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                            getSecureActivity().getPatternRepresentation()), false);
                 }
 
                 SpannableString span = getSpannableString(credential, finalPatternString);
@@ -117,19 +125,25 @@ public class CredentialDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewCredentialInputHints(Credential credential, TextView obfusTextView) {
-        String patternString = credential.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = credential.getPatternRepresentationWithNumberedPlaceholder(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         SpannableString span = getSpannableString(credential, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
     }
 
     private void onCreateForNewCredentialBuilder(Credential credential, TextView obfusTextView) {
-        String patternString = credential.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = credential.getPatternRepresentationHinted(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         obfusTextView.setText(patternString);
     }
 
     private void onCreateForNewCredentialSelectHints(final Credential credential, final TextView obfusTextView) {
-        String patternString = credential.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = credential.getPatternRepresentationRevealed(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         final SpannableString span = new SpannableString(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {

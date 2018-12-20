@@ -83,7 +83,9 @@ public class TemplateDetailFragment extends SecureFragment {
 
     private void onCreateForShowTemplateDetails(final Template template, final TextView obfusTextView) {
         String patternString = buildPatternString(template,
-                template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
+                template.getPatternRepresentationWithNumberedPlaceholder(
+                        SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                        getSecureActivity().getPatternRepresentation()),
                 false);
         SpannableString span = getSpannableString(template, patternString);
 
@@ -99,12 +101,16 @@ public class TemplateDetailFragment extends SecureFragment {
                 String finalPatternString;
                 if (counter % 2 == 0) {
                     finalPatternString = buildPatternString(template,
-                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
+                            template.getPatternRepresentationWithNumberedPlaceholder(
+                                    SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                                    getSecureActivity().getPatternRepresentation()),
                             false);
                 }
                 else {
                     finalPatternString = buildPatternString(template,
-                            template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())),
+                            template.getPatternRepresentationWithNumberedPlaceholder(
+                                    SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                                    getSecureActivity().getPatternRepresentation()),
                             true);
                 }
 
@@ -117,19 +123,25 @@ public class TemplateDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewTemplateBuilder(Template template, TextView obfusTextView) {
-        String patternString = template.getPatternRepresentationHinted(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = template.getPatternRepresentationHinted(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         obfusTextView.setText(patternString);
     }
 
     private void onCreateForNewTemplateInputHints(Template template, TextView obfusTextView) {
-        String patternString = template.getPatternRepresentationWithNumberedPlaceholder(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = template.getPatternRepresentationWithNumberedPlaceholder(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         SpannableString span = getSpannableString(template, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
     }
 
     private void onCreateForNewTemplateSelectHints(final Template template, final TextView obfusTextView) {
-        String patternString = template.getPatternRepresentationRevealed(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+        String patternString = template.getPatternRepresentationRevealed(
+                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                getSecureActivity().getPatternRepresentation());
         final SpannableString span = new SpannableString(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {

@@ -69,7 +69,8 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
             holder.nameView.setText(templates.get(position).getName());
             holder.patternView.setText(
                     templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
-                            SecureActivity.SecretChecker.getOrAskForSecret(activity)
+                            SecureActivity.SecretChecker.getOrAskForSecret(activity),
+                            activity.getPatternRepresentation()
                     ));
 
             holder.iconView.setTag(templates.get(position));

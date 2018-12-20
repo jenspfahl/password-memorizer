@@ -135,7 +135,7 @@ public class TemplateBuildPatternActivity extends SecureActivity {
     }
 
     private void createObfusCharButton(final Template template, Button button, final ObfusChar obfusChar) {
-        button.setText(obfusChar.toRepresentation());
+        button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

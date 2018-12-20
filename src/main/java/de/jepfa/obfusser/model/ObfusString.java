@@ -76,14 +76,14 @@ public class ObfusString {
      * @param obfusString
      * @return
      */
-    protected static String toRepresentation(ObfusString obfusString) {
+    protected static String toRepresentation(ObfusString obfusString, Representation representation) {
         if (obfusString == null) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
         for (ObfusChar obfusChar : obfusString.getObfusChars()) {
-            sb.append(obfusChar.toRepresentation());
+            sb.append(obfusChar.toRepresentation(representation));
         }
         return sb.toString();
     }
@@ -122,10 +122,10 @@ public class ObfusString {
     /**
      * Returns the current obfuscated string as a fancy string.
      *
-     * @see ObfusChar#getRepresentation()
+     * @see ObfusChar#getRepresentation(Representation)
      */
-    public String toRepresentation() {
-        return toRepresentation(this);
+    public String toRepresentation(Representation representation) {
+        return toRepresentation(this, representation);
     }
 
     public int length() {

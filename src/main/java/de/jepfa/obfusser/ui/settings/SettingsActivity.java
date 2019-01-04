@@ -49,6 +49,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ENABLE_PASSWORD = "pref_enable_password";
     public static final String PREF_EXPANDABLE_CREDENTIAL_LIST = "pref_expandable_credential_list";
     public static final String PREF_PATTERN_STYLE = "pref_pattern_style";
+    public static final String PREF_SHOW_PATTERN_IN_OVERVIEW = "pref_show_pattern_in_overview";
 
 
     private static class PatternStylePreferenceListener implements Preference.OnPreferenceChangeListener {
@@ -99,6 +100,26 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             boolean enabled = Boolean.parseBoolean(value.toString());
 
             inputPasswordAndCrypt(activity, preference, enabled);
+
+            return true;
+        }
+    }
+
+    private static class ShowPatternsInOverviewPreferenceListener implements Preference.OnPreferenceChangeListener {
+
+        private final Activity activity;
+
+        public ShowPatternsInOverviewPreferenceListener(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            boolean show = Boolean.parseBoolean(value.toString());
+
+            SharedPreferences.Editor editor = preference.getEditor();
+            editor.putBoolean(PREF_SHOW_PATTERN_IN_OVERVIEW, !show);
+            editor.commit();
 
             return true;
         }
@@ -300,6 +321,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Preference passwordEnablePref = findPreference(PREF_ENABLE_PASSWORD);
             passwordEnablePref.setOnPreferenceChangeListener(
                     new EnablePasswordPreferenceListener(getActivity()));
+
+            Preference passwordShowPattern = findPreference(PREF_SHOW_PATTERN_IN_OVERVIEW);
+            passwordShowPattern.setOnPreferenceChangeListener(
+                    new ShowPatternsInOverviewPreferenceListener(getActivity()));
 
         }
 

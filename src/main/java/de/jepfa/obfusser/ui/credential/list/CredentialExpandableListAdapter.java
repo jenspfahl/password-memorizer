@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.credential.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
+import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
@@ -169,9 +171,20 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
         ImageView iconView = convertView.findViewById(R.id.credential_list_menu_popup);
 
         nameView.setText(credential.getName());
-        patternView.setText(credential.getPatternRepresentationHinted(
-                SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
-                fragment.getSecureActivity().getPatternRepresentation()));
+
+        boolean showPattern = PreferenceManager
+                .getDefaultSharedPreferences(fragment.getActivity())
+                .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+
+        if (showPattern) {
+            patternView.setText(credential.getPatternRepresentationHinted(
+                    SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
+                    fragment.getSecureActivity().getPatternRepresentation()));
+        }
+        else {
+            patternView.setText(credential.getHiddenPatternRepresentation(
+                    fragment.getSecureActivity().getPatternRepresentation()));
+        }
 
         iconView.setTag(credential);
         nameView.setOnClickListener(onClickListener);

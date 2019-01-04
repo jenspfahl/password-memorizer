@@ -199,7 +199,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         }
     }
 
-    private String getHiddenPatternRepresentation(Representation representation) {
+    public String getHiddenPatternRepresentation(Representation representation) {
         return new ObfusString(
                 Arrays.asList(new ObfusChar[]{
                         ObfusChar.ANY_CHAR,

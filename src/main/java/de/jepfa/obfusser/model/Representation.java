@@ -40,6 +40,51 @@ public enum Representation {
             '\u25EF', // '◯'
             Build.VERSION_CODES.M),
 
+    NUMBERS("Numbers",
+            '1', // ''
+            '3', // ''
+            '5',
+            '7',
+            '0',
+            '\u25EF', // '◯'
+            null),
+
+    HEXAGRAM("Hexagram",
+            '\u4DD2', // ''
+            '\u4DD3', // ''
+            '\u4DE8',
+            '\u4DEA',
+            '\u4DC0', // ''
+            '\u25EF', // '◯'
+            Build.VERSION_CODES.M),
+
+    LINES("Lines",
+            '\u02E8', // ''
+            '\u02E6', // ''
+            '\u02E9',
+            '\u02E5',
+            '-', // ''
+            '\u25EF', // '◯'
+            null),
+
+    MUSIC("Music",
+            '\u15B1', // ''
+            '\u15B0', // ''
+            '\u15B2',
+            '\u15B3',
+            '\u2022', // ''
+            '\u25EF', // '◯'
+            Build.VERSION_CODES.M),
+
+  /*  SYMBOLS("Symbols",
+            '\u20DF', // ''
+            '\u20DE', // ''
+            '\u20DD',
+            '\u20E4',
+            '\u20E0', // ''
+            '\u25EF', // '◯'
+            Build.VERSION_CODES.M),*/
+
     ;
 
 

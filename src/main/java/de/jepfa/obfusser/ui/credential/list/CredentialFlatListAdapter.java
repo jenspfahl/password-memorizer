@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.credential.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
+import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder> {
@@ -69,9 +71,20 @@ public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFl
             Credential credential = credentials.get(position);
 
             holder.nameView.setText(credential.getName());
-            holder.patternView.setText(credential.getPatternRepresentationHinted(
-                    SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
-                    fragment.getSecureActivity().getPatternRepresentation()));
+
+            boolean showPattern = PreferenceManager
+                    .getDefaultSharedPreferences(fragment.getActivity())
+                    .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+
+            if (showPattern) {
+                holder.patternView.setText(credential.getPatternRepresentationHinted(
+                        SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
+                        fragment.getSecureActivity().getPatternRepresentation()));
+            }
+            else {
+                holder.patternView.setText(credential.getHiddenPatternRepresentation(
+                        fragment.getSecureActivity().getPatternRepresentation()));
+            }
 
             holder.iconView.setTag(credential);
             holder.nameView.setOnClickListener(onClickListener);

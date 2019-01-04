@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.template.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import java.util.List;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
@@ -67,11 +69,24 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (templates != null || !templates.isEmpty()) {
             holder.nameView.setText(templates.get(position).getName());
-            holder.patternView.setText(
-                    templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
-                            SecureActivity.SecretChecker.getOrAskForSecret(activity),
-                            activity.getPatternRepresentation()
-                    ));
+
+            boolean showPattern = PreferenceManager
+                    .getDefaultSharedPreferences(activity)
+                    .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+
+            if (showPattern) {
+                holder.patternView.setText(
+                        templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
+                                SecureActivity.SecretChecker.getOrAskForSecret(activity),
+                                activity.getPatternRepresentation()
+                        ));
+            }
+            else {
+                holder.patternView.setText(
+                        templates.get(position).getHiddenPatternRepresentation(
+                                activity.getPatternRepresentation()
+                        ));
+            }
 
             holder.iconView.setTag(templates.get(position));
             holder.nameView.setOnClickListener(onClickListener);

@@ -79,10 +79,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
         buttonBackspace.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                int length = template.getPatternLength();
-                if (length > 0) {
-                    obfusEditText.backspace();
-                }
+                obfusEditText.backspace();
             }
         });
 

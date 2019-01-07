@@ -91,10 +91,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         buttonBackspace.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                int length = credential.getPatternLength();
-                if (length > 0) {
-                    obfusEditText.backspace();
-                }
+                obfusEditText.backspace();
             }
         });
 

@@ -83,8 +83,6 @@ public class CredentialInputHintsTextActivity extends SecureActivity {
                         credentialViewModel.getRepo().insert(credential);
                     }
 
-                    //Intent replyIntent = new Intent(getBaseContext(), NavigationActivity.class);
-                    //startActivity(replyIntent);
                     Intent upIntent = new Intent(getBaseContext(), NavigationActivity.class);
                     upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials);
                     navigateUpTo(upIntent);

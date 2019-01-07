@@ -35,10 +35,6 @@ public class TemplateDetailActivity extends SecureActivity {
         CollapsingToolbarLayout appBarLayout = findViewById(R.id.template_detail_toolbar_layout);
         if (appBarLayout != null) {
             StringBuilder sb = new StringBuilder(template.getName());
-            if (template.getInfo() != null) {
-                sb.append(System.lineSeparator());
-                sb.append(template.getInfo()); //TODO info not in the header, move it to the body
-            }
             appBarLayout.setTitle(sb.toString());
         }
 

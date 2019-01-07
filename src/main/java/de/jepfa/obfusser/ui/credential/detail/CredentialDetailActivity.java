@@ -60,17 +60,11 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                appBarLayout.setTitle(group.getName() + "/" + System.lineSeparator() + appBarLayout.getTitle());
+                                appBarLayout.setTitle(group.getName() + " / " + appBarLayout.getTitle());
                             }
                         }
                     });
 
-            if (credential.getInfo() != null && !credential.getInfo().isEmpty()) {
-                sb.append(System.lineSeparator());
-                sb.append('(');
-                sb.append(credential.getInfo()); //TODO info not in the header, move it to the body
-                sb.append(')');
-            }
             appBarLayout.setTitle(sb.toString());
         }
 

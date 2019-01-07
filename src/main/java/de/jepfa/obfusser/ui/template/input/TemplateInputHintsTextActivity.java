@@ -38,7 +38,7 @@ public class TemplateInputHintsTextActivity extends SecureActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                    TemplateDetailFragment.NEW_CREDENTIAL_INPUT_HINTS);
+                    TemplateDetailFragment.INPUT_HINTS);
 
             TemplateDetailFragment detailFragment = new TemplateDetailFragment();
             detailFragment.setArguments(arguments);

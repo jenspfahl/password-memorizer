@@ -37,7 +37,7 @@ public class CredentialInputHintsActivity extends SecureActivity {
 
             Bundle arguments = new Bundle();
             arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                    CredentialDetailFragment.NEW_CREDENTIAL_SELECT_HINTS);
+                    CredentialDetailFragment.SELECT_HINTS);
 
             CredentialDetailFragment fragment = new CredentialDetailFragment();
             fragment.setArguments(arguments);

@@ -58,7 +58,7 @@ public class ObfusString {
      * @param obfusString
      * @return
      */
-    protected static String toExchangeFormat(ObfusString obfusString) {
+    public static String toExchangeFormat(ObfusString obfusString) {
         if (obfusString == null) {
             return null;
         }
@@ -71,12 +71,33 @@ public class ObfusString {
     }
 
     /**
+     * Creates an {@link ObfusString} from the given representation string.
+     *
+     * @param string
+     * @param  representation the current used {@link Representation}
+     * @return
+     */
+    public static ObfusString fromRepresentation(String string, Representation representation) {
+        if (string == null) {
+            return null;
+        }
+
+        List<ObfusChar> obfusChars = new ArrayList<>(string.length());
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            obfusChars.add(ObfusChar.fromRepresentation(c, representation));
+        }
+
+        return new ObfusString(obfusChars);
+    }
+
+    /**
      * Creates a fancy representation string from the given {@link ObfusString}.
      *
      * @param obfusString
      * @return
      */
-    protected static String toRepresentation(ObfusString obfusString, Representation representation) {
+    public static String toRepresentation(ObfusString obfusString, Representation representation) {
         if (obfusString == null) {
             return null;
         }

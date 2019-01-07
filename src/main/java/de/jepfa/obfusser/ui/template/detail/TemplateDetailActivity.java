@@ -46,7 +46,7 @@ public class TemplateDetailActivity extends SecureActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                    TemplateDetailFragment.SHOW_CREDENTIAL_DETAIL);
+                    TemplateDetailFragment.SHOW_DETAIL);
 
             TemplateDetailFragment fragment = new TemplateDetailFragment();
             fragment.setArguments(arguments);

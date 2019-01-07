@@ -39,7 +39,7 @@ public class CredentialInputHintsTextActivity extends SecureActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                    CredentialDetailFragment.NEW_CREDENTIAL_INPUT_HINTS);
+                    CredentialDetailFragment.INPUT_HINTS);
 
             CredentialDetailFragment detailFragment = new CredentialDetailFragment();
             detailFragment.setArguments(arguments);

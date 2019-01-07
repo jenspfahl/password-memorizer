@@ -58,14 +58,14 @@ public enum Representation {
             '\u25EF', // '◯'
             Build.VERSION_CODES.M),
 
-    LINES("Lines",
+   /* LINES("Lines",
             '\u02E8', // ''
             '\u02E6', // ''
             '\u02E9',
             '\u02E5',
             '-', // ''
             '\u25EF', // '◯'
-            null),
+            null),*/
 
     MUSIC("Music",
             '\u15B1', // ''

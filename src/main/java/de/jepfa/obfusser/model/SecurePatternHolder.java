@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.util.EncryptUtil;
 
 /**
@@ -23,13 +24,20 @@ public abstract class SecurePatternHolder extends PatternHolder {
     public String getPatternAsExchangeFormatHinted(byte[] key) {
         StringBuilder sb = new StringBuilder();
         int index = 0;
-        if (getPattern(key) != null && getPattern(key).getObfusChars() != null) {
-            for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
+        ObfusString pattern = getPattern(key);
+        if (pattern != null && pattern.getObfusChars() != null) {
+            for (ObfusChar obfusChar : pattern.getObfusChars()) {
                 String s = obfusChar.toExchangeFormat();
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        s = ObfusString.obfuscate(hint).toExchangeFormat();
+                        if (hint.equals(Constants.EMPTY_HINT)) {
+                            //TODO should we present placeholder in the builder?
+                            s = obfusChar.toExchangeFormat();
+                        }
+                        else {
+                            s = ObfusString.obfuscate(hint).toExchangeFormat();
+                        }
                     }
                 }
                 sb.append(s);

@@ -76,6 +76,35 @@ public enum ObfusChar {
         }
     }
 
+    /**
+     * Creates an {@link ObfusChar} from the given representation char.
+     * @param c
+     * @return
+     */
+    public static ObfusChar fromRepresentation(char c, Representation representation) {
+        if (c == ObfusChar.DIGIT.getRepresentation(representation)) {
+            return(ObfusChar.DIGIT);
+        }
+        else if (c == ObfusChar.LOWER_CASE_CHAR.getRepresentation(representation)) {
+            return(ObfusChar.LOWER_CASE_CHAR);
+        }
+        else if (c == ObfusChar.UPPER_CASE_CHAR.getRepresentation(representation)) {
+            return(ObfusChar.UPPER_CASE_CHAR);
+        }
+        else if (c == ObfusChar.SPECIAL_CHAR.getRepresentation(representation)) {
+            return(ObfusChar.SPECIAL_CHAR);
+        }
+        else if (c == ObfusChar.ANY_CHAR.getRepresentation(representation)) {
+            return(ObfusChar.ANY_CHAR);
+        }
+        else if (c == ObfusChar.PLACEHOLDER.getRepresentation(representation)) {
+            return(ObfusChar.PLACEHOLDER);
+        }
+        else {
+            throw new IllegalStateException("Unknown exchange char: " + c);
+        }
+    }
+
 
     private char exchangeValue;
     private Double useLikelihood;

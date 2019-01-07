@@ -76,7 +76,7 @@ public class CredentialDetailActivity extends SecureActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                    CredentialDetailFragment.SHOW_CREDENTIAL_DETAIL);
+                    CredentialDetailFragment.SHOW_DETAIL);
 
             CredentialDetailFragment fragment = new CredentialDetailFragment();
             fragment.setArguments(arguments);

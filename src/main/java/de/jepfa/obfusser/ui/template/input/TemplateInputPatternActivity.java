@@ -1,8 +1,10 @@
 package de.jepfa.obfusser.ui.template.input;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
+
+import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,9 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
+import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.toolkit.ObfusEditText;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
@@ -22,7 +27,7 @@ import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 public class TemplateInputPatternActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
-    private EditText mPatternView;
+    private ObfusEditText obfusEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +37,12 @@ public class TemplateInputPatternActivity extends SecureActivity {
         templateViewModel = TemplateViewModel.getFromIntent(this, getIntent());
         final Template template = templateViewModel.getTemplate().getValue();
 
-        mPatternView = findViewById(R.id.template_pattern);
-        String pattern = template.getPatternAsExchangeFormatHinted(SecretChecker.getOrAskForSecret(this));
-        if (pattern != null) {
-            mPatternView.setText(pattern);
-        }
-
         if (template.isPersisted()) {
             setTitle("Change template");
         }
 
-        mPatternView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        EditText editText = findViewById(R.id.template_builder_editview);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -53,14 +53,36 @@ public class TemplateInputPatternActivity extends SecureActivity {
             }
         });
 
-        View buildPattern = findViewById(R.id.link_to_pattern_builder);
-        buildPattern.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        byte[] secret = SecretChecker.getOrAskForSecret(this);
+        String pattern = template.getPatternAsExchangeFormatHinted(secret);
+        obfusEditText = new ObfusEditText(editText,
+                getPatternRepresentation(), pattern);
 
-                Intent intent = new Intent(getBaseContext(), TemplateBuildPatternActivity.class);
-                IntentUtil.setTemplateExtra(intent, template);
-                startActivity(intent);
+
+        Button lowerCaseButton = findViewById(R.id.button_pattern_lower_case);
+        createObfusCharButton(lowerCaseButton, ObfusChar.LOWER_CASE_CHAR);
+
+        Button upperCaseButton = findViewById(R.id.button_pattern_upper_case);
+        createObfusCharButton(upperCaseButton, ObfusChar.UPPER_CASE_CHAR);
+
+        Button digitButton = findViewById(R.id.button_pattern_digit);
+        createObfusCharButton(digitButton, ObfusChar.DIGIT);
+
+        Button specialCharButton = findViewById(R.id.button_pattern_special_char);
+        createObfusCharButton(specialCharButton, ObfusChar.SPECIAL_CHAR);
+
+        Button buttonBackspace = findViewById(R.id.button_pattern_backspace);
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            buttonBackspace.setText("<X"); //TODO find better char
+        }
+
+        buttonBackspace.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int length = template.getPatternLength();
+                if (length > 0) {
+                    obfusEditText.backspace();
+                }
             }
         });
 
@@ -77,6 +99,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -98,26 +121,17 @@ public class TemplateInputPatternActivity extends SecureActivity {
         } //TODO
     }
 
+
     private void attemptNextStep() {
 
-        mPatternView.setError(null);
-
-        String pattern = mPatternView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
+        String pattern = obfusEditText.getPattern();
 
         if (!isPatternValid(pattern)) {
-            mPatternView.setError(getString(R.string.error_invalid_pattern));
-            focusView = mPatternView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
+            obfusEditText.getEditText().setError(getString(R.string.error_invalid_pattern));
         } else {
             Template template = templateViewModel.getTemplate().getValue();
-            template.setPatternFromUser(mPatternView.getText().toString(), SecretChecker.getOrAskForSecret(this));
+            byte[] secret = SecretChecker.getOrAskForSecret(this);
+            template.setPatternFromUser(pattern, secret);
 
             Intent intent = new Intent(getBaseContext(), TemplateInputHintsActivity.class);
             IntentUtil.setTemplateExtra(intent, template);
@@ -126,8 +140,18 @@ public class TemplateInputPatternActivity extends SecureActivity {
         }
     }
 
+    private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
+        button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
+        button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                obfusEditText.insert(obfusChar);
+            }
+        });
+    }
+
     private boolean isPatternValid(String pattern) {
-        return pattern.length() >= 4;
+        return pattern.length() >= Constants.MIN_PATTERN_LENGTH;
     }
 
 

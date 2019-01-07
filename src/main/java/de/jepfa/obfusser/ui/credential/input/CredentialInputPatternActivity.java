@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.ui.credential.input;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 
 import android.os.Bundle;
@@ -13,9 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.toolkit.ObfusEditText;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
@@ -23,7 +27,7 @@ import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 public class CredentialInputPatternActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
-    private EditText mPatternView;
+    private ObfusEditText obfusEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,17 +37,12 @@ public class CredentialInputPatternActivity extends SecureActivity {
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         final Credential credential = credentialViewModel.getCredential().getValue();
 
-        mPatternView = findViewById(R.id.credential_pattern);
-        String pattern = credential.getPatternAsExchangeFormatHinted(SecretChecker.getOrAskForSecret(this));
-        if (pattern != null) {
-            mPatternView.setText(pattern);
-        }
-
         if (credential.isPersisted()) {
             setTitle("Change credential");
         }
 
-        mPatternView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        EditText editText = findViewById(R.id.credential_builder_editview);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -53,6 +52,12 @@ public class CredentialInputPatternActivity extends SecureActivity {
                 return false;
             }
         });
+
+        byte[] secret = SecretChecker.getOrAskForSecret(this);
+        String pattern = credential.getPatternAsExchangeFormatHinted(secret);
+        obfusEditText = new ObfusEditText(editText,
+                getPatternRepresentation(), pattern);
+
 
         View selectTemplate = findViewById(R.id.link_to_template_selection);
         selectTemplate.setOnClickListener(new OnClickListener() {
@@ -65,17 +70,33 @@ public class CredentialInputPatternActivity extends SecureActivity {
             }
         });
 
-        View buildPattern = findViewById(R.id.link_to_pattern_builder);
-        buildPattern.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                Intent intent = new Intent(getBaseContext(), CredentialBuildPatternActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
-                startActivity(intent);
+        Button lowerCaseButton = findViewById(R.id.button_pattern_lower_case);
+        createObfusCharButton(lowerCaseButton, ObfusChar.LOWER_CASE_CHAR);
+
+        Button upperCaseButton = findViewById(R.id.button_pattern_upper_case);
+        createObfusCharButton(upperCaseButton, ObfusChar.UPPER_CASE_CHAR);
+
+        Button digitButton = findViewById(R.id.button_pattern_digit);
+        createObfusCharButton(digitButton, ObfusChar.DIGIT);
+
+        Button specialCharButton = findViewById(R.id.button_pattern_special_char);
+        createObfusCharButton(specialCharButton, ObfusChar.SPECIAL_CHAR);
+
+        Button buttonBackspace = findViewById(R.id.button_pattern_backspace);
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            buttonBackspace.setText("<X"); //TODO find better char
+        }
+
+        buttonBackspace.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int length = credential.getPatternLength();
+                if (length > 0) {
+                    obfusEditText.backspace();
+                }
             }
         });
-
 
         Button nextStepButton = findViewById(R.id.credential_next_step);
         nextStepButton.setOnClickListener(new OnClickListener() {
@@ -90,6 +111,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -111,28 +133,17 @@ public class CredentialInputPatternActivity extends SecureActivity {
         } //TODO
     }
 
+
     private void attemptNextStep() {
 
-        mPatternView.setError(null);
-
-        String pattern = mPatternView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
+        String pattern = obfusEditText.getPattern();
 
         if (!isPatternValid(pattern)) {
-            mPatternView.setError(getString(R.string.error_invalid_pattern));
-            focusView = mPatternView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
+            obfusEditText.getEditText().setError(getString(R.string.error_invalid_pattern));
         } else {
             Credential credential = credentialViewModel.getCredential().getValue();
-            credential.setPatternFromUser(
-                    mPatternView.getText().toString(),
-                    SecretChecker.getOrAskForSecret(this));
+            byte[] secret = SecretChecker.getOrAskForSecret(this);
+            credential.setPatternFromUser(pattern, secret);
 
             Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
             IntentUtil.setCredentialExtra(intent, credential);
@@ -141,8 +152,18 @@ public class CredentialInputPatternActivity extends SecureActivity {
         }
     }
 
+    private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
+        button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
+        button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                obfusEditText.insert(obfusChar);
+            }
+        });
+    }
+
     private boolean isPatternValid(String pattern) {
-        return pattern.length() >= 4;
+        return pattern.length() >= Constants.MIN_PATTERN_LENGTH;
     }
 
 

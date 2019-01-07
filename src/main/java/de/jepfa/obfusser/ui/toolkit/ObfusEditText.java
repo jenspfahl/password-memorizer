@@ -8,6 +8,7 @@ import android.widget.EditText;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
 import de.jepfa.obfusser.model.Representation;
+import de.jepfa.obfusser.ui.credential.input.CredentialHintRecyclerViewAdapter;
 
 public class ObfusEditText {
 
@@ -96,6 +97,10 @@ public class ObfusEditText {
         return pattern;
     }
 
+    public EditText getEditText() {
+        return editText;
+    }
+
     private int ensureNotNegative(int value) {
         return Math.max(0, value);
     }
@@ -103,4 +108,5 @@ public class ObfusEditText {
     private boolean isSelectionValid(int selection) {
         return selection != -1 && selection <= pattern.length();
     }
+
 }

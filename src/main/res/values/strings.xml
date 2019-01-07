@@ -14,8 +14,7 @@
     <string name="action_sign_in_next">Next step</string>
     <string name="action_sign_in">Create Credential</string>
     <string name="action_sign_in_short">Create</string>
-    <string name="error_invalid_pattern">This pattern is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_pattern">This pattern is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email

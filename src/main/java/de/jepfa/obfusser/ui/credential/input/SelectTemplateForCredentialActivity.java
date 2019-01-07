@@ -29,6 +29,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
     private CredentialViewModel credentialViewModel;
     private RadioGroup radioGroup;
     private Credential credential;
+    private Template selectedTemplate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,25 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                 .get(TemplateListViewModel.class);
 
         radioGroup = findViewById(R.id.select_template);
+        createRadioButtons();
+
+
+        final Button nextStepButton = findViewById(R.id.credential_next_step);
+        nextStepButton.setEnabled(false);
+        nextStepButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Credential credential = credentialViewModel.getCredential().getValue();
+                if (selectedTemplate != null) {
+                    credential.copyFrom(selectedTemplate);
+                }
+                Intent intent = new Intent(getBaseContext(), CredentialInputHintsTextActivity.class);
+                IntentUtil.setCredentialExtra(intent, credential);
+
+                startActivity(intent);
+            }
+        });
+
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -65,31 +85,14 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
 
                                 @Override
                                 public void onChanged(@Nullable Template template) {
-                                    if (template != null) {
-                                        Credential credential = credentialViewModel.getCredential().getValue();
-                                        credential.copyFrom(template);
-                                    }
+                                    selectedTemplate = template;
+                                    nextStepButton.setEnabled(selectedTemplate != null);
                                 }
                             });
                 }
             }
         });
 
-
-        createRadioButtons();
-
-
-        Button nextStepButton = findViewById(R.id.credential_next_step);
-        nextStepButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Credential credential = credentialViewModel.getCredential().getValue();
-                Intent intent = new Intent(getBaseContext(), CredentialInputHintsTextActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
-
-                startActivity(intent);
-            }
-        });
 
     }
 

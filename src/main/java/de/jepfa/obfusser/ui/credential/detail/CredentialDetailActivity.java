@@ -15,6 +15,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -117,11 +118,14 @@ public class CredentialDetailActivity extends SecureActivity {
                 return true;
 
             case R.id.menu_delete_credential:
-                credentialViewModel.getRepo().delete(credential);
-
-                Intent upIntent = new Intent(this, NavigationActivity.class);
-                upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials);
-                navigateUpTo(upIntent);
+                DeletionHelper.askAndDelete(credentialViewModel.getRepo(), credential, this, new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent upIntent = new Intent(CredentialDetailActivity.this, NavigationActivity.class);
+                        upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials);
+                        navigateUpTo(upIntent);
+                    }
+                });
 
                 return true;
         }

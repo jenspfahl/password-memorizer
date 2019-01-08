@@ -12,6 +12,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.ui.group.input.GroupInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -80,11 +81,16 @@ public class GroupDetailActivity extends BaseActivity {
                 return true;
 
             case R.id.menu_delete_group:
-                groupViewModel.getRepo().delete(group);
+                DeletionHelper.askAndDelete(groupViewModel.getRepo(), group, this, new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent upIntent = new Intent(GroupDetailActivity.this, NavigationActivity.class);
+                        upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_groups);
+                        navigateUpTo(upIntent);
+                    }
+                });
 
-                Intent upIntent = new Intent(this, NavigationActivity.class);
-                upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_groups);
-                navigateUpTo(upIntent);
+
                 return true;
         }
 

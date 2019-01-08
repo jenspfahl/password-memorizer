@@ -29,6 +29,8 @@ import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
+import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -165,7 +167,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
         }
 
         if (id == R.id.menu_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://jepfa.de"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://password-memorizer.jepfa.de"));
             startActivity(browserIntent);
 
             return true;
@@ -207,7 +209,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_credential:
-                        credentialListViewModel.getRepo().delete(credential);
+                        DeletionHelper.askAndDelete(credentialListViewModel.getRepo(), credential, getActivity(), null);
                         return true;
                     default:
                         return false;

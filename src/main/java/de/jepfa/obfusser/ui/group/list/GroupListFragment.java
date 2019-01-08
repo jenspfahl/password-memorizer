@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.group.input.GroupInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
@@ -94,7 +95,7 @@ public class GroupListFragment extends Fragment implements View.OnClickListener{
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_group:
-                        groupListViewModel.getRepo().delete(group);
+                        DeletionHelper.askAndDelete(groupListViewModel.getRepo(), group, getActivity(), null);
                         return true;
                     default:
                         return false;

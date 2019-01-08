@@ -19,6 +19,7 @@ import java.util.List;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureFragment;
+import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
@@ -95,7 +96,7 @@ public class TemplateListFragment extends SecureFragment implements View.OnClick
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_template:
-                        templateListViewModel.getRepo().delete(template);
+                        DeletionHelper.askAndDelete(templateListViewModel.getRepo(), template, getActivity(), null);
                         return true;
                     default:
                         return false;

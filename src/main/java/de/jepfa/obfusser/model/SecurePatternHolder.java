@@ -77,7 +77,13 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        s = ObfusString.obfuscate(hint).toRepresentation(representation);
+                        if (hint.equals(Constants.EMPTY_HINT)) {
+                            //TODO should we present placeholder in the builder?
+                            s = String.valueOf(representation.getPlaceholderChar());
+                        }
+                        else {
+                            s = ObfusString.obfuscate(hint).toRepresentation(representation);
+                        }
                     }
                 }
                 sb.append(s);
@@ -114,6 +120,13 @@ public abstract class SecurePatternHolder extends PatternHolder {
     public void setPatternFromUser(String userInput, byte[] key) {
         if (userInput != null) {
             setPattern(ObfusString.obfuscate(userInput), key);
+        }
+    }
+
+    @Ignore
+    public void setPatternFromExchangeFormat(String pattern, byte[] key) {
+        if (pattern != null) {
+            setPattern(ObfusString.obfuscate(pattern), key);
         }
     }
 

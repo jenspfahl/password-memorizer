@@ -10,74 +10,74 @@ public enum Representation {
             getAlternative(Build.VERSION_CODES.M, '\u2B24', '\u25CF'),  // '⬤' / '●'
             getAlternative(Build.VERSION_CODES.LOLLIPOP, '\u2580', '\u25A0'), // '▀' / '■'
             '\u25A0', // '■'
-            '\u25EF', // '◯'
             null),
 
     VIKING("Viking",
-            '\u16B4', // ''
-            '\u16A1', // ''
+            '\u16B4',
+            '\u16A1',
             '\u16CA',
             '\u16C9',
-            '\u16DC', // ''
-            '\u25EF', // '◯'
+            '\u16DC',
             Build.VERSION_CODES.M),
 
     HATCHING("Hatching",
-            '\u2591', // ''
-            '\u2592', // ''
+            '\u2591',
+            '\u2592',
             '\u2593',
             '\u2594',
-            '\u2596', // ''
-            '\u25EF', // '◯'
+            '\u2596',
             Build.VERSION_CODES.M),
 
     BRAILLE("Braille",
-            '\u2860', // ''
-            '\u28F8', // ''
+            '\u2860',
+            '\u28F8',
             '\u28F6',
             '\u2819',
-            '\u28FF', // ''
-            '\u25EF', // '◯'
+            '\u28FF',
             Build.VERSION_CODES.M),
 
     NUMBERS("Numbers",
-            '1', // ''
-            '3', // ''
+            '1',
+            '3',
             '5',
             '7',
             '0',
-            '\u25EF', // '◯'
             null),
 
     HEXAGRAM("Hexagram",
-            '\u4DD2', // ''
-            '\u4DD3', // ''
+            '\u4DD2',
+            '\u4DD3',
             '\u4DE8',
             '\u4DEA',
-            '\u4DC0', // ''
-            '\u25EF', // '◯'
+            '\u4DC0',
             Build.VERSION_CODES.M),
 
-   /* LINES("Lines",
-            '\u02E8', // ''
-            '\u02E6', // ''
-            '\u02E9',
-            '\u02E5',
-            '-', // ''
-            '\u25EF', // '◯'
-            null),*/
+    LINES("Lines",
+            '\u23CA',
+            '\u23C9',
+            '\u23CB',
+            '\u23CC',
+            '\u2014',
+            null),
 
     MUSIC("Music",
-            '\u15B1', // ''
-            '\u15B0', // ''
+            '\u15B1',
+            '\u15B0',
             '\u15B2',
             '\u15B3',
-            '\u2022', // ''
-            '\u25EF', // '◯'
+            '\u2022',
             Build.VERSION_CODES.M),
 
+    CHESS("Chess",
+            '\u265F',
+            '\u265A',
+            '\u2658',
+            '\u2657',
+            '\u2656',
+            Build.VERSION_CODES.LOLLIPOP),
+
   /*  SYMBOLS("Symbols",
-            '\u20DF', // ''
+            '\u20DF',
             '\u20DE', // ''
             '\u20DD',
             '\u20E4',
@@ -86,6 +86,8 @@ public enum Representation {
             Build.VERSION_CODES.M),*/
 
     ;
+
+    private static final char COMMON_PLACEHOLDER_CHAR = '\u25EF'; // '◯'
 
 
     private static char getAlternative(int version, char origin, char alternative) {
@@ -98,18 +100,16 @@ public enum Representation {
     private char digit;
     private char specialChar;
     private char anyChar;
-    private char placeholderChar;
     private Integer minVersion;
 
     private Representation(String name, char lowerChar, char upperChar, char digit, char specialChar,
-                           char anyChar, char placeholderChar, Integer minVersion) {
+                           char anyChar, Integer minVersion) {
         this.name = name;
         this.lowerChar = lowerChar;
         this.upperChar = upperChar;
         this.digit = digit;
         this.specialChar = specialChar;
         this.anyChar = anyChar;
-        this.placeholderChar = placeholderChar;
         this.minVersion = minVersion;
     }
 
@@ -138,7 +138,7 @@ public enum Representation {
     }
 
     public char getPlaceholderChar() {
-        return placeholderChar;
+        return COMMON_PLACEHOLDER_CHAR;
     }
 
     public Integer getMinVersion() {

@@ -1,18 +1,23 @@
 package de.jepfa.obfusser.ui.credential.list;
 
 import android.arch.lifecycle.Observer;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.settings.SettingsActivity;
 
 
 public class CredentialExpandableListFragment extends CredentialListFragmentBase {
@@ -35,6 +40,9 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
         expandableAdapter = new CredentialExpandableListAdapter(this);
         listView.setAdapter(expandableAdapter);
 
+        final SharedPreferences defaultSharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(this.getActivity());
+
         credentialListViewModel
                 .getRepo()
                 .getAllCredentialsSortByGroupAndName()
@@ -48,20 +56,56 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
                                     @Override
                                     public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call
                                         expandableAdapter.setCredentials(groups, credentials);
-                                        expandAllGroups(listView);
+                                        expandStoredGroups(listView, defaultSharedPreferences);
                                     }
                                 });
                     }
                 });
 
+
+
+        listView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                Set<String> expandedGroups = defaultSharedPreferences
+                        .getStringSet(SettingsActivity.PREF_EXPANDED_GROUPS, new HashSet<String>());
+
+                expandedGroups.add(String.valueOf(groupPosition));
+
+                SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+                editor.putStringSet(SettingsActivity.PREF_EXPANDED_GROUPS, expandedGroups);
+                editor.commit();
+            }
+        });
+
+        listView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+                Set<String> expandedGroups = defaultSharedPreferences
+                        .getStringSet(SettingsActivity.PREF_EXPANDED_GROUPS, new HashSet<String>());
+
+                expandedGroups.remove(String.valueOf(groupPosition));
+
+                SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+                editor.putStringSet(SettingsActivity.PREF_EXPANDED_GROUPS, expandedGroups);
+                editor.commit();
+            }
+        });
+
         return view;
     }
 
-    private void expandAllGroups(ExpandableListView listView) {
+    private void expandStoredGroups(ExpandableListView listView, SharedPreferences defaultSharedPreferences) {
         if (listView != null) {
+            Set<String> expandedGroups = defaultSharedPreferences
+                    .getStringSet(SettingsActivity.PREF_EXPANDED_GROUPS, new HashSet<String>());
+
             int count = expandableAdapter.getGroupCount();
-            for (int position = 1; position <= count; position++)
-                listView.expandGroup(position - 1);
+            for (int position = 0; position < count; position++) {
+                if (expandedGroups.contains(String.valueOf(position))) {
+                    listView.expandGroup(position);
+                }
+            }
         }
     }
 

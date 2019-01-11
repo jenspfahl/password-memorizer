@@ -1,12 +1,15 @@
 package de.jepfa.obfusser.ui.common;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -24,15 +27,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
-import de.jepfa.obfusser.model.PatternHolder;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
-import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 public abstract class PatternDetailFragment extends SecureFragment {
+
+    public interface HintSelectionListener {
+        boolean onHintSelected(int index);
+        boolean onHintDeselected(int index);
+    }
 
     public static final String ARG_MODE = "mode";
     public static final int SHOW_DETAIL = 1;
@@ -40,6 +45,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
     public static final int INPUT_HINTS = 3;
 
     protected int mode;
+
+    private HintSelectionListener hintSelectionListener;
 
 
     @Override
@@ -85,6 +92,10 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     protected abstract String getPatternRepresentationForDetails(SecurePatternHolder pattern);
 
+    public void setHintSelectionListener(HintSelectionListener hintSelectionListener) {
+        this.hintSelectionListener = hintSelectionListener;
+    }
+
     private void onCreateForShowPatternDetails(final SecurePatternHolder pattern, final TextView obfusTextView) {
         String patternString = buildPatternString(
                 pattern,
@@ -122,65 +133,83 @@ public abstract class PatternDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewPatternSelectHints(final SecurePatternHolder pattern, final TextView obfusTextView) {
-        String patternString = pattern.getPatternRepresentationRevealed(
+        String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                 SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
                 getSecureActivity().getPatternRepresentation());
-        final SpannableString span = new SpannableString( patternString);
+        final SpannableStringBuilder span = new SpannableStringBuilder(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {
-            int j = i + 1;
 
-            final boolean fenabled;
-            String hint = pattern.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
-            if (hint != null) {
-                fenabled = true;
-            }
-            else {
-                fenabled = false;
-             }
+            final boolean fenabled = pattern.hasHint(i);
 
             final int fi = i;
-            final int fj = j;
             ClickableSpan clickSpan = new ClickableSpan() {
 
                 private boolean enabled = fenabled;
+                private int index = fi;
 
                 @Override
                 public void updateDrawState(@NonNull TextPaint ds) {
-
                     int color;
                     if (enabled) {
                         color = getResources().getColor(R.color.colorAccent);
+
                     }
                     else {
                         color = Color.BLACK;
                     }
-
                     ds.setColor(color);
-                    ds.setUnderlineText(false);
+                    ds.setUnderlineText(false); // overwrite super underline setting
                 }
 
                 @Override
                 public void onClick(View yourTextView) {
 
                     enabled = !enabled;
-                    int color;
                     if (enabled) {
-                        pattern.addPotentialHint(fi);
-                        color = getResources().getColor(R.color.colorAccent);
+                        pattern.addPotentialHint(index);
+
+                        if (hintSelectionListener != null) {
+                            hintSelectionListener.onHintSelected(index);
+                        }
                     }
                     else {
-                        pattern.removePotentialHint(fi);
-                        color = Color.BLACK;
+
+                        if (pattern.isFilledHint(index)) {
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Delete revealed ")
+                                    .setMessage("Sure delete number "
+                                            + pattern.getNumberedPlaceholder(index).toRepresentation() + " ?")
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                                            pattern.removePotentialHint(index);
+
+                                            if (hintSelectionListener != null) {
+                                                hintSelectionListener.onHintDeselected(index);
+                                            }
+                                            onCreateForNewPatternSelectHints(pattern, obfusTextView);
+
+                                        }})
+                                    .setNegativeButton(android.R.string.no, null)
+                                    .show();
+                        }
+                        else {
+                            pattern.removePotentialHint(index);
+
+                            if (hintSelectionListener != null) {
+                                hintSelectionListener.onHintDeselected(index);
+                            }
+                        }
+
                     }
 
-                    span.setSpan(new ForegroundColorSpan(color), fi, fj, 0);
-                    obfusTextView.setText(span, TextView.BufferType.SPANNABLE);
-                    obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
-
+                    onCreateForNewPatternSelectHints(pattern, obfusTextView);
                 }
             };
-            span.setSpan(clickSpan, i, j, 0);
+            span.setSpan(clickSpan, i, i + 1, 0);
 
         }
 

@@ -8,5 +8,5 @@ public interface Constants {
     int NO_ID = Integer.MIN_VALUE;
     String NO_GROUP_NAME = "-no group-";
     int MIN_PATTERN_LENGTH = 4;
-    String EMPTY_HINT = "";
+    String EMPTY = "";
 }

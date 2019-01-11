@@ -11,6 +11,7 @@ import android.widget.Button;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.PatternDetailFragment;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -39,18 +40,32 @@ public class CredentialInputHintsTextActivity extends SecureActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                    CredentialDetailFragment.INPUT_HINTS);
+                    CredentialDetailFragment.SELECT_HINTS);
 
             CredentialDetailFragment detailFragment = new CredentialDetailFragment();
             detailFragment.setArguments(arguments);
 
-            CredentialHintFragment hintsFragment = new CredentialHintFragment();
+            final CredentialHintFragment hintsFragment = new CredentialHintFragment();
             hintsFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.credential_detail_container_for_input, detailFragment)
                     .add(R.id.credential_hints_list, hintsFragment)
                     .commit();
+
+            detailFragment.setHintSelectionListener(new PatternDetailFragment.HintSelectionListener() {
+                @Override
+                public boolean onHintSelected(int index) {
+                    hintsFragment.refresh();
+                    return true;
+                }
+
+                @Override
+                public boolean onHintDeselected(int index) {
+                    hintsFragment.refresh();
+                    return true;
+                }
+            });
         }
 
 

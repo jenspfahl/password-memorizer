@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import de.jepfa.obfusser.Constants;
+
 /**
  * Base class for {@link Credential} and {@link Template}.
  *
@@ -19,7 +21,6 @@ import java.util.TreeMap;
  */
 public abstract class PatternHolder extends IdEntity {
 
-    public static final String EMPTY = "";
     public static final String ATTRIB_NAME = "name";
     public static final String ATTRIB_INFO = "info";
     public static final String ATTRIB_PATTERN_INTERNAL = "pattern_internal";
@@ -115,10 +116,38 @@ public abstract class PatternHolder extends IdEntity {
         return null;
     }
 
+    @Ignore
+    public NumberedPlaceholder getNumberedPlaceholder(int index) {
+        int placeholder = 1;
+        for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
+            if (index == entry.getKey()) {
+                return NumberedPlaceholder.fromPlaceholderNumber(placeholder);
+            }
+            placeholder++;
+        }
+        return null;
+    }
+
+
+    @Ignore
+    public boolean hasHint(int index) {
+        return getHints().containsKey(index);
+    }
+
+    @Ignore
+    public boolean isPotentialHint(int index) {
+        return getHints().containsKey(index) && getHints().get(index).equals(Constants.EMPTY);
+    }
+
+    @Ignore
+    public boolean isFilledHint(int index) {
+        return getHints().containsKey(index) && !getHints().get(index).isEmpty();
+    }
+
 
     @Ignore
     public void addPotentialHint(int index) {
-        getHints().put(index, EMPTY);
+        getHints().put(index, Constants.EMPTY);
     }
 
 

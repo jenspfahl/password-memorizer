@@ -19,7 +19,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.toolkit.ObfusEditText;
+import de.jepfa.obfusser.ui.common.ObfusEditText;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 

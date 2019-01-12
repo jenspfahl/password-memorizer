@@ -31,13 +31,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        if (hint.equals(Constants.EMPTY)) {
-                            //TODO should we present placeholder in the builder?
-                            s = obfusChar.toExchangeFormat();
-                        }
-                        else {
-                            s = ObfusString.obfuscate(hint).toExchangeFormat();
-                        }
+                        s = ObfusString.obfuscate(hint).toExchangeFormat();
                     }
                 }
                 sb.append(s);
@@ -77,13 +71,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        if (hint.equals(Constants.EMPTY)) {
-                            //TODO should we present placeholder in the builder?
-                            s = String.valueOf(representation.getPlaceholderChar());
-                        }
-                        else {
-                            s = ObfusString.obfuscate(hint).toRepresentation(representation);
-                        }
+                        s = ObfusString.obfuscate(hint).toRepresentation(representation);
                     }
                 }
                 sb.append(s);

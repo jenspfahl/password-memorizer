@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.ui.toolkit;
+package de.jepfa.obfusser.ui.common;
 
 import android.text.InputFilter;
 import android.text.SpannableString;

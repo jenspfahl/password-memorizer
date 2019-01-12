@@ -14,9 +14,9 @@ import android.widget.EditText;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
-import de.jepfa.obfusser.model.Secret;
 
 public abstract class SecureActivity extends BaseActivity {
 

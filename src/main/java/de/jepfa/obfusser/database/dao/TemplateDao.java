@@ -9,8 +9,6 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.model.Template;
 
 @Dao

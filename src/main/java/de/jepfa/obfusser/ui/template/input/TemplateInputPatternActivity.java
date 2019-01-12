@@ -2,9 +2,8 @@ package de.jepfa.obfusser.ui.template.input;
 
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.ActionBar;
-
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,8 +15,8 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.model.ObfusChar;
+import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.ObfusEditText;
 import de.jepfa.obfusser.util.IntentUtil;

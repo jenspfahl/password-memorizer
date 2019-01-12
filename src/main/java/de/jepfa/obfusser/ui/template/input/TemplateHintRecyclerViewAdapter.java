@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
+import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 
 public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<TemplateHintRecyclerViewAdapter.ViewHolder> {

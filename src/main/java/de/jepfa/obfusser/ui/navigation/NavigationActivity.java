@@ -1,20 +1,15 @@
 package de.jepfa.obfusser.ui.navigation;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialExpandableListFragment;

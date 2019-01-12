@@ -1,8 +1,8 @@
 package de.jepfa.obfusser.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import java.util.List;
 

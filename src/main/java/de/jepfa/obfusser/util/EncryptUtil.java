@@ -1,7 +1,5 @@
 package de.jepfa.obfusser.util;
 
-import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -13,7 +11,6 @@ import java.util.List;
 
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
-import de.jepfa.obfusser.ui.settings.SettingsActivity;
 
 /**
  * Utils to help with en-/decrypt data and generate keys from user secrets like passwords or pins.

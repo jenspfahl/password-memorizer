@@ -3,7 +3,6 @@ package de.jepfa.obfusser.ui.common;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
 
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;

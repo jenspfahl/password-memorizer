@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentActivity;
 
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.util.IntentUtil;
-import de.jepfa.obfusser.viewmodel.group.GroupViewModelBase;
 
 public class GroupViewModel extends GroupViewModelBase {
 

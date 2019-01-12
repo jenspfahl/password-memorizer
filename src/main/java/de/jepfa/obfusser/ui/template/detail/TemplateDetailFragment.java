@@ -1,32 +1,10 @@
 package de.jepfa.obfusser.ui.template.detail;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.SecurePatternHolder;
-import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.common.PatternDetailFragment;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 

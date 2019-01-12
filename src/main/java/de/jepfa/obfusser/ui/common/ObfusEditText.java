@@ -4,7 +4,6 @@ import android.text.InputFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.EditText;
 
 import de.jepfa.obfusser.model.ObfusChar;

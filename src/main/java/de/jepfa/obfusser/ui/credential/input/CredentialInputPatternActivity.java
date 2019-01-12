@@ -2,9 +2,8 @@ package de.jepfa.obfusser.ui.credential.input;
 
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.ActionBar;
-
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;

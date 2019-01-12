@@ -34,19 +34,17 @@ import de.jepfa.obfusser.ui.SecureFragment;
 
 public abstract class PatternDetailFragment extends SecureFragment {
 
-    public interface HintSelectionListener {
-        boolean onHintSelected(int index);
-        boolean onHintDeselected(int index);
+    public interface HintUpdateListener {
+        void onHintUpdated(int index);
     }
 
     public static final String ARG_MODE = "mode";
     public static final int SHOW_DETAIL = 1;
     public static final int SELECT_HINTS = 2;
-    public static final int INPUT_HINTS = 3;
 
     protected int mode;
 
-    private HintSelectionListener hintSelectionListener;
+    private HintUpdateListener hintUpdateListener;
 
 
     @Override
@@ -67,9 +65,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
             switch (mode) {
                 case SELECT_HINTS:
                     onCreateForNewPatternSelectHints(pattern, obfusTextView);
-                    break;
-                case INPUT_HINTS:
-                    onCreateForNewPatternInputHints(pattern, obfusTextView);
                     break;
                 case SHOW_DETAIL:
                     onCreateForShowPatternDetails(pattern, obfusTextView);
@@ -92,8 +87,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     protected abstract String getPatternRepresentationForDetails(SecurePatternHolder pattern);
 
-    public void setHintSelectionListener(HintSelectionListener hintSelectionListener) {
-        this.hintSelectionListener = hintSelectionListener;
+    public void setHintUpdateListener(HintUpdateListener hintUpdateListener) {
+        this.hintUpdateListener = hintUpdateListener;
     }
 
     private void onCreateForShowPatternDetails(final SecurePatternHolder pattern, final TextView obfusTextView) {
@@ -120,16 +115,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
             }
 
         });
-    }
-
-
-    private void onCreateForNewPatternInputHints(SecurePatternHolder pattern, TextView obfusTextView) {
-        String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
-                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                getSecureActivity().getPatternRepresentation());
-        SpannableString span = getSpannableString(pattern, patternString, null);
-
-        obfusTextView.setText(span, TextView.BufferType.NORMAL);
     }
 
     private void onCreateForNewPatternSelectHints(final SecurePatternHolder pattern, final TextView obfusTextView) {
@@ -169,8 +154,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     if (enabled) {
                         pattern.addPotentialHint(index);
 
-                        if (hintSelectionListener != null) {
-                            hintSelectionListener.onHintSelected(index);
+                        if (hintUpdateListener != null) {
+                            hintUpdateListener.onHintUpdated(index);
                         }
                     }
                     else {
@@ -178,7 +163,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                         if (pattern.isFilledHint(index)) {
                             new AlertDialog.Builder(getContext())
                                     .setTitle("Delete revealed ")
-                                    .setMessage("Sure delete number "
+                                    .setMessage("Sure delete not emtpy number "
                                             + pattern.getNumberedPlaceholder(index).toRepresentation() + " ?")
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -187,8 +172,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
                                             pattern.removePotentialHint(index);
 
-                                            if (hintSelectionListener != null) {
-                                                hintSelectionListener.onHintDeselected(index);
+                                            if (hintUpdateListener != null) {
+                                                hintUpdateListener.onHintUpdated(index);
                                             }
                                             onCreateForNewPatternSelectHints(pattern, obfusTextView);
 
@@ -199,8 +184,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
                         else {
                             pattern.removePotentialHint(index);
 
-                            if (hintSelectionListener != null) {
-                                hintSelectionListener.onHintDeselected(index);
+                            if (hintUpdateListener != null) {
+                                hintUpdateListener.onHintUpdated(index);
                             }
                         }
 

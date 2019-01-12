@@ -40,14 +40,6 @@
         <activity
             android:name=".ui.credential.input.CredentialInputHintsActivity"
             android:label="@string/title_activity_credential_input"
-            android:parentActivityName=".ui.credential.input.CredentialInputPatternActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.jepfa.obfusser.ui.credential.input.CredentialInputPatternActivity" />
-        </activity>
-        <activity
-            android:name=".ui.credential.input.CredentialInputHintsTextActivity"
-            android:label="@string/title_activity_credential_input"
             android:parentActivityName=".ui.credential.input.CredentialInputHintsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -82,14 +74,6 @@
         </activity>
         <activity
             android:name=".ui.template.input.TemplateInputHintsActivity"
-            android:label="@string/title_activity_template_input"
-            android:parentActivityName=".ui.template.input.TemplateInputPatternActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.jepfa.obfusser.ui.template.input.TemplateInputPatternActivity" />
-        </activity>
-        <activity
-            android:name=".ui.template.input.TemplateInputHintsTextActivity"
             android:label="@string/title_activity_template_input"
             android:parentActivityName=".ui.template.input.TemplateInputHintsActivity">
             <meta-data

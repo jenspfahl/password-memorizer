@@ -63,7 +63,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                 if (selectedTemplate != null) {
                     credential.copyFrom(selectedTemplate);
                 }
-                Intent intent = new Intent(getBaseContext(), CredentialInputHintsTextActivity.class);
+                Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
                 IntentUtil.setCredentialExtra(intent, credential);
 
                 startActivity(intent);

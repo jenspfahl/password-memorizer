@@ -13,7 +13,7 @@
     <string name="credential_input_hints_explanation">Select the characters to be revealed by touching them and input the real characters. This will help you to remember your password. The more characters you reveal the less have you to keep in mind. But remember, you shouldn\'t reveal too much.</string>
     <string name="credential_input_name_explanation">Here you can type the name and an optional info text for your pattern.</string>
     <string name="credential_input_pattern_explanation">You can input your password and it will be transformed into a pattern immediately. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
-    <string name="credential_select_group_explanation">Select a group to be assigned to your pattern.</string>
+    <string name="credential_select_group_explanation">Optionally categorize your pattern.</string>
     <string name="credential_select_template_explanation">Select a template to be used for your pattern.</string>
 
 
@@ -36,17 +36,19 @@
 
 
     <!-- Strings related to group -->
-    <string name="title_group_detail">Group Detail</string>
-    <string name="title_activity_group_input">New Group</string>
-    <string name="title_groups">Groups</string>
-    <string name="title_change_group">Change group</string>
+    <string name="title_group_detail">Category Detail</string>
+    <string name="title_activity_group_input">New Category</string>
+    <string name="title_groups">Categories</string>
+    <string name="title_change_group">Change Category</string>
 
-    <string name="title_assign_group">Assign to group for</string>
+    <string name="title_assign_group">Categorize for</string>
 
-    <string name="button_create_group">Create Group</string>
-    <string name="button_change_group">Change Group</string>
+    <string name="button_create_group">Create Category</string>
+    <string name="button_change_group">Change Category</string>
 
-    <string name="no_group">-no group-</string>
+    <string name="no_group">-not categorized-</string>
+
+    <string name="assign_to_group">Categorize</string>
 
 
 
@@ -62,7 +64,6 @@
     <string name="error_field_required">This field is required</string>
 
     <string name="change">Change</string>
-    <string name="assign_to_group">Assign to group</string>
     <string name="delete">Delete</string>
 
     <string name="hint">Revealed</string>

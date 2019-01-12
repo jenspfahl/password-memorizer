@@ -31,7 +31,6 @@
             android:layout_gravity="right"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/title_template_detail"
-            android:src="@drawable/ic_action_name"
-            android:text="Show Popup Menu" />
+            android:src="@drawable/ic_action_name" />
     </TableRow>
 </TableLayout>

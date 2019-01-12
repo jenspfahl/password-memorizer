@@ -12,4 +12,5 @@
     android:textIsSelectable="false"
 
     android:textStyle="normal"
-    tools:context=".ui.group.detail.GroupDetailFragment" />
+    tools:context=".ui.group.detail.GroupDetailFragment"
+    android:focusable="true" />

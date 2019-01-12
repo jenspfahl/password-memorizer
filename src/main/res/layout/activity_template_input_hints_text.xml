@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="24dp"
+                android:text="@string/template_input_hints_explanation"/>
+
 
             <android.support.v4.widget.NestedScrollView
                 android:id="@+id/template_detail_container_for_input"
@@ -42,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in"
+                android:text="@string/button_create_template"
                 android:background="@color/colorAccent"
                 android:textStyle="bold" />
 

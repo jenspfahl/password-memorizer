@@ -39,7 +39,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         credential = credentialViewModel.getCredential().getValue();
         if (credential.isPersisted()) {
-            setTitle("Change credential");
+            setTitle(R.string.title_change_credential);
         }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

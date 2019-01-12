@@ -59,7 +59,7 @@ public class GroupListFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        getActivity().setTitle("Groups");
+        getActivity().setTitle(R.string.title_groups);
 
         RecyclerView recyclerView = view.findViewById(R.id.group_list);
         assert recyclerView != null;

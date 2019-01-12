@@ -70,7 +70,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
                 else {
                     Group noGroupGroup = new Group();
                     noGroupGroup.setId(Constants.NO_ID);
-                    noGroupGroup.setName(Constants.NO_GROUP_NAME);
+                    noGroupGroup.setName(fragment.getString(R.string.no_group));
                     groups.add(0, noGroupGroup);
                 }
             }

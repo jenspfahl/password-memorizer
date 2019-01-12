@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="24dp"
-                android:text="You can input your password and it will be transformed into a pattern immediately. If you don't want to type your password, you can also build the pattern by clicking the buttons for the character classes."/>
+                android:text="@string/template_input_pattern_explanation"/>
 
             <EditText
                 android:id="@+id/template_builder_editview"
@@ -57,9 +57,9 @@
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorAccent"
-                    android:text="a..z"
+                    android:text="@string/lower_char"
                     android:textAllCaps="false"
-                    android:textSize="24dp" />
+                    android:textSize="24sp" />
 
                 <Button
                     android:id="@+id/button_pattern_upper_case"
@@ -70,8 +70,8 @@
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorAccent"
-                    android:text="A..Z"
-                    android:textSize="24dp"/>
+                    android:text="@string/upper_char"
+                    android:textSize="24sp"/>
 
                 <Button
                     android:id="@+id/button_pattern_digit"
@@ -82,8 +82,8 @@
                     android:layout_marginTop="16dp"
                     android:background="@color/colorAccent"
                     android:layout_weight="1"
-                    android:text="0..9"
-                    android:textSize="24dp"/>
+                    android:text="@string/digit"
+                    android:textSize="24sp"/>
 
                 <Button
                     android:id="@+id/button_pattern_special_char"
@@ -94,8 +94,8 @@
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorAccent"
-                    android:text="#/+.."
-                    android:textSize="24dp"/>
+                    android:text="@string/special_char"
+                    android:textSize="24sp"/>
 
                 <Button
                     android:id="@+id/button_pattern_backspace"
@@ -106,8 +106,8 @@
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorAccent"
-                    android:text="⌫"
-                    android:textSize="24dp"/>
+                    android:text="@string/backspace"
+                    android:textSize="24sp"/>
 
 
             </LinearLayout>
@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in_next"
+                android:text="@string/button_next_step"
                 android:background="@color/colorAccent"
                 android:textStyle="bold" />
 

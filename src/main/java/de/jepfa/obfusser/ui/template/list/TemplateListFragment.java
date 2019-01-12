@@ -60,7 +60,7 @@ public class TemplateListFragment extends SecureFragment implements View.OnClick
             }
         });
 
-        getActivity().setTitle("Templates");
+        getActivity().setTitle(R.string.title_templates);
 
         RecyclerView recyclerView = view.findViewById(R.id.template_list);
         assert recyclerView != null;

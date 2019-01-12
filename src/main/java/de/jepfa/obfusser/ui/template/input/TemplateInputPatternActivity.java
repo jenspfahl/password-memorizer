@@ -37,7 +37,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
         final Template template = templateViewModel.getTemplate().getValue();
 
         if (template.isPersisted()) {
-            setTitle("Change template");
+            setTitle(R.string.title_change_template);
         }
 
         EditText editText = findViewById(R.id.template_builder_editview);

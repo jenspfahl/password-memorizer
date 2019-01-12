@@ -25,7 +25,6 @@ import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 public class SelectGroupForCredentialActivity extends SecureActivity {
 
-    private GroupListViewModel groupListViewModel;
     private CredentialViewModel credentialViewModel;
 
     @Override
@@ -35,14 +34,14 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         final Credential credential = credentialViewModel.getCredential().getValue();
-        setTitle("Assign to group for " + credential.getName());
+        setTitle(getString(R.string.title_assign_group) + " " + credential.getName());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        groupListViewModel = ViewModelProviders
+        GroupListViewModel groupListViewModel = ViewModelProviders
                 .of(this)
                 .get(GroupListViewModel.class);
 
@@ -69,7 +68,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
 
                         RadioButton noGroupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
                         noGroupRadioButton.setId(Constants.NO_ID);
-                        noGroupRadioButton.setText(Constants.NO_GROUP_NAME);
+                        noGroupRadioButton.setText(getString(R.string.no_group));
                         if (selectedGroupId == null) {
                             noGroupRadioButton.setChecked(true);
                         }

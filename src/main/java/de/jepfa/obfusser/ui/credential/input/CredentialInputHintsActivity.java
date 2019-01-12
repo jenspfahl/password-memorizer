@@ -28,9 +28,6 @@ public class CredentialInputHintsActivity extends SecureActivity {
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         Credential credential = credentialViewModel.getCredential().getValue();
-        if (credential.isPersisted()) {
-            setTitle("Change credential");
-        }
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -101,6 +98,11 @@ public class CredentialInputHintsActivity extends SecureActivity {
                 }
             }
         });
+
+        if (credential.isPersisted()) {
+            setTitle(R.string.title_change_credential);
+            button.setText(R.string.button_change_credential);
+        }
     }
 
 

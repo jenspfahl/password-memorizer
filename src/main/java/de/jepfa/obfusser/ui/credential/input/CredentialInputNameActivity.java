@@ -48,7 +48,7 @@ public class CredentialInputNameActivity extends SecureActivity {
         }
 
         if (credential.isPersisted()) {
-            setTitle("Change credential");
+            setTitle(R.string.title_change_credential);
         }
 
         infoView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

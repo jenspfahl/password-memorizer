@@ -48,7 +48,7 @@ public class TemplateInputNameActivity extends SecureActivity {
         }
 
         if (template.isPersisted()) {
-            setTitle("Change template");
+            setTitle(R.string.title_change_template);
         }
 
         infoView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

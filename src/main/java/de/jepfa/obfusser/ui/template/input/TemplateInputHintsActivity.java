@@ -27,9 +27,6 @@ public class TemplateInputHintsActivity extends SecureActivity {
 
         templateViewModel = TemplateViewModel.getFromIntent(this, getIntent());
         Template template = templateViewModel.getTemplate().getValue();
-        if (template.isPersisted()) {
-            setTitle("Change template");
-        }
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -86,6 +83,11 @@ public class TemplateInputHintsActivity extends SecureActivity {
 
             }
         });
+
+        if (template.isPersisted()) {
+            setTitle(R.string.title_change_template);
+            button.setText(R.string.button_change_template);
+        }
     }
 
 

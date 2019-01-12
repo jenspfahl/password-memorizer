@@ -74,7 +74,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
             }
         });
 
-        getActivity().setTitle("Credentials");
+        getActivity().setTitle(R.string.title_credentials);
 
         return view;
     }

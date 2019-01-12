@@ -37,7 +37,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         final Credential credential = credentialViewModel.getCredential().getValue();
 
         if (credential.isPersisted()) {
-            setTitle("Change credential");
+            setTitle(R.string.title_change_credential);
         }
 
         EditText editText = findViewById(R.id.credential_builder_editview);

@@ -12,4 +12,5 @@
     android:textIsSelectable="false"
 
     android:textStyle="normal"
-    tools:context=".ui.template.detail.TemplateDetailFragment" />
+    tools:context=".ui.template.detail.TemplateDetailFragment"
+    android:focusable="true" />

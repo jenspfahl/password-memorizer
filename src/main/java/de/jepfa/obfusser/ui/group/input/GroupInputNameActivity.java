@@ -46,10 +46,6 @@ public class GroupInputNameActivity extends BaseActivity {
             infoView.setText(info);
         }
 
-        if (group.isPersisted()) {
-            setTitle("Change group");
-        }
-
         infoView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -68,6 +64,11 @@ public class GroupInputNameActivity extends BaseActivity {
                 attemptNextStep();
             }
         });
+
+        if (group.isPersisted()) {
+            setTitle(R.string.title_change_group);
+            nextStepButton.setText(R.string.button_change_group);
+        }
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

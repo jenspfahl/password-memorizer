@@ -22,14 +22,11 @@ import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
-import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
 
 
 public class CredentialDetailActivity extends SecureActivity {
 
     private CredentialViewModel credentialViewModel;
-    private TemplateListViewModel templateListViewModel;
-    private GroupListViewModel groupListViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +36,7 @@ public class CredentialDetailActivity extends SecureActivity {
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         Credential credential = credentialViewModel.getCredential().getValue();
 
-        templateListViewModel = ViewModelProviders
-                .of(this)
-                .get(TemplateListViewModel.class);
-
-        groupListViewModel = ViewModelProviders
+        GroupListViewModel groupListViewModel = ViewModelProviders
                 .of(this)
                 .get(GroupListViewModel.class);
 

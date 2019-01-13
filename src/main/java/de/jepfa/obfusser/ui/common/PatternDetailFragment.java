@@ -150,6 +150,15 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 @Override
                 public void onClick(View yourTextView) {
 
+                    if (!enabled && pattern.getHints().size() == NumberedPlaceholder.values().length) {
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Set revealed")
+                                .setMessage("Maximum of revealed characters already reached.")
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();
+                        return;
+                    }
+
                     enabled = !enabled;
                     if (enabled) {
                         pattern.addPotentialHint(index);

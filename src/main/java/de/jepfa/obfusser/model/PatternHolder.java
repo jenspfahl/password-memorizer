@@ -167,7 +167,7 @@ public abstract class PatternHolder extends IdEntity {
 
     public void copyFrom(PatternHolder other) {
         setPatternInternal(other.getPatternInternal());
-        setHints(mergeHints(other.getHints()));
+        setHints(new TreeMap<>(other.getHints()));
         //setGroupId(other.getGroupId()); TODO activate if group is part of the cretion/change process
     }
 
@@ -189,25 +189,6 @@ public abstract class PatternHolder extends IdEntity {
                 ", groupId=" + groupId +
                 '}';
     }
-
-    private Map<Integer,String> mergeHints(Map<Integer, String> templateHints) {
-        Map<Integer, String> newHints = new HashMap<>(templateHints);
-
-        Map<Integer, String> credentialHints = getHints();
-        if (!credentialHints.isEmpty() && !templateHints.isEmpty()) {
-            int i = 0;
-            for (Map.Entry<Integer, String> entry : templateHints.entrySet()) {
-                Pair<Integer, String> hintData = getHintDataByPosition(i);
-                if (hintData != null) {
-                    newHints.put(entry.getKey(), hintData.second);
-                }
-                i++;
-            }
-        }
-        return newHints;
-    }
-
-
 
     private void cutOverlapingHints(int patternSize) {
         if (patternSize == 0) {

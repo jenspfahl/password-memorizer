@@ -172,7 +172,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
             Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
             builder.setTitle("About the app")
                     .setMessage(getString(R.string.app_name) + ", Version " + Constants.VERSION +
-                            Constants.NL + " (c) Jens Pfahl 2018")
+                            Constants.NL + " (c) Jens Pfahl 2018,2019")
                     .setIcon(icon)
                     .show();
 

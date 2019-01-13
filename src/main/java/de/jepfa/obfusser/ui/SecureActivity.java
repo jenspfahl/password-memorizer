@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.EditText;
 
@@ -85,7 +86,7 @@ public abstract class SecureActivity extends BaseActivity {
         }
 
 
-        public static String getApplicationUuid(Context context) {
+        public static synchronized String getApplicationUuid(Context context) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(context);
             String uuid = defaultSharedPreferences
@@ -102,6 +103,7 @@ public abstract class SecureActivity extends BaseActivity {
 
         public static byte[] getApplicationSalt(Context context) {
             String uuid = getApplicationUuid(context);
+            Log.d("SALT", uuid);
             if (uuid != null) {
                 return uuid.getBytes();
             }

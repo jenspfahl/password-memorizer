@@ -58,7 +58,7 @@ public enum Representation {
             '\u23CB',
             '\u23CC',
             '\u2014',
-            null),
+            Build.VERSION_CODES.M),
 
     MUSIC("Music",
             '\u15B1',

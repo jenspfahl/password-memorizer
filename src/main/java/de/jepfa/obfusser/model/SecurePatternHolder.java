@@ -123,7 +123,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
             return null;
         }
         String hint = getHints().get(index);
-        return EncryptUtil.decryptPlainString(hint, key);
+        return EncryptUtil.decryptPlainString(hint, index, key);
     }
 
     @Ignore
@@ -134,7 +134,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         Map<Integer, String> hints = new TreeMap<>(getHints());
 
         for (Map.Entry<Integer, String> entry : hints.entrySet()) {
-            String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), key);
+            String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), entry.getKey(), key);
             hints.put(entry.getKey(), decryptedHint);
         }
 
@@ -148,7 +148,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         }
         Pair<Integer, String> pair = super.getHintDataByPosition(position);
         if (pair != null) {
-            return new Pair<>(pair.first, EncryptUtil.decryptPlainString(pair.second, key));
+            return new Pair<>(pair.first, EncryptUtil.decryptPlainString(pair.second, pair.first, key));
         }
 
         return null;
@@ -156,7 +156,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     @Ignore
     public void setPotentialHint(int index, String value, byte[] key) {
-        getHints().put(index, EncryptUtil.encryptPlainString(value, key));
+        getHints().put(index, EncryptUtil.encryptPlainString(value, index, key));
     }
 
     @Ignore
@@ -165,7 +165,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
         if (key != null) {
             for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                String encryptedHint = EncryptUtil.encryptPlainString(entry.getValue(), key);
+                String encryptedHint = EncryptUtil.encryptPlainString(entry.getValue(), entry.getKey(), key);
                 getHints().put(entry.getKey(), encryptedHint);
             }
 
@@ -178,7 +178,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
         if (key != null) {
             for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), key);
+                String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), entry.getKey(), key);
                 getHints().put(entry.getKey(), decryptedHint);
             }
 

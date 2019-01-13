@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.util;
 
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 
 import java.security.MessageDigest;
@@ -21,16 +22,30 @@ public class EncryptUtil {
 
     private static final int BYTE_COUNT = 256;
 
-    /**
+
+    /*
      * To encypt single chars, we need to define which chars are common in credentials.
      */
-    private static final Character[] USED_CHARS = new Character[]{
-            'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-            'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+    static final Character[] USED_CHARS = new Character[]{
             '0','1','2','3','4','5','6','7','8','9',
             ' ','!','"','§','$','%','&','/','(',')','=','?','`','´','+','#','-','.',',','<','>',';',
-            ':','_','\'','*','¡','“','^','°','¢','[',']','|','{','}','≠','¿','∞','…','–','@','€'};
-    private static final Loop<Character> LOOP_ENCRYPT_CHARS = new Loop<>(Arrays.asList(USED_CHARS));
+            ':','_','\'','*','¡','“','^','°','¢','[',']','|','{','}','¿','–','@','€'};
+    /*
+     * We also add all possible letters.
+     */
+    static final List<Character> CHARACTERS = new ArrayList<>(Arrays.asList(USED_CHARS));
+    static {
+        for (int i = 0; i < BYTE_COUNT; i++) {
+            char c = (char) i;
+
+            if (Character.isLetter(c)) {
+                CHARACTERS.add(c);
+            }
+        }
+    }
+
+
+    static final Loop<Character> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
 
 
     /**
@@ -44,9 +59,11 @@ public class EncryptUtil {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update(pin.getBytes());
             if (salt != null) {
-                //messageDigest.update(salt); TODO activate this when it is useful
+                messageDigest.update(salt);
             }
-            return messageDigest.digest();
+            byte[] digest = messageDigest.digest();
+ //           Log.e("KEY", Arrays.toString(digest));
+            return digest;
         } catch (NoSuchAlgorithmException e) {
             Log.e("KEY", "Cannot get ", e);
             e.printStackTrace();
@@ -87,15 +104,18 @@ public class EncryptUtil {
         return new ObfusString(obfusChars);
     }
 
-    public static String encryptPlainString(String s, byte[] key) {
+    public static String encryptPlainString(String s, int index, byte[] key) {
         if (s != null && !s.isEmpty() && key != null) {
             StringBuilder sb = new StringBuilder();
+//            Log.e("DEC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
+
             for (int i = 0; i < s.length() && i < key.length; i++) {
                 char c =  s.charAt(i);
-                int b = Math.abs(key[i]);
+                int b = key[(index + i) % key.length];
 
                 if (LOOP_ENCRYPT_CHARS.applies(c)) {
                     Character encryptedChar = LOOP_ENCRYPT_CHARS.forwards(c, b);
+//                    Log.e("DEC_CHAR", "in=" + c + " key=" + b + " out=" + encryptedChar);
                     sb.append(encryptedChar.charValue());
                 }
                 else {
@@ -107,15 +127,18 @@ public class EncryptUtil {
         return s;
     }
 
-    public static String decryptPlainString(String s, byte[] key) {
+    public static String decryptPlainString(String s, int index, byte[] key) {
         if (s != null && !s.isEmpty() && key != null) {
             StringBuilder sb = new StringBuilder();
+//            Log.e("ENC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
+
             for (int i = 0; i < s.length() && i < key.length; i++) {
                 char c =  s.charAt(i);
-                int b = Math.abs(key[i]);
+                int b = key[(index + i) % key.length];
 
                 if (LOOP_ENCRYPT_CHARS.applies(c)) {
                     Character encryptedChar = LOOP_ENCRYPT_CHARS.backwards(c, b);
+//                    Log.e("ENC_CHAR", "in=" + c + " key=" + b + " out=" + encryptedChar);
                     sb.append(encryptedChar.charValue());
                 }
                 else {

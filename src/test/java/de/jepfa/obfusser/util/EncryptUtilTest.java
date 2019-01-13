@@ -8,9 +8,15 @@ import java.util.UUID;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
+import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 
 public class EncryptUtilTest {
+
+    @Test
+    public void showCharLoop() throws Exception {
+        System.out.println(EncryptUtil.CHARACTERS);
+    }
 
     @Test
     public void addObfusChar() throws Exception {
@@ -52,11 +58,11 @@ public class EncryptUtilTest {
             String pin = String.valueOf(i);
             byte[] salt = UUID.randomUUID().toString().getBytes();
             byte[] key = EncryptUtil.generateKey(pin, salt);
-            String origin = user.toRepresentation();
+            String origin = user.toRepresentation(Representation.DEFAULT_BLOCKS);
             ObfusString encryptedOS = user.encrypt(key);
-            String encrypted = encryptedOS.toRepresentation();
+            String encrypted = encryptedOS.toRepresentation(Representation.DEFAULT_BLOCKS);
             String encryptedExchangeFormat = encryptedOS.toExchangeFormat();
-            String decrypted = user.decrypt(key).toRepresentation();
+            String decrypted = user.decrypt(key).toRepresentation(Representation.DEFAULT_BLOCKS);
             System.out.println(pin + ": " + origin + " --> " + encrypted + "(" + encryptedExchangeFormat + ")");
 
             Assert.assertEquals(origin, decrypted);
@@ -89,8 +95,8 @@ public class EncryptUtilTest {
             byte[] salt = null;
             byte[] key = EncryptUtil.generateKey(pin, salt);
 
-            String encrypted = EncryptUtil.encryptPlainString(string, key);
-            String decrypted = EncryptUtil.decryptPlainString(encrypted, key);
+            String encrypted = EncryptUtil.encryptPlainString(string, 23, key);
+            String decrypted = EncryptUtil.decryptPlainString(encrypted, 23, key);
 
             System.out.println(pin + ": " + string + " --> " + encrypted + " --> " + decrypted);
 

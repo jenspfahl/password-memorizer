@@ -18,7 +18,7 @@ public enum Representation {
             '\u16CA',
             '\u16C9',
             '\u16DC',
-            Build.VERSION_CODES.M),
+            Build.VERSION_CODES.O),
 
     HATCHING("Hatching",
             '\u2591',
@@ -50,7 +50,7 @@ public enum Representation {
             '\u4DE8',
             '\u4DEA',
             '\u4DC0',
-            Build.VERSION_CODES.M),
+            Build.VERSION_CODES.O),
 
     LINES("Lines",
             '\u23CA',

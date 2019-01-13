@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.util.EncryptUtil;
 
 /**
@@ -30,7 +31,13 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        s = ObfusString.obfuscate(hint).toExchangeFormat();
+                        if (hint.equals(Constants.EMPTY)) {
+                            //TODO not set hints as special char for representation
+                            s = ObfusChar.SPECIAL_CHAR.toExchangeFormat();
+                        }
+                        else {
+                            s = ObfusString.obfuscate(hint).toExchangeFormat();
+                        }
                     }
                 }
                 sb.append(s);
@@ -70,7 +77,13 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 if (obfusChar.isPlaceholder()) {
                     String hint = getHint(index, key);
                     if (hint != null) {
-                        s = ObfusString.obfuscate(hint).toRepresentation(representation);
+                        if (hint.equals(Constants.EMPTY)) {
+                            //TODO not set hints as special char for representation
+                            s = ObfusChar.SPECIAL_CHAR.toRepresentation(representation);
+                        }
+                        else {
+                            s = ObfusString.obfuscate(hint).toRepresentation(representation);
+                        }
                     }
                 }
                 sb.append(s);

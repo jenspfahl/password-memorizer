@@ -1,9 +1,12 @@
 package de.jepfa.obfusser.ui.credential.list;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -171,7 +174,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
 
             Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
             builder.setTitle("About the app")
-                    .setMessage(getString(R.string.app_name) + ", Version " + Constants.VERSION +
+                    .setMessage(getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
                             Constants.NL + " (c) Jens Pfahl 2018,2019")
                     .setIcon(icon)
                     .show();
@@ -211,6 +214,16 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
         });
         popup.inflate(R.menu.credential_list_menu);
         popup.show();
+    }
+
+    private String getVersionName(Activity activity) {
+        try {
+            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

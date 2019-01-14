@@ -173,7 +173,7 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
             Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
-            builder.setTitle("About the app")
+            builder.setTitle(R.string.title_about_the_app)
                     .setMessage(getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
                             Constants.NL + " (c) Jens Pfahl 2018,2019")
                     .setIcon(icon)

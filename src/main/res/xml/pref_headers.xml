@@ -3,7 +3,7 @@
     <header
         android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="General" />
+        android:title="@string/pref_header_general" />
 
     <header
         android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$SecurityPreferenceFragment"

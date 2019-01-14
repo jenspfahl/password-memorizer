@@ -9,12 +9,15 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.EncryptUtil;
@@ -126,8 +129,9 @@ public abstract class SecureActivity extends BaseActivity {
             final EditText input = new EditText(activity);
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             input.requestFocus();
-            AlertDialog dialog = builder.setTitle("Password required")
-                    .setMessage("Please enter your password to encrypt your patterns.")
+
+            final AlertDialog dialog = builder.setTitle(R.string.title_encryption_password_required)
+                    .setMessage(R.string.message_encrypt_password_required)
                     .setView(input)
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -135,23 +139,38 @@ public abstract class SecureActivity extends BaseActivity {
                             secretDialogOpened = 0;
                         }
                     })
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setCancelable(false)
+                    .create();
+
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+
+                    Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    buttonPositive.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
                             String pwd = input.getText().toString();
                             if (TextUtils.isEmpty(pwd)) {
-                                secret.setDigest(null);
+                                input.setError(activity.getString(R.string.title_encryption_password_required));
+                                return;
                             } else {
                                 secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
                                 activity.refresh(false); // show correct encrypted data
                             }
 
                             secretDialogOpened = 0;
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setCancelable(false)
-                    .create();
 
+                            dialog.dismiss();
+                        }
+                    });
+
+                }
+            });
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             dialog.show();
 

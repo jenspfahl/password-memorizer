@@ -8,11 +8,14 @@
     <string name="title_credentials">Patterns</string>
 
     <string name="button_create_credential">Create Pattern</string>
-    <string name="button_change_credential">Change Pattern</string>
+    <string name="button_change_credential">Update Pattern</string>
 
-    <string name="credential_input_hints_explanation">Select the characters to be revealed by touching them and input the real characters. This will help you to remember your password. The more characters you reveal the less have you to keep in mind. But remember, you shouldn\'t reveal too much.</string>
-    <string name="credential_input_name_explanation">Here you can type the name and an optional info text for your pattern.</string>
-    <string name="credential_input_pattern_explanation">You can input your password and it will be transformed into a pattern immediately. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
+    <string name="title_delete_credential">Delete Pattern</string>
+    <string name="message_delete_credential">Do you really want to delete this pattern with name \'%1$s\'?</string>
+
+    <string name="credential_input_hints_explanation">Select the characters to be revealed by touching them and input the real characters. This will help you to remember your password. The more characters you reveal the less do you need to keep in mind. But remember, you shouldn\'t reveal too much.</string>
+    <string name="credential_input_name_explanation">Here you need to give your pattern a short name. Optionally you can type an additional info text.</string>
+    <string name="credential_input_pattern_explanation">You can input your password and it will be transformed instantly to a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
     <string name="credential_select_group_explanation">Optionally categorize your pattern.</string>
     <string name="credential_select_template_explanation">Select a template to be used for your pattern.</string>
 
@@ -25,13 +28,17 @@
     <string name="title_templates">Templates</string>
 
     <string name="button_create_template">Create Template</string>
-    <string name="button_change_template">Change Template</string>
+    <string name="button_change_template">Update Template</string>
+
+    <string name="title_delete_template">Delete Template</string>
+    <string name="message_delete_template">Do you really want to delete this template with name \'%1$s\'?</string>
+
 
     <string name="use_a_template_instead">Use a template instead</string>
 
-    <string name="template_input_hints_explanation">Select the characters to be revealed by touching them and input the real characters. This will help you to remember your password. The more characters you reveal the less have you to keep in mind. But remember, you shouldn\'t reveal too much.</string>
-    <string name="template_input_name_explanation">Here you can type the name and an optional info text for your template.</string>
-    <string name="template_input_pattern_explanation">You can input your password and it will be transformed into a pattern immediately. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
+    <string name="template_input_hints_explanation">Select the characters to be placeholders by touching them. You can predefine revealed characters. This will help you to remember your password. The more characters you reveal the less do you need to keep in mind. But remember, you shouldn\'t reveal too much.</string>
+    <string name="template_input_name_explanation">Here you need to give your template a short name. Optionally you can type an additional info text.</string>
+    <string name="template_input_pattern_explanation">You can input your password and it will be transformed instantly into a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
 
 
 
@@ -44,10 +51,12 @@
     <string name="title_assign_group">Categorize for</string>
 
     <string name="button_create_group">Create Category</string>
-    <string name="button_change_group">Change Category</string>
+    <string name="button_change_group">Update Category</string>
+
+    <string name="title_delete_group">Delete Category</string>
+    <string name="message_delete_group">Do you really want to delete this category with name \'%1$s\'?</string>
 
     <string name="no_group">-not categorized-</string>
-
     <string name="assign_to_group">Categorize</string>
 
 
@@ -60,13 +69,12 @@
     <string name="button_next_step">Next step</string>
 
     <string name="error_invalid_pattern">This pattern is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
     <string name="change">Change</string>
     <string name="delete">Delete</string>
 
-    <string name="hint">Revealed</string>
+    <string name="hint">Reveal</string>
 
 
 
@@ -76,9 +84,10 @@
 
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
 
-    <string name="group_items">Group items</string>
-    <string name="lock_items">Lock items</string>
+    <string name="group_items">Group patterns</string>
+    <string name="lock_items">Lock patterns</string>
     <string name="help">Help</string>
     <string name="about">About</string>
     <string name="save">Save</string>
@@ -98,10 +107,31 @@
 
     <string name="pref_header_security">Security</string>
     <string name="pref_title_enable_password">Ensure data with password</string>
-    <string name="pref_description_enable_password">It is recommend to ensure your data with a password. Note: a wrong password will also show your data, but other data.</string>
+    <string name="pref_description_enable_password">It is recommended to ensure your data with a password. Note: a wrong password will also show data, but other data. Only you knows your correct data!</string>
+    <string name="pattern_style">Pattern style</string>
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_show_patterns">Show patterns in overview list</string>
+    <string name="pref_description_show_patterns">To prevent others seeing all your patterns in the overview lists, deactivate this option.</string>
 
-    <string name="pref_title_reference_password">Reference check pattern</string>
-    <string name="pref_description_reference_password">Input a word or whatever which indicates you the correct password. Note: This will decrease security</string>
+
+
+
+    <string name="title_encryption_password_required">Password required</string>
+    <string name="message_encrypt_password_required">Please enter your password to encrypt your patterns.</string>
+    <string name="title_set_revealed">Set revealed character</string>
+    <string name="message_set_revealed">Maximum of revealed characters reached.</string>
+    <string name="title_delete_revealed_character">Delete revealed character</string>
+    <string name="message_delete_revealed_character">Sure delete not empty revealed character with number \'%1$s\'?</string>
+    <string name="hint_tbd">t.b.d.</string>
+    <string name="fill_hints">Please fill all placeholders.</string>
+    <string name="title_about_the_app">About the app</string>
+
+    <string name="message_password_to_encrypt">Your password is used to encrypt all data. It is important to remember this password, there is no recovery. It can be an easy one, since wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns look like.</string>
+    <string name="message_password_to_decrypt">Enter your password to disable pattern encryption. It is important to type it correctly, otherwise the patterns will be decrypted in a different way. This is not undo-able.</string>
+    <string name="title_enter_and_confirm_password">Enter and confirm a password</string>
+    <string name="password_required">Password required</string>
+    <string name="password_confirmation_required">Password confirmation required</string>
+    <string name="password_not_equal">Password not equal</string>
 
 
 </resources>

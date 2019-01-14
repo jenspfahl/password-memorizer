@@ -152,8 +152,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
                     if (!enabled && pattern.getHints().size() == NumberedPlaceholder.values().length) {
                         new AlertDialog.Builder(getContext())
-                                .setTitle("Set revealed")
-                                .setMessage("Maximum of revealed characters already reached.")
+                                .setTitle(R.string.title_set_revealed)
+                                .setMessage(R.string.message_set_revealed)
                                 .setIcon(android.R.drawable.ic_dialog_info)
                                 .show();
                         return;
@@ -171,9 +171,9 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
                         if (pattern.isFilledHint(index)) {
                             new AlertDialog.Builder(getContext())
-                                    .setTitle("Delete revealed ")
-                                    .setMessage("Sure delete not emtpy number "
-                                            + pattern.getNumberedPlaceholder(index).toRepresentation() + " ?")
+                                    .setTitle(R.string.title_delete_revealed_character)
+                                    .setMessage(getString(R.string.message_delete_revealed_character,
+                                            pattern.getNumberedPlaceholder(index).toRepresentation()))
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
@@ -224,7 +224,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 sb.append(NumberedPlaceholder.fromPlaceholderNumber(counter).toRepresentation());
                 sb.append("=");
                 if (hint == null || hint.isEmpty()) {
-                    hint = "t.b.d.";
+                    hint = getString(R.string.hint_tbd);
                 }
                 sb.append(hint);
             }

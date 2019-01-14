@@ -5,6 +5,6 @@
         android:key="pref_pattern_style"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="Pattern style" />
+        android:title="@string/pattern_style" />
 
 </PreferenceScreen>

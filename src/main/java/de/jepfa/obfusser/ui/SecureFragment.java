@@ -26,7 +26,7 @@ public abstract class SecureFragment extends Fragment {
         if (activity instanceof SecureActivity) {
             return (SecureActivity) activity;
         }
-        throw new IllegalStateException("Programming Error, all SecureFragmens should belong to SecureActivity class");
+        throw new IllegalStateException("Programming Error, all SecureFragments should belong to SecureActivity class");
     }
 
     public abstract void refresh();

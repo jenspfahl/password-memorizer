@@ -9,7 +9,7 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="pref_show_pattern_in_overview"
-        android:summary="To prevent others seeing all your patterns in the overview lists, deactivate this option."
-        android:title="Show patterns in overview list" />
+        android:summary="@string/pref_description_show_patterns"
+        android:title="@string/pref_title_show_patterns" />
 
 </PreferenceScreen>

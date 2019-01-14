@@ -126,15 +126,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    private static void inputPasswordAndCrypt(Activity activity, final Preference preference, final boolean encrypt) {
+    private static void inputPasswordAndCrypt(final Activity activity, final Preference preference, final boolean encrypt) {
         LayoutInflater inflater = activity.getLayoutInflater();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
         String message = encrypt
-                ? "Your password is used to encrypt all data. It is important to remember this password, there is no recovery. It can be an easy one, since wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns look like."
-                : "Enter your password to disable pattern encryption. It is important to type it correctly, otherwise the patterns will be decrypted in a different way. This is not undo-able.";
+                ? activity.getString(R.string.message_password_to_encrypt)
+                : activity.getString(R.string.message_password_to_decrypt);
         final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
-        final AlertDialog dialog = builder.setTitle("Enter and confirm a password")
+        final AlertDialog dialog = builder.setTitle(R.string.title_enter_and_confirm_password)
                 .setMessage(message)
                 .setView(passwordView)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -155,19 +155,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         TextView firstPassword = passwordView.findViewById(R.id.first_password);
                         String pwd = firstPassword.getText().toString();
                         if (TextUtils.isEmpty(pwd)) {
-                            firstPassword.setError("Password required");
+                            firstPassword.setError(activity.getString(R.string.password_required));
                             return;
                         }
 
                         TextView secondPassword = passwordView.findViewById(R.id.second_password);
                         String pwd2 = secondPassword.getText().toString();
                         if (TextUtils.isEmpty(pwd2)) {
-                            secondPassword.setError("Password confirmation required");
+                            secondPassword.setError(activity.getString(R.string.password_confirmation_required));
                             return;
                         }
 
                         if (!TextUtils.equals(pwd, pwd2)) {
-                            secondPassword.setError("Password not equal");
+                            secondPassword.setError(activity.getString(R.string.password_not_equal));
                             return;
                         }
 

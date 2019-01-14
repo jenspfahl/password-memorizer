@@ -93,7 +93,7 @@ public class CredentialInputHintsActivity extends SecureActivity {
                     navigateUpTo(upIntent);
                 }
                 else {
-                    Snackbar.make(view, "Please fill all hints.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, R.string.fill_hints, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
             }

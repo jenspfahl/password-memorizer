@@ -55,7 +55,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         byte[] secret = SecretChecker.getOrAskForSecret(this);
         String pattern = credential.getPatternAsExchangeFormatHinted(secret);
         obfusEditText = new ObfusEditText(editText,
-                getPatternRepresentation(), pattern);
+                getPatternRepresentation(), pattern, savedInstanceState != null);
 
 
         View selectTemplate = findViewById(R.id.link_to_template_selection);
@@ -107,7 +107,6 @@ public class CredentialInputPatternActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

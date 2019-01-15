@@ -14,10 +14,13 @@ public class ObfusEditText {
 
     private EditText editText;
     private Representation representation;
+    private boolean recreation;
 
-    public ObfusEditText(final EditText editText, final Representation representation, final String initialPattern) {
+    public ObfusEditText(final EditText editText, final Representation representation,
+                         final String initialPattern, boolean isRecreation) {
         this.editText = editText;
         this.representation = representation;
+        this.recreation = isRecreation;
 
         editText.setText(ObfusString.fromExchangeFormat(initialPattern).toRepresentation(representation));
         editText.setSelection(initialPattern.length());
@@ -29,7 +32,16 @@ public class ObfusEditText {
 
                     char[] v = new char[end - start];
                     TextUtils.getChars(source, start, end, v, 0);
-                    String s = ObfusString.obfuscate(new String(v)).toRepresentation(representation);
+                    String currString = new String(v);
+                    String s;
+                    if (recreation) {
+                        // during recreation no obfuscating to avoid double obfuscating
+                        s = currString;
+                        recreation = false;
+                    }
+                    else {
+                        s = ObfusString.obfuscate(currString).toRepresentation(representation);
+                    }
 
                     if (source instanceof Spanned) {
                         SpannableString sp = new SpannableString(s);

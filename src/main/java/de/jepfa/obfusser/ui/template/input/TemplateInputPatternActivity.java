@@ -55,7 +55,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
         byte[] secret = SecretChecker.getOrAskForSecret(this);
         String pattern = template.getPatternAsExchangeFormatHinted(secret);
         obfusEditText = new ObfusEditText(editText,
-                getPatternRepresentation(), pattern);
+                getPatternRepresentation(), pattern, savedInstanceState != null);
 
 
         Button lowerCaseButton = findViewById(R.id.button_pattern_lower_case);

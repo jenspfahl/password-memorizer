@@ -56,6 +56,13 @@ public class NavigationActivity extends SecureActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
+        navigation.setSelectedItemId(selectedNavId);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SELECTED_NAVTAB, selectedNavId);
@@ -85,6 +92,7 @@ public class NavigationActivity extends SecureActivity {
             case R.id.navigation_credentials:
             case R.id.navigation_templates:
             case R.id.navigation_groups:
+                getIntent().putExtra(SELECTED_NAVTAB, selectedNavId);
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.navigation_tab_container, getSelectedFragment(selectedNavId))

@@ -7,9 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
@@ -19,9 +22,49 @@ import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
-public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder> {
+public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder>
+implements Filterable {
 
     private final CredentialListFragmentBase fragment;
+
+    private final LayoutInflater inflater;
+    private List<Credential> credentials; // Cached copy of credentials
+    private List<Credential> originCredentials;
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                FilterResults filterResults = new FilterResults();
+
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    filterResults.values = originCredentials;
+                } else {
+                    List<Credential> filteredList = new ArrayList<>();
+                    for (Credential credential : originCredentials) {
+                        if (credential.getName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(credential);
+                        }
+                    }
+
+                    filterResults.values = filteredList;
+                }
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                credentials = (ArrayList<Credential>) filterResults.values;
+
+                // refresh the list with filtered data
+                notifyDataSetChanged();
+            }
+        };
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView nameView;
@@ -38,8 +81,7 @@ public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFl
         }
     }
 
-    private final LayoutInflater inflater;
-    private List<Credential> credentials; // Cached copy of credentials
+
     private final View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -96,6 +138,7 @@ public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFl
 
     void setCredentials(List<Credential> credentials){
         this.credentials = credentials;
+        this.originCredentials = credentials;
         notifyDataSetChanged();
     }
 

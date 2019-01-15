@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,12 +27,63 @@ import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
-public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
+public class CredentialExpandableListAdapter extends BaseExpandableListAdapter implements Filterable {
 
     private final CredentialListFragmentBase fragment;
     private final LayoutInflater inflater;
+    private final ExpandableListView listView;
     private Map<Integer, List<Credential>> groupIdCredentials;
     private List<Group> groups;
+    private Map<Integer, List<Credential>> originGroupIdCredentials;
+    private List<Group> originGroups;
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                FilterResults filterResults = new FilterResults();
+
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    filterResults.values = originGroupIdCredentials;
+                } else {
+                    Map<Integer, List<Credential>> filteredMap = new HashMap<>();
+                    for (Map.Entry<Integer, List<Credential>> entry : originGroupIdCredentials.entrySet()) {
+                        int groupId = entry.getKey();
+                        List<Credential> credentials = entry.getValue();
+                        for (Credential credential : credentials) {
+                            if (credential.getName().toLowerCase().contains(charString.toLowerCase())) {
+                                if (!filteredMap.containsKey(groupId)) {
+                                    filteredMap.put(groupId, new ArrayList<Credential>());
+                                }
+                                Group group = findGroupById(groups, groupId);
+                                if (group != null) {
+                                    int position = findPositionByGroup(groups, group);
+                                    listView.expandGroup(position);
+                                }
+                                filteredMap.get(groupId).add(credential);
+                            }
+                        }
+
+                    }
+
+                    filterResults.values = filteredMap;
+                }
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                groupIdCredentials = (Map<Integer, List<Credential>>) filterResults.values;
+
+                // refresh the list with filtered data
+                notifyDataSetChanged();
+            }
+        };
+    }
 
     private final View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -43,14 +97,17 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
     };
 
 
-    CredentialExpandableListAdapter(CredentialListFragmentBase fragment) {
+    CredentialExpandableListAdapter(CredentialListFragmentBase fragment, ExpandableListView listView ) {
         inflater = LayoutInflater.from(fragment.getContext());
         this.fragment = fragment;
+        this.listView = listView;
     }
 
     void setCredentials(List<Group> allGroups, List<Credential> credentials) {
         groups = new ArrayList<>(allGroups.size());
         groupIdCredentials = new HashMap<>();
+        originGroups = groups;
+        originGroupIdCredentials = groupIdCredentials;
 
 
         for (Credential credential : credentials) {
@@ -63,7 +120,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
             }
             if (!groupIdCredentials.containsKey(groupId)) {
                 groupIdCredentials.put(groupId, new ArrayList<Credential>());
-                Group assocGroup = findGroup(allGroups, groupId);
+                Group assocGroup = findGroupById(allGroups, groupId);
                 if (assocGroup != null) {
                     groups.add(assocGroup);
                 }
@@ -202,7 +259,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
 
-    private Group findGroup(List<Group> groups, int groupId) {
+    private Group findGroupById(List<Group> groups, int groupId) {
         for (Group group : groups) {
             if (group.getId() == groupId) {
                 return group;
@@ -210,5 +267,14 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter {
         }
         return null;
     }
-
+    private int findPositionByGroup(List<Group> groups, Group group) {
+        int i = 0;
+        for (Group g : groups) {
+            if (g == group) {
+                return i;
+            }
+            i++;
+        }
+        return i;
+    }
 }

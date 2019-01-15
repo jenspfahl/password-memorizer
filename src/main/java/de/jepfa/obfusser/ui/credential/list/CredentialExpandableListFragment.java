@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.Filterable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,13 +32,18 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
     }
 
     @Override
+    protected Filterable getFilterable() {
+        return expandableAdapter;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         final ExpandableListView listView = view.findViewById(R.id.credential_expandable_list);
         assert listView != null;
 
-        expandableAdapter = new CredentialExpandableListAdapter(this);
+        expandableAdapter = new CredentialExpandableListAdapter(this, listView);
         listView.setAdapter(expandableAdapter);
 
         final SharedPreferences defaultSharedPreferences = PreferenceManager

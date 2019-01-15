@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 
 import java.util.List;
 
@@ -90,6 +91,12 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
     protected int getMenuId() {
         return R.menu.toolbar_menu_template;
     }
+
+    @Override
+    protected Filterable getFilterable() {
+        return adapter;
+    }
+
 
     @Override
     public void onClick(final View v) {

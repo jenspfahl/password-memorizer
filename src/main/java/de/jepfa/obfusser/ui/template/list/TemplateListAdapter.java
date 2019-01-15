@@ -7,22 +7,65 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
-public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapter.ViewHolder> {
+public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapter.ViewHolder> implements Filterable {
 
     private final View.OnClickListener listener;
     private final SecureActivity activity;
+
+    private final LayoutInflater inflater;
+    private List<Template> templates; // Cached copy of templates
+    private List<Template> originTemplates;
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                FilterResults filterResults = new FilterResults();
+
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    filterResults.values = originTemplates;
+                } else {
+                    List<Template> filteredList = new ArrayList<>();
+                    for (Template template : originTemplates) {
+                        if (template.getName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(template);
+                        }
+                    }
+
+                    filterResults.values = filteredList;
+                }
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                templates = (ArrayList<Template>) filterResults.values;
+
+                // refresh the list with filtered data
+                notifyDataSetChanged();
+            }
+        };
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView nameView;
@@ -39,8 +82,6 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
         }
     }
 
-    private final LayoutInflater inflater;
-    private List<Template> templates; // Cached copy of templates
     private final View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -98,6 +139,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
 
     void setTemplates(List<Template> templates){
         this.templates = templates;
+        originTemplates = templates;
         notifyDataSetChanged();
     }
 

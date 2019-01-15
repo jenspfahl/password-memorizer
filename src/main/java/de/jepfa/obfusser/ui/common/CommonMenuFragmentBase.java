@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.ui.common;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -14,12 +15,14 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
@@ -41,6 +44,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
 
 
     protected abstract int getMenuId();
+    protected abstract Filterable getFilterable();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,34 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(getMenuId(), menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchItem.collapseActionView();
+
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                Filterable filterable = getFilterable();
+                if (filterable != null) {
+                    filterable.getFilter().filter(s);
+                }
+                return false;
+            }
+        });
     }
+
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {

@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +19,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.common.ObfusEditText;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
@@ -96,10 +98,19 @@ public class TemplateInputPatternActivity extends SecureActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(R.string.legend);
+        return true;
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == 0) {
+            LegendShower.showLegend(this, getPatternRepresentation());
+        }
         if (id == android.R.id.home) {
             Template template = templateViewModel.getTemplate().getValue();
             Intent intent = new Intent(this, TemplateInputNameActivity.class);

@@ -12,6 +12,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -59,6 +60,7 @@ public class TemplateDetailActivity extends SecureActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(R.string.legend);
         getMenuInflater().inflate(R.menu.template_list_menu, menu);
         return true;
     }
@@ -75,6 +77,9 @@ public class TemplateDetailActivity extends SecureActivity {
 
         Template template = templateViewModel.getTemplate().getValue();
         switch (item.getItemId()) {
+            case 0:
+                LegendShower.showLegend(this, getPatternRepresentation());
+                return true;
             case R.id.menu_change_template:
                 Intent intent = new Intent(this, TemplateInputNameActivity.class);
                 IntentUtil.setTemplateExtra(intent, template);

@@ -36,6 +36,9 @@ public class NavigationActivity extends SecureActivity {
         setSupportActionBar(toolbar);
 
         selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
+        if (savedInstanceState != null) {
+            selectedNavId = savedInstanceState.getInt(SELECTED_NAVTAB, R.id.navigation_credentials);
+        }
 
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(
@@ -53,10 +56,9 @@ public class NavigationActivity extends SecureActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        selectedNavId = getIntent().getIntExtra(SELECTED_NAVTAB, R.id.navigation_credentials);
-        navigation.setSelectedItemId(selectedNavId);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SELECTED_NAVTAB, selectedNavId);
     }
 
     protected void refresh(boolean before) {
@@ -77,11 +79,12 @@ public class NavigationActivity extends SecureActivity {
     }
 
     private boolean refreshContainerFragment(int selectedNavId) {
+        this.selectedNavId = selectedNavId;
+
         switch (selectedNavId) {
             case R.id.navigation_credentials:
             case R.id.navigation_templates:
             case R.id.navigation_groups:
-                getIntent().putExtra(SELECTED_NAVTAB, selectedNavId);
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.navigation_tab_container, getSelectedFragment(selectedNavId))

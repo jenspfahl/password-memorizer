@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.common.PatternDetailFragment;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -105,11 +107,18 @@ public class CredentialInputHintsActivity extends SecureActivity {
         }
     }
 
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(R.string.legend);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == 0) {
+            LegendShower.showLegend(this, getPatternRepresentation());
+        }
         if (id == android.R.id.home) {
             Intent upIntent = new Intent(this, CredentialInputPatternActivity.class);
             IntentUtil.setCredentialExtra(upIntent, credentialViewModel.getCredential().getValue());

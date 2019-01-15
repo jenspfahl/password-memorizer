@@ -94,6 +94,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                 Credential credential = credentialViewModel.getCredential().getValue();
                 credentialViewModel.getRepo().update(credential);
 
+                // TODO onBackPressed(); go back to detail if we come from there
                 Intent upIntent = new Intent(getBaseContext(), NavigationActivity.class);
                 upIntent.putExtra(NavigationActivity.SELECTED_NAVTAB, R.id.navigation_credentials); //TODO destination should be dynamic
                 navigateUpTo(upIntent);

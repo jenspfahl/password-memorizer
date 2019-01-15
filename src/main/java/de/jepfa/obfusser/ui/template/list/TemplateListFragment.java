@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +21,21 @@ import java.util.List;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureFragment;
+import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
 
 
-public class TemplateListFragment extends SecureFragment implements View.OnClickListener{
+public class TemplateListFragment extends CommonMenuFragmentBase implements View.OnClickListener{
 
     private TemplateListViewModel templateListViewModel;
     private TemplateListAdapter adapter;
 
 
     public TemplateListFragment() {
+        super();
         // Required empty public constructor
     }
 
@@ -80,6 +84,11 @@ public class TemplateListFragment extends SecureFragment implements View.OnClick
                 });
 
         return view;
+    }
+
+    @Override
+    protected int getMenuId() {
+        return R.menu.toolbar_menu_template;
     }
 
     @Override

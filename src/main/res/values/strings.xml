@@ -88,16 +88,23 @@
 
     <string name="group_items">Group patterns</string>
     <string name="lock_items">Lock patterns</string>
+    <string name="legend">Show legend</string>
     <string name="help">Help</string>
     <string name="about">About</string>
     <string name="save">Save</string>
 
+    <string name="lower_char_explanation">Lower case letters</string>
+    <string name="upper_char_explanation">Upper case letters</string>
+    <string name="digit_explanation">Digits</string>
+    <string name="special_char_explanation">Special characters</string>
 
     <string name="lower_char">a..z</string>
     <string name="upper_char">A..Z</string>
     <string name="digit">0..9</string>
     <string name="special_char">#/+..</string>
+
     <string name="backspace">⌫</string>
+    <string name="title_legend">Legend</string>
 
 
 

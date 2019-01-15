@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.navigation.NavigationActivity">
+
+    <item
+        android:id="@+id/menu_lock_items"
+        android:icon="@drawable/ic_lock_outline_white_24dp"
+        android:title="@string/lock_items"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
+        android:id="@+id/menu_legend"
+        android:title="@string/legend"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/menu_help"
+        android:title="@string/help"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/menu_about"
+        android:title="@string/about"
+        app:showAsAction="never">
+    </item>
+
+</menu>

@@ -24,9 +24,11 @@ import android.view.ViewGroup;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
+import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
@@ -37,7 +39,7 @@ import de.jepfa.obfusser.viewmodel.credential.CredentialListViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 
-public abstract class CredentialListFragmentBase extends SecureFragment implements View.OnClickListener{
+public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase implements View.OnClickListener{
 
     protected CredentialListViewModel credentialListViewModel;
     protected GroupListViewModel groupListViewModel;
@@ -48,8 +50,6 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setHasOptionsMenu(true);
 
         credentialListViewModel = ViewModelProviders
                 .of(this)
@@ -83,12 +83,13 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.toolbar_menu, menu);
+    protected int getMenuId() {
+        return R.menu.toolbar_menu_credential;
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
 
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
@@ -99,31 +100,13 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
             boolean expandableList = defaultSharedPreferences
                     .getBoolean(SettingsActivity.PREF_EXPANDABLE_CREDENTIAL_LIST, false);
 
+            menuGroupItems.setChecked(expandableList);
             if (expandableList) {
                 menuGroupItems.setIcon(R.drawable.ic_sort_expanded_white_24dp);
             } else {
                 menuGroupItems.setIcon(R.drawable.ic_sort_white_24dp);
             }
         }
-
-        MenuItem menuLockItems = menu.findItem(R.id.menu_lock_items);
-        if (menuLockItems != null) {
-            boolean passwordCheckEnabled = defaultSharedPreferences
-                    .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
-
-            if (passwordCheckEnabled) {
-                Secret secret = Secret.getOrCreate();
-                menuLockItems.setVisible(true);
-                if (secret.hasDigest()) {
-                    menuLockItems.setIcon(R.drawable.ic_lock_open_white_24dp);
-                } else {
-                    menuLockItems.setIcon(R.drawable.ic_lock_outline_white_24dp);
-                }
-            } else {
-                menuLockItems.setVisible(false);
-            }
-        }
-
     }
 
     @Override
@@ -146,45 +129,8 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
             return true;
         }
 
-        if (id == R.id.menu_lock_items) {
-            boolean passwordCheckEnabled = defaultSharedPreferences
-                    .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
-            if (passwordCheckEnabled) {
-                Secret secret = Secret.getOrCreate();
-                if (secret.hasDigest()) {
-                    secret.invalidate();
-                }
-                else {
-                    SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
-                }
-                navigationActivity.refreshContainerFragment();
-            }
-            return true;
-        }
-
-        if (id == R.id.menu_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://password-memorizer.jepfa.de"));
-            startActivity(browserIntent);
-
-            return true;
-        }
-
-        if (id == R.id.menu_about) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-            Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
-            builder.setTitle(R.string.title_about_the_app)
-                    .setMessage(getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
-                            Constants.NL + " (c) Jens Pfahl 2018,2019")
-                    .setIcon(icon)
-                    .show();
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onClick(final View v) {
@@ -214,16 +160,6 @@ public abstract class CredentialListFragmentBase extends SecureFragment implemen
         });
         popup.inflate(R.menu.credential_list_menu);
         popup.show();
-    }
-
-    private String getVersionName(Activity activity) {
-        try {
-            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            return pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

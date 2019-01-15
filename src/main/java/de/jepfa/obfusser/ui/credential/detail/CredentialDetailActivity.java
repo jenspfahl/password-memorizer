@@ -16,6 +16,7 @@ import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -34,7 +35,7 @@ public class CredentialDetailActivity extends SecureActivity {
         setContentView(R.layout.activity_credential_detail);
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
-        Credential credential = credentialViewModel.getCredential().getValue();
+        final Credential credential = credentialViewModel.getCredential().getValue();
 
         GroupListViewModel groupListViewModel = ViewModelProviders
                 .of(this)
@@ -54,7 +55,7 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                appBarLayout.setTitle(group.getName() + " / " + appBarLayout.getTitle());
+                                appBarLayout.setTitle(credential.getName() + " (" + group.getName() + ")");
                             }
                         }
                     });
@@ -82,6 +83,7 @@ public class CredentialDetailActivity extends SecureActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(R.string.legend);
         getMenuInflater().inflate(R.menu.credential_list_menu, menu);
         return true;
     }
@@ -98,6 +100,9 @@ public class CredentialDetailActivity extends SecureActivity {
 
         Credential credential = credentialViewModel.getCredential().getValue();
         switch (item.getItemId()) {
+            case 0:
+                LegendShower.showLegend(this, getPatternRepresentation());
+                return true;
             case R.id.menu_change_credential:
                 Intent intent = new Intent(this, CredentialInputNameActivity.class);
                 IntentUtil.setCredentialExtra(intent, credential);

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="1dp">
+
+    <TextView
+        android:id="@+id/pattern_info_textview"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textStyle="normal"
+        android:focusable="true" />
+
+    <TextView
+        android:id="@+id/pattern_detail_obfuschar"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:letterSpacing="0.1"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textStyle="normal"
+        android:focusable="true" />
+
+    <TextView
+        android:id="@+id/pattern_hints_textview"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
+        android:focusable="true" />
+</LinearLayout>
+

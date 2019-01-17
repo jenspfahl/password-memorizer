@@ -139,6 +139,7 @@
     <string name="password_required">Password required</string>
     <string name="password_confirmation_required">Password confirmation required</string>
     <string name="password_not_equal">Password not equal</string>
+    <string name="nothing_revealed">Nothing revealed</string>
 
 
 </resources>

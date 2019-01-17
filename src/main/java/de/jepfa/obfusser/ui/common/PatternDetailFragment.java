@@ -32,6 +32,8 @@ import de.jepfa.obfusser.ui.SecureFragment;
 
 public abstract class PatternDetailFragment extends SecureFragment {
 
+    private TextView hintsTextView;
+
     public interface HintUpdateListener {
         void onHintUpdated(int index);
     }
@@ -54,12 +56,20 @@ public abstract class PatternDetailFragment extends SecureFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(getFragmentDetailId(), container, false);
+        View rootView = inflater.inflate(R.layout.pattern_detail, container, false);
         SecurePatternHolder pattern = getPattern();
 
         if (pattern != null) {
-            final TextView obfusTextView = rootView.findViewById(getTextViewId());
+            if (pattern.getInfo() != null) {
+                TextView infoTextView = rootView.findViewById(R.id.pattern_info_textview);
+                infoTextView.setText(pattern.getInfo());
+            }
+
+            final TextView obfusTextView = rootView.findViewById(R.id.pattern_detail_obfuschar);
             ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
+
+            hintsTextView = rootView.findViewById(R.id.pattern_hints_textview);
+
 
             switch (mode) {
                 case SELECT_HINTS:
@@ -69,20 +79,16 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     onCreateForShowPatternDetails(pattern, obfusTextView);
                     break;
             }
-
-            //TODO fitSizeToScreen(obfusTextView);
         }
 
         return rootView;
     }
 
-    protected abstract int getFragmentDetailId();
-
-    protected abstract int getTextViewId();
-
     protected abstract SecurePatternHolder getPattern();
 
     protected abstract String getFinalPatternForDetails(SecurePatternHolder pattern, int counter);
+
+    protected abstract boolean showHints(int counter);
 
     protected abstract String getPatternRepresentationForDetails(SecurePatternHolder pattern);
 
@@ -91,11 +97,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
     }
 
     private void onCreateForShowPatternDetails(final SecurePatternHolder pattern, final TextView obfusTextView) {
-        String patternString = buildPatternString(
-                pattern,
-                getPatternRepresentationForDetails(pattern),
-                false);
-        SpannableString span = getSpannableString(pattern, patternString, pattern.getInfo());
+        String patternString = getPatternRepresentationForDetails(pattern);
+        SpannableString span = getSpannableString(pattern, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
         ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView);
@@ -108,8 +111,14 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 int counter = clickCounter.getAndIncrement();
 
                 String finalPatternString = getFinalPatternForDetails(pattern, counter);
+                if (showHints(counter)) {
+                    hintsTextView.setText(buildHintsString(pattern));
+                }
+                else {
+                    hintsTextView.setText(null);
+                }
 
-                SpannableString span = getSpannableString(pattern, finalPatternString, pattern.getInfo());
+                SpannableString span = getSpannableString(pattern, finalPatternString);
                 obfusTextView.setText(span, TextView.BufferType.NORMAL);
             }
 
@@ -233,12 +242,9 @@ public abstract class PatternDetailFragment extends SecureFragment {
         ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
     }
 
-    @NonNull
-    protected String buildPatternString(SecurePatternHolder pattern, String patternString, boolean withHints) {
-        StringBuilder sb = new StringBuilder(patternString);
-        if (withHints && pattern.getHints() != null && !pattern.getHints().isEmpty()) {
-            //TODO move this in anotherUI component, so pattern can be fit automatically to the screen size w/o hints
-            sb.append(System.lineSeparator());
+    protected String buildHintsString(SecurePatternHolder pattern) {
+        StringBuilder sb = new StringBuilder();
+        if (pattern.getHints() != null && !pattern.getHints().isEmpty()) {
             int counter = 0;
             for (String hint : pattern.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())).values()) {
                 counter++;
@@ -250,35 +256,31 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 }
                 sb.append(hint);
             }
+            return sb.toString();
         }
-        return sb.toString();
+        else {
+            return getString(R.string.nothing_revealed);
+        }
+
     }
 
 
     @NonNull
-    private SpannableString getSpannableString(SecurePatternHolder pattern, String patternString, String prefixText) {
-        SpannableString span;
-        int start = 0;
-        if (TextUtils.isEmpty(prefixText)) {
-            span = new SpannableString(patternString);
-        }
-        else {
-            span = new SpannableString(prefixText + Constants.NL + patternString);
-            start = prefixText.length() + 1;
-        }
+    private SpannableString getSpannableString(SecurePatternHolder pattern, String patternString) {
+        SpannableString span = new SpannableString(patternString);;
 
         for (int i = 0; i < pattern.getPatternLength(); i++) {
             int j = i + 1;
             String hint = pattern.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
             if (hint != null) {
-                span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), start + i, start + j, Spanned.SPAN_MARK_MARK);
+                span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), i, j, Spanned.SPAN_MARK_MARK);
             }
 
         }
 
         for (int i = pattern.getPatternLength(); i < patternString.length(); i++) {
             int j = i + 1;
-            span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), start + i, start + j, Spanned.SPAN_MARK_MARK);
+            span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), i, j, Spanned.SPAN_MARK_MARK);
 
         }
         return span;

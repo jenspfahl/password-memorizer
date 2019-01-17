@@ -20,17 +20,6 @@ public class TemplateDetailFragment extends PatternDetailFragment {
         templateViewModel = TemplateViewModel.get(this.getActivity());
     }
 
-
-    @Override
-    protected int getFragmentDetailId() {
-        return R.layout.template_detail;
-    }
-
-    @Override
-    protected int getTextViewId() {
-        return R.id.template_detail_textview;
-    }
-
     @Override
     protected SecurePatternHolder getPattern() {
         return templateViewModel.getTemplate().getValue();
@@ -40,20 +29,21 @@ public class TemplateDetailFragment extends PatternDetailFragment {
     protected String getFinalPatternForDetails(SecurePatternHolder pattern, int counter) {
         String finalPatternString;
         if (counter % 2 == 0) {
-            finalPatternString = buildPatternString(pattern,
-                    pattern.getPatternRepresentationWithNumberedPlaceholder(
+            finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                             SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                            getSecureActivity().getPatternRepresentation()),
-                    false);
+                            getSecureActivity().getPatternRepresentation());
         }
         else {
-            finalPatternString = buildPatternString(pattern,
-                    pattern.getPatternRepresentationWithNumberedPlaceholder(
+            finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                             SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                            getSecureActivity().getPatternRepresentation()),
-                    true);
+                            getSecureActivity().getPatternRepresentation());
         }
         return finalPatternString;
+    }
+
+    @Override
+    protected boolean showHints(int counter) {
+        return counter % 2 == 1;
     }
 
     @Override

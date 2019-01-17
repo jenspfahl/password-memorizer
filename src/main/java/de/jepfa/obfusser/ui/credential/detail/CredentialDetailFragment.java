@@ -23,16 +23,6 @@ public class CredentialDetailFragment extends PatternDetailFragment {
     }
 
     @Override
-    protected int getFragmentDetailId() {
-        return R.layout.credential_detail;
-    }
-
-    @Override
-    protected int getTextViewId() {
-        return R.id.credential_detail_textview;
-    }
-
-    @Override
     protected SecurePatternHolder getPattern() {
         return credentialViewModel.getCredential().getValue();
     }
@@ -41,21 +31,26 @@ public class CredentialDetailFragment extends PatternDetailFragment {
     protected String getFinalPatternForDetails(SecurePatternHolder pattern, int counter) {
         String finalPatternString;
         if (counter % 3 == 0) {
-            finalPatternString = buildPatternString(pattern, pattern.getPatternRepresentationHinted(
+            finalPatternString = pattern.getPatternRepresentationHinted(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation()), false);
+                    getSecureActivity().getPatternRepresentation());
         }
         else if (counter % 3 == 1) {
-            finalPatternString = buildPatternString(pattern, pattern.getPatternRepresentationWithNumberedPlaceholder(
+            finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation()), true);
+                    getSecureActivity().getPatternRepresentation());
         }
         else {
-            finalPatternString = buildPatternString(pattern, pattern.getPatternRepresentationRevealed(
+            finalPatternString = pattern.getPatternRepresentationRevealed(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation()), false);
+                    getSecureActivity().getPatternRepresentation());
         }
         return finalPatternString;
+    }
+
+    @Override
+    protected boolean showHints(int counter) {
+        return counter % 3 == 1;
     }
 
     @Override

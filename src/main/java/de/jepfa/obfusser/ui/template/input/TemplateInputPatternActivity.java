@@ -150,7 +150,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
 
     private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
         button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
-        ObfusTextAdjuster.adjustText(getPatternRepresentation(), button);
+        ObfusTextAdjuster.adjustTextForRepresentation(getPatternRepresentation(), button);
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -2,13 +2,8 @@ package de.jepfa.obfusser.ui.common;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -19,7 +14,6 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -32,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
-import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
@@ -66,7 +59,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         if (pattern != null) {
             final TextView obfusTextView = rootView.findViewById(getTextViewId());
-            ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
+            ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
 
             switch (mode) {
                 case SELECT_HINTS:
@@ -105,6 +98,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
         SpannableString span = getSpannableString(pattern, patternString, pattern.getInfo());
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
+        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView);
 
         final AtomicInteger clickCounter = new AtomicInteger(1);
         obfusTextView.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +230,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         obfusTextView.setText(span);
         obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
-        ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
+        ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
     }
 
     @NonNull
@@ -290,31 +284,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
         return span;
     }
 
-
-    private void fitSizeToScreen(TextView textView) {
-        Display display = getActivity().getWindowManager(). getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int displayWidth = size.x - 10;
-
-        Paint paint = new Paint();
-        Rect bounds = new Rect();
-
-        paint.setTypeface(textView.getTypeface());
-        float textSize = textView.getTextSize();
-        paint.setTextSize(textSize);
-        String text = textView.getText().toString();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-
-        while (bounds.width() > displayWidth) {
-            textSize--;
-            paint.setTextSize(textSize);
-            paint.getTextBounds(text, 0, text.length(), bounds);
-        }
-//TODO
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, Math.max(textSize, displayWidth));
-       // textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 36);
-    }
 
     @Override
     public void refresh() {

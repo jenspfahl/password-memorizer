@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -20,6 +21,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,9 +117,30 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
                 SpannableString span = getSpannableString(pattern, finalPatternString, pattern.getInfo());
                 obfusTextView.setText(span, TextView.BufferType.NORMAL);
-                ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
             }
 
+        });
+
+        final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(getActivity(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                float size = obfusTextView.getTextSize() * detector.getScaleFactor();
+                obfusTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+                return true;
+            }
+
+        });
+
+        obfusTextView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getPointerCount() == 2) {
+                    return scaleGestureDetector.onTouchEvent(motionEvent);
+                }
+                else {
+                    return false;
+                }
+            }
         });
     }
 
@@ -297,5 +320,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
     public void refresh() {
         getActivity().recreate(); //TODO
     }
+
+
+
 
 }

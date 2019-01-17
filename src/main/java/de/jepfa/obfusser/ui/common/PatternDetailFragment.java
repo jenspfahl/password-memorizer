@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
+import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
@@ -61,6 +64,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         if (pattern != null) {
             final TextView obfusTextView = rootView.findViewById(getTextViewId());
+            ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
 
             switch (mode) {
                 case SELECT_HINTS:
@@ -111,7 +115,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
                 SpannableString span = getSpannableString(pattern, finalPatternString, pattern.getInfo());
                 obfusTextView.setText(span, TextView.BufferType.NORMAL);
-
+                ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
             }
 
         });
@@ -209,6 +213,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         obfusTextView.setText(span);
         obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        ObfusTextAdjuster.adjustText(getSecureActivity().getPatternRepresentation(), obfusTextView);
     }
 
     @NonNull
@@ -262,6 +267,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
         return span;
     }
 
+
     private void fitSizeToScreen(TextView textView) {
         Display display = getActivity().getWindowManager(). getDefaultDisplay();
         Point size = new Point();
@@ -272,7 +278,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
         Rect bounds = new Rect();
 
         paint.setTypeface(textView.getTypeface());
-        float textSize = 1000;//textView.getTextSize();
+        float textSize = textView.getTextSize();
         paint.setTextSize(textSize);
         String text = textView.getText().toString();
         paint.getTextBounds(text, 0, text.length(), bounds);

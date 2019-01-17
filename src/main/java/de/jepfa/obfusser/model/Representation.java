@@ -4,13 +4,23 @@ import android.os.Build;
 
 public enum Representation {
 
-    DEFAULT_BLOCKS("Blocks (defaut)",
+    DEFAULT_BLOCKS("Blocks (default)",
             '\u2584', // '▄'
             '\u2588', // '█'
             getAlternative(Build.VERSION_CODES.M, '\u2B24', '\u25CF'),  // '⬤' / '●'
             getAlternative(Build.VERSION_CODES.LOLLIPOP, '\u2580', '\u25A0'), // '▀' / '■'
             '\u25A0', // '■'
             null),
+
+    SYMBOLS("Symbols",
+            '\u25B2',
+            '\u25A0',
+            '\u25CF',
+            '\u25C6',  // alt: 25BC
+            '\u25FE',
+            null,
+            0.0f,
+            32.0f),
 
     VIKING("Viking",
             '\u16B4',
@@ -58,7 +68,9 @@ public enum Representation {
             '\u23CB',
             '\u23CC',
             '\u2014',
-            Build.VERSION_CODES.M),
+            Build.VERSION_CODES.M,
+            null,
+            22.0f),
 
     MUSIC("Music",
             '\u15B1',
@@ -66,7 +78,9 @@ public enum Representation {
             '\u15B2',
             '\u15B3',
             '\u2022',
-            Build.VERSION_CODES.M),
+            Build.VERSION_CODES.M,
+            null,
+            32.0f),
 
     CHESS("Chess",
             '\u265F',
@@ -74,16 +88,17 @@ public enum Representation {
             '\u2658',
             '\u2657',
             '\u2656',
-            Build.VERSION_CODES.LOLLIPOP),
+            Build.VERSION_CODES.LOLLIPOP,
+            null,
+            32.0f),
 
-  /*  SYMBOLS("Symbols",
-            '\u20DF',
-            '\u20DE', // ''
-            '\u20DD',
-            '\u20E4',
-            '\u20E0', // ''
-            '\u25EF', // '◯'
-            Build.VERSION_CODES.M),*/
+    RECORDER("Recorder",
+            '\u23E9',
+            '\u23F9',
+            '\u23FA',
+            '\u23F8',
+            '\u23EB',
+            Build.VERSION_CODES.O),
 
     ;
 
@@ -101,9 +116,16 @@ public enum Representation {
     private char specialChar;
     private char anyChar;
     private Integer minVersion;
+    private Float letterSpacing;
+    private Float textSize;
 
     private Representation(String name, char lowerChar, char upperChar, char digit, char specialChar,
                            char anyChar, Integer minVersion) {
+        this(name, lowerChar, upperChar, digit, specialChar, anyChar, minVersion, null, null);
+    }
+
+    private Representation(String name, char lowerChar, char upperChar, char digit, char specialChar,
+                           char anyChar, Integer minVersion, Float letterSpacing, Float textSize) {
         this.name = name;
         this.lowerChar = lowerChar;
         this.upperChar = upperChar;
@@ -111,6 +133,8 @@ public enum Representation {
         this.specialChar = specialChar;
         this.anyChar = anyChar;
         this.minVersion = minVersion;
+        this.letterSpacing = letterSpacing;
+        this.textSize = textSize;
     }
 
     public String getName() {
@@ -143,6 +167,14 @@ public enum Representation {
 
     public Integer getMinVersion() {
         return minVersion;
+    }
+
+    public Float getLetterSpacing() {
+        return letterSpacing;
+    }
+
+    public Float getTextSize() {
+        return textSize;
     }
 
     public boolean isAvailable() {

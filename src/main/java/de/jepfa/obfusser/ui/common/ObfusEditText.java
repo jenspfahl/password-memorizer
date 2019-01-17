@@ -25,6 +25,8 @@ public class ObfusEditText {
         editText.setText(ObfusString.fromExchangeFormat(initialPattern).toRepresentation(representation));
         editText.setSelection(initialPattern.length());
 
+        ObfusTextAdjuster.adjustText(representation, editText);
+
         InputFilter filter = new InputFilter() {
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 

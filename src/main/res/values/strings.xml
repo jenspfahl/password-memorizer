@@ -86,7 +86,7 @@
     <string name="repeat_password">Repeat password</string>
     <string name="error_incorrect_password">This password is incorrect</string>
 
-    <string name="group_items">Group patterns</string>
+    <string name="group_items">Group by categories</string>
     <string name="lock_items">Lock patterns</string>
     <string name="legend">Show legend</string>
     <string name="help">Help</string>

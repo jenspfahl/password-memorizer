@@ -19,6 +19,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.ObfusTextAdjuster;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;

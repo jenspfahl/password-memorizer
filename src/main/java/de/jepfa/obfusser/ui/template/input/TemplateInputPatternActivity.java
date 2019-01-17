@@ -21,6 +21,7 @@ import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.common.ObfusEditText;
+import de.jepfa.obfusser.ui.common.ObfusTextAdjuster;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
@@ -149,6 +150,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
 
     private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
         button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
+        ObfusTextAdjuster.adjustText(getPatternRepresentation(), button);
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

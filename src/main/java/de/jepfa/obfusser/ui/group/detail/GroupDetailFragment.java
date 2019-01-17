@@ -35,7 +35,9 @@ public class GroupDetailFragment extends Fragment {
         if (groupViewModel.getGroup() != null) {
             Group group = groupViewModel.getGroup().getValue();
             TextView textView = rootView.findViewById(R.id.group_detail_textview);
-            textView.setText(group.getName() + Constants.NL + " " + group.getInfo());
+            if (group.getInfo() != null) {
+                textView.setText(group.getInfo());
+            }
 
         }
 

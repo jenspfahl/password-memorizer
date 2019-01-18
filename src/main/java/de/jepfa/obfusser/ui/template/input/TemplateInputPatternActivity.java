@@ -134,9 +134,13 @@ public class TemplateInputPatternActivity extends SecureActivity {
 
         String pattern = obfusEditText.getPattern();
 
-        if (!isPatternValid(pattern)) {
-            obfusEditText.getEditText().setError(getString(R.string.error_invalid_pattern));
-        } else {
+        if (pattern.length() < Constants.MIN_PATTERN_LENGTH) {
+            obfusEditText.getEditText().setError(getString(R.string.error_pattern_too_short));
+        }
+        else if (pattern.length() > Constants.MAX_PATTERN_LENGTH) {
+            obfusEditText.getEditText().setError(getString(R.string.error_pattern_too_long));
+        }
+        else {
             Template template = templateViewModel.getTemplate().getValue();
             byte[] secret = SecretChecker.getOrAskForSecret(this);
             template.setPatternFromUser(pattern, secret);
@@ -158,11 +162,6 @@ public class TemplateInputPatternActivity extends SecureActivity {
             }
         });
     }
-
-    private boolean isPatternValid(String pattern) {
-        return pattern.length() >= Constants.MIN_PATTERN_LENGTH;
-    }
-
 
 }
 

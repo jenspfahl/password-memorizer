@@ -6,5 +6,6 @@ public interface Constants {
 
     int NO_ID = Integer.MIN_VALUE;
     int MIN_PATTERN_LENGTH = 4;
+    int MAX_PATTERN_LENGTH = 32;
     String EMPTY = "";
 }

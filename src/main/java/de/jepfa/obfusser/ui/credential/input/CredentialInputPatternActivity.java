@@ -146,9 +146,13 @@ public class CredentialInputPatternActivity extends SecureActivity {
 
         String pattern = obfusEditText.getPattern();
 
-        if (!isPatternValid(pattern)) {
-            obfusEditText.getEditText().setError(getString(R.string.error_invalid_pattern));
-        } else {
+        if (pattern.length() < Constants.MIN_PATTERN_LENGTH) {
+            obfusEditText.getEditText().setError(getString(R.string.error_pattern_too_short));
+        }
+        else if (pattern.length() > Constants.MAX_PATTERN_LENGTH) {
+            obfusEditText.getEditText().setError(getString(R.string.error_pattern_too_long));
+        }
+        else {
             Credential credential = credentialViewModel.getCredential().getValue();
             byte[] secret = SecretChecker.getOrAskForSecret(this);
             credential.setPatternFromUser(pattern, secret);
@@ -169,10 +173,6 @@ public class CredentialInputPatternActivity extends SecureActivity {
                 obfusEditText.insert(obfusChar);
             }
         });
-    }
-
-    private boolean isPatternValid(String pattern) {
-        return pattern.length() >= Constants.MIN_PATTERN_LENGTH;
     }
 
 

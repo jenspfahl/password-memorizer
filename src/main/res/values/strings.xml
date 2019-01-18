@@ -68,7 +68,8 @@
 
     <string name="button_next_step">Next step</string>
 
-    <string name="error_invalid_pattern">This pattern is too short</string>
+    <string name="error_pattern_too_short">This pattern is too short</string>
+    <string name="error_pattern_too_long">This pattern is too long</string>
     <string name="error_field_required">This field is required</string>
 
     <string name="change">Change</string>

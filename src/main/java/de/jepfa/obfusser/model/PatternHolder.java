@@ -77,12 +77,11 @@ public abstract class PatternHolder extends IdEntity {
     }
 
     public void setPatternInternal(@NonNull String patternInternal) {
-        cutOverlapingHints(patternInternal != null ? patternInternal.length() : 0);
         this.patternInternal = patternInternal;
     }
 
     /**
-     * Not sorted nor encrypted!!! Use {@link SecurePatternHolder} instead.
+     * Not encrypted!!! Use {@link SecurePatternHolder#getHints(byte[])} instead.
      */
     @NonNull
     public Map<Integer, String> getHints() {
@@ -96,64 +95,15 @@ public abstract class PatternHolder extends IdEntity {
         return hints;
     }
 
+    public int getHintsCount() {
+        return getHints().size();
+    }
+
     /**
      * Use only for copy data.
      */
     public void setHints(@NonNull Map<Integer, String> hints) {
         this.hints = hints;
-    }
-
-    @Ignore
-    public Pair<Integer, String> getHintDataByPosition(int position) {
-        int count = 0;
-        Map<Integer, String> hints = getHints();
-        for (Map.Entry<Integer, String> entry : hints.entrySet()) {
-            if (position == count) {
-                return new Pair<>(entry.getKey(), entry.getValue());
-            }
-            count++;
-        }
-        return null;
-    }
-
-    @Ignore
-    public NumberedPlaceholder getNumberedPlaceholder(int index) {
-        int placeholder = 1;
-        for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-            if (index == entry.getKey()) {
-                return NumberedPlaceholder.fromPlaceholderNumber(placeholder);
-            }
-            placeholder++;
-        }
-        return null;
-    }
-
-
-    @Ignore
-    public boolean hasHint(int index) {
-        return getHints().containsKey(index);
-    }
-
-    @Ignore
-    public boolean isPotentialHint(int index) {
-        return getHints().containsKey(index) && getHints().get(index).equals(Constants.EMPTY);
-    }
-
-    @Ignore
-    public boolean isFilledHint(int index) {
-        return getHints().containsKey(index) && !getHints().get(index).isEmpty();
-    }
-
-
-    @Ignore
-    public void addPotentialHint(int index) {
-        getHints().put(index, Constants.EMPTY);
-    }
-
-
-    @Ignore
-    public String removePotentialHint(int index) {
-        return getHints().remove(index);
     }
 
     @Ignore
@@ -180,23 +130,6 @@ public abstract class PatternHolder extends IdEntity {
                 ", hints=" + hints +
                 ", groupId=" + groupId +
                 '}';
-    }
-
-    private void cutOverlapingHints(int patternSize) {
-        if (patternSize == 0) {
-            getHints().clear();
-        }
-        else {
-            Set<Integer> deleteCandidates = new HashSet<>();
-            for (Integer hintIndex : getHints().keySet()) {
-                if (hintIndex >= patternSize) {
-                    deleteCandidates.add(hintIndex);
-                }
-            }
-            for (Integer deleteCandidate : deleteCandidates) {
-                getHints().remove(deleteCandidate);
-            }
-        }
     }
 
 }

@@ -36,8 +36,7 @@ public class TemplateDetailActivity extends SecureActivity {
 
         CollapsingToolbarLayout appBarLayout = findViewById(R.id.template_detail_toolbar_layout);
         if (appBarLayout != null) {
-            StringBuilder sb = new StringBuilder(template.getName());
-            appBarLayout.setTitle(sb.toString());
+            appBarLayout.setTitle(template.getName());
         }
 
         ActionBar actionBar = getSupportActionBar();

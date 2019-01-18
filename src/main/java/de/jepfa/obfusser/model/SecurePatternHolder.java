@@ -6,7 +6,10 @@ import android.support.v4.util.Pair;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import de.jepfa.obfusser.Constants;
@@ -124,13 +127,20 @@ public abstract class SecurePatternHolder extends PatternHolder {
         }
     }
 
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     * @return
+     */
     @Ignore
     public String getHint(int index, byte[] key) {
         if (key == Secret.INVALID_DIGEST) {
             return null;
         }
-        String hint = getHints().get(index);
-        return EncryptUtil.decryptPlainString(hint, index, key);
+        int encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        String hint = getHints().get(encryptedIndex);
+        return EncryptUtil.decryptHint(hint, encryptedIndex, key);
     }
 
     @Ignore
@@ -138,44 +148,131 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (key == Secret.INVALID_DIGEST) {
             return Collections.emptyMap();
         }
-        Map<Integer, String> hints = new TreeMap<>(getHints());
+        Map<Integer, String> hints = new TreeMap<>();
 
-        for (Map.Entry<Integer, String> entry : hints.entrySet()) {
-            String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), entry.getKey(), key);
-            hints.put(entry.getKey(), decryptedHint);
+        for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
+            Integer decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), key);
+            String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), key);
+
+            hints.put(decryptedIndex, decryptedHint);
         }
 
         return hints;
     }
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     * @return
+     */
+    @Ignore
+    public NumberedPlaceholder getNumberedPlaceholder(int index, byte[] key) {
+        int placeholder = 1;
+        for (Map.Entry<Integer, String> entry : getHints(key).entrySet()) {
+            if (index == entry.getKey()) {
+                return NumberedPlaceholder.fromPlaceholderNumber(placeholder);
+            }
+            placeholder++;
+        }
+        return null;
+    }
+
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     * @return
+     */
+    @Ignore
+    public boolean hasHint(int index, byte[] key) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        return getHints().containsKey(encryptedIndex);
+    }
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     * @return
+     */
+    @Ignore
+    public boolean isFilledHint(int index, byte[] key) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        return getHints().containsKey(encryptedIndex) && !getHints().get(encryptedIndex).isEmpty();
+    }
+
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     */
+    @Ignore
+    public void addHint(int index, byte[] key) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        getHints().put(encryptedIndex, Constants.EMPTY);
+    }
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param value
+     * @param key
+     */
+    @Ignore
+    public void setHint(int index, String value, byte[] key) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        getHints().put(encryptedIndex, EncryptUtil.encryptHint(value, encryptedIndex, key));
+    }
+
+    /**
+     *
+     * @param index the real (UI) index
+     * @param key
+     * @return
+     */
+    @Ignore
+    public String removeHint(int index, byte[] key) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        return getHints().remove(encryptedIndex);
+    }
+
 
     @Ignore
     public Pair<Integer, String> getHintDataByPosition(int position, byte[] key) {
         if (key == Secret.INVALID_DIGEST) {
             return null;
         }
-        Pair<Integer, String> pair = super.getHintDataByPosition(position);
-        if (pair != null) {
-            return new Pair<>(pair.first, EncryptUtil.decryptPlainString(pair.second, pair.first, key));
+        int count = 0;
+        Map<Integer, String> hints = getHints(key);
+        for (Map.Entry<Integer, String> entry : hints.entrySet()) {
+            if (position == count) {
+                return new Pair<>(entry.getKey(), entry.getValue());
+            }
+            count++;
         }
-
         return null;
     }
 
-    @Ignore
-    public void setPotentialHint(int index, String value, byte[] key) {
-        getHints().put(index, EncryptUtil.encryptPlainString(value, index, key));
-    }
 
     @Ignore
     public void encrypt(byte[] key) {
         setPattern(getPattern(null), key); // load as is and save encrypted
 
         if (key != null) {
-            for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                String encryptedHint = EncryptUtil.encryptPlainString(entry.getValue(), entry.getKey(), key);
-                getHints().put(entry.getKey(), encryptedHint);
+            synchronized (this) {
+                Map<Integer, String> originHints = getHints();
+                Map<Integer, String> newHints = new TreeMap<>();
+                for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
+                    int encryptedIndex = EncryptUtil.encryptIndex(entry.getKey(), getPatternLength(), key);
+                    // encrypt hint data with encrypted index
+                    String encryptedHint = EncryptUtil.encryptHint(entry.getValue(), encryptedIndex, key);
+                    newHints.put(encryptedIndex, encryptedHint);
+                }
+                setHints(newHints);
             }
-
         }
     }
 
@@ -184,11 +281,17 @@ public abstract class SecurePatternHolder extends PatternHolder {
         setPattern(getPattern(key), null); // load decrypted and save as is
 
         if (key != null) {
-            for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                String decryptedHint = EncryptUtil.decryptPlainString(entry.getValue(), entry.getKey(), key);
-                getHints().put(entry.getKey(), decryptedHint);
+            synchronized (this) {
+                Map<Integer, String> originHints = getHints();
+                Map<Integer, String> newHints = new TreeMap<>();
+                for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
+                    // decrypt hint data with encrypted index
+                    String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), key);
+                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), key);
+                    newHints.put(decryptedIndex, decryptedHint);
+                }
+                setHints(newHints);
             }
-
         }
 
     }
@@ -205,13 +308,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     private void setPattern(@NonNull ObfusString pattern, byte[] key) {
 
-        if (pattern != null) {
-            ObfusString tbs = new ObfusString(pattern);
-            if (key != null) {
-                tbs.encrypt(key);
-            }
-            setPatternInternal(tbs.toExchangeFormat());
+        cutOverlapingHints(pattern.length(), key);
+        recryptAllHints(getPatternLength(), pattern.length(), key);
+
+        ObfusString tbs = new ObfusString(pattern);
+        if (key != null) {
+            tbs.encrypt(key);
         }
+        setPatternInternal(tbs.toExchangeFormat());
     }
 
     public String getHiddenPatternRepresentation(Representation representation) {
@@ -229,4 +333,35 @@ public abstract class SecurePatternHolder extends PatternHolder {
                         ObfusChar.ANY_CHAR
                 })).toRepresentation(representation);
     }
+
+    private void cutOverlapingHints(int patternSize, byte[] key) {
+        if (patternSize == 0) {
+            getHints().clear();
+        }
+        else {
+            Set<Integer> deleteCandidates = new HashSet<>();
+            for (Integer hintIndex : getHints(key).keySet()) {
+                if (hintIndex >= patternSize) {
+                    deleteCandidates.add(hintIndex);
+                }
+            }
+            for (Integer deleteCandidate : deleteCandidates) {
+                getHints(key).remove(deleteCandidate);
+            }
+        }
+    }
+
+
+    private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key) {
+        if (getHintsCount() != 0) {
+            Map<Integer, String> newHints = new HashMap<>();
+            for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
+                int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, key);
+                int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, key);
+                newHints.put(encryptedIndex, entry.getValue());
+            }
+            setHints(newHints);
+        }
+    }
+
 }

@@ -53,7 +53,7 @@ public class CredentialHintRecyclerViewAdapter extends RecyclerView.Adapter<Cred
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    credential.setPotentialHint(
+                    credential.setHint(
                             holder.hintData.first,
                             holder.hint.getText().toString(),
                             SecureActivity.SecretChecker.getOrAskForSecret(activity));
@@ -64,7 +64,7 @@ public class CredentialHintRecyclerViewAdapter extends RecyclerView.Adapter<Cred
 
     @Override
     public int getItemCount() {
-        return credential.getHints().size();
+        return credential.getHintsCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

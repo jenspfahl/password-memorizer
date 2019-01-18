@@ -9,11 +9,11 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.model.SecurePatternHolder;
@@ -131,7 +130,15 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 obfusTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
                 return true;
             }
+        });
 
+        final GestureDetector longPressGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+            public void onLongPress(MotionEvent e) {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Debug pattern")
+                        .setMessage(pattern.toString())
+                        .show();
+            }
         });
 
         obfusTextView.setOnTouchListener(new View.OnTouchListener() {
@@ -141,21 +148,22 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     return scaleGestureDetector.onTouchEvent(motionEvent);
                 }
                 else {
-                    return false;
+                    return longPressGestureDetector.onTouchEvent(motionEvent);
                 }
             }
         });
     }
 
     private void onCreateForNewPatternSelectHints(final SecurePatternHolder pattern, final TextView obfusTextView) {
+        byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
         String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
-                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
+                secret,
                 getSecureActivity().getPatternRepresentation());
         final SpannableStringBuilder span = new SpannableStringBuilder(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {
 
-            final boolean fenabled = pattern.hasHint(i);
+            final boolean fenabled = pattern.hasHint(i, secret);
 
             final int fi = i;
             ClickableSpan clickSpan = new ClickableSpan() {
@@ -180,7 +188,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 @Override
                 public void onClick(View yourTextView) {
 
-                    if (!enabled && pattern.getHints().size() == NumberedPlaceholder.values().length) {
+                    if (!enabled && pattern.getHintsCount() == NumberedPlaceholder.values().length) {
                         new AlertDialog.Builder(getContext())
                                 .setTitle(R.string.title_set_revealed)
                                 .setMessage(R.string.message_set_revealed)
@@ -189,9 +197,11 @@ public abstract class PatternDetailFragment extends SecureFragment {
                         return;
                     }
 
+                    final byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
+
                     enabled = !enabled;
                     if (enabled) {
-                        pattern.addPotentialHint(index);
+                        pattern.addHint(index, secret);
 
                         if (hintUpdateListener != null) {
                             hintUpdateListener.onHintUpdated(index);
@@ -199,17 +209,17 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     }
                     else {
 
-                        if (pattern.isFilledHint(index)) {
+                        if (pattern.isFilledHint(index, secret)) {
                             new AlertDialog.Builder(getContext())
                                     .setTitle(R.string.title_delete_revealed_character)
                                     .setMessage(getString(R.string.message_delete_revealed_character,
-                                            pattern.getNumberedPlaceholder(index).toRepresentation()))
+                                            pattern.getNumberedPlaceholder(index, secret).toRepresentation()))
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                                            pattern.removePotentialHint(index);
+                                            pattern.removeHint(index, secret);
 
                                             if (hintUpdateListener != null) {
                                                 hintUpdateListener.onHintUpdated(index);
@@ -221,7 +231,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                                     .show();
                         }
                         else {
-                            pattern.removePotentialHint(index);
+                            pattern.removeHint(index, secret);
 
                             if (hintUpdateListener != null) {
                                 hintUpdateListener.onHintUpdated(index);
@@ -244,9 +254,10 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     protected String buildHintsString(SecurePatternHolder pattern) {
         StringBuilder sb = new StringBuilder();
-        if (pattern.getHints() != null && !pattern.getHints().isEmpty()) {
+        byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
+        if (pattern.getHintsCount() > 0) {
             int counter = 0;
-            for (String hint : pattern.getHints(SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity())).values()) {
+            for (String hint : pattern.getHints(secret).values()) {
                 counter++;
                 sb.append(System.lineSeparator());
                 sb.append(NumberedPlaceholder.fromPlaceholderNumber(counter).toRepresentation());

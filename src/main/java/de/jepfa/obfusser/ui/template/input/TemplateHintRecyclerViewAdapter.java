@@ -53,7 +53,7 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    template.setPotentialHint(
+                    template.setHint(
                             holder.hintData.first,
                             holder.hint.getText().toString(),
                             SecureActivity.SecretChecker.getOrAskForSecret(activity));
@@ -64,7 +64,7 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
 
     @Override
     public int getItemCount() {
-        return template.getHints().size();
+        return template.getHintsCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

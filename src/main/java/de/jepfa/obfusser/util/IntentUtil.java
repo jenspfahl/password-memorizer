@@ -81,7 +81,7 @@ public class IntentUtil {
         intent.putExtra(Credential.ATTRIB_GROUP_ID, pattern.getGroupId());
         intent.putExtra(Credential.ATTRIB_PATTERN_INTERNAL, pattern.getPatternInternal());
 
-        ArrayList<String> hints = new ArrayList<>(pattern.getHints().size());
+        ArrayList<String> hints = new ArrayList<>(pattern.getHintsCount());
         for (Map.Entry<Integer, String> hintsEntry : pattern.getHints().entrySet()) {
             hints.add(createHintElem(hintsEntry.getKey(), hintsEntry.getValue()));
         }

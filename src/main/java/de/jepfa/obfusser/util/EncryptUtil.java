@@ -104,7 +104,14 @@ public class EncryptUtil {
         return new ObfusString(obfusChars);
     }
 
-    public static String encryptPlainString(String s, int index, byte[] key) {
+    /**
+     *
+     * @param s
+     * @param index the encrypted index if possible
+     * @param key
+     * @return
+     */
+    public static String encryptHint(String s, int index, byte[] key) {
         if (s != null && !s.isEmpty() && key != null) {
             StringBuilder sb = new StringBuilder();
 //            Log.e("DEC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
@@ -127,7 +134,14 @@ public class EncryptUtil {
         return s;
     }
 
-    public static String decryptPlainString(String s, int index, byte[] key) {
+    /**
+     *
+     * @param s
+     * @param index the encrypted index if possible
+     * @param key
+     * @return
+     */
+    public static String decryptHint(String s, int index, byte[] key) {
         if (s != null && !s.isEmpty() && key != null) {
             StringBuilder sb = new StringBuilder();
 //            Log.e("ENC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
@@ -150,6 +164,29 @@ public class EncryptUtil {
         return s;
     }
 
+    public static int encryptIndex(int index, int patternLength, byte[] key) {
+        if (key == null) {
+            return index;
+        }
+        int k = getKeyForIndex(key);
+
+        return (index + k) % patternLength;
+    }
+
+    public static int decryptIndex(int index, int patternLength, byte[] key) {
+        if (key == null) {
+            return index;
+        }
+        int k = getKeyForIndex(key);
+
+        int forward = patternLength - (k % patternLength);
+        return (index + forward) % patternLength;
+    }
+
+    static int getKeyForIndex(byte[] key) {
+        return Math.abs(key[key.length - 1]);
+    }
+
     private static boolean isInRange(byte b, double left, double right) {
         double zeroBased = b + -Byte.MIN_VALUE; // [-128 ... 127] --> [0 ... 255]
 
@@ -158,5 +195,6 @@ public class EncryptUtil {
 
         return left <= i && i < right;
     }
+
 
 }

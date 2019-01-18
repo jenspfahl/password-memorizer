@@ -171,14 +171,6 @@ public abstract class PatternHolder extends IdEntity {
         //setGroupId(other.getGroupId()); TODO activate if group is part of the cretion/change process
     }
 
-    public void mergeHintsIntoPattern() {
-
-        for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-            Integer index = entry.getKey();
-            replacePatternWithPlaceholder(index, index + 1);
-        }
-    }
-
     public String toString() {
         return "Pattern{" +
                 "id=" + id +
@@ -204,16 +196,6 @@ public abstract class PatternHolder extends IdEntity {
             for (Integer deleteCandidate : deleteCandidates) {
                 getHints().remove(deleteCandidate);
             }
-        }
-    }
-
-    private void replacePatternWithPlaceholder(int start, int end) {
-        String patternInternal = getPatternInternal();
-        if (patternInternal != null) {
-            ObfusString pattern = ObfusString.fromExchangeFormat(patternInternal);
-
-            pattern.replaceWithPlaceholder(start, end);
-            setPatternInternal(pattern.toExchangeFormat());
         }
     }
 

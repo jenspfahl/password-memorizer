@@ -81,8 +81,6 @@ public class CredentialInputHintsActivity extends SecureActivity {
                 //TODO check mandatory fields in a better way
 
                 if (check) {
-
-                    credential.mergeHintsIntoPattern();
                     if (credential.isPersisted()) {
                         credentialViewModel.getRepo().update(credential);
                     }

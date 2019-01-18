@@ -69,7 +69,7 @@ public enum ObfusChar {
             return(ObfusChar.ANY_CHAR);
         }
         else if (c == ObfusChar.PLACEHOLDER.getExchangeValue()) {
-            return(ObfusChar.PLACEHOLDER);
+            return(ObfusChar.SPECIAL_CHAR); //TODO migration code
         }
         else {
             throw new IllegalStateException("Unknown exchange char: " + c);
@@ -98,7 +98,7 @@ public enum ObfusChar {
             return(ObfusChar.ANY_CHAR);
         }
         else if (c == ObfusChar.PLACEHOLDER.getRepresentation(representation)) {
-            return(ObfusChar.PLACEHOLDER);
+            return(ObfusChar.SPECIAL_CHAR); //TODO migration code
         }
         else {
             throw new IllegalStateException("Unknown exchange char: " + c);
@@ -150,9 +150,6 @@ public enum ObfusChar {
         return useLikelihood;
     }
 
-    public boolean isPlaceholder() {
-        return this == PLACEHOLDER;
-    }
 
     /**
      * Encrypts the given {@link ObfusChar} with the given key.

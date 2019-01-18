@@ -69,7 +69,6 @@ public class TemplateInputHintsActivity extends SecureActivity {
                 TemplateHintFragment hintsFragment = (TemplateHintFragment) getSupportFragmentManager().findFragmentById(R.id.template_hints_list);
                 Template template = templateViewModel.getTemplate().getValue();
 
-                template.mergeHintsIntoPattern();
                 if (template.isPersisted()) {
                     templateViewModel.getRepo().update(template);
                 }

@@ -158,18 +158,6 @@ public class ObfusString {
     }
 
     /**
-     * Replace a range of this {@link ObfusString} with placeholder markers.
-     *
-     * @param start
-     * @param end
-     */
-    public void replaceWithPlaceholder(int start, int end) {
-        for (int i = start; i < end && i < obfusChars.size(); i++) {
-            obfusChars.set(i, ObfusChar.PLACEHOLDER);
-        }
-    }
-
-    /**
      * Encrypts the given {@link ObfusString} with the given key.
      * @param key
      * @return

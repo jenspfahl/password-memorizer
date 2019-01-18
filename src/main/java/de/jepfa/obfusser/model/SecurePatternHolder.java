@@ -28,16 +28,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (pattern != null && pattern.getObfusChars() != null) {
             for (ObfusChar obfusChar : pattern.getObfusChars()) {
                 String s = obfusChar.toExchangeFormat();
-                if (obfusChar.isPlaceholder()) {
-                    String hint = getHint(index, key);
-                    if (hint != null) {
-                        if (hint.equals(Constants.EMPTY)) {
-                            //TODO not set hints as special char for representation
-                            s = ObfusChar.SPECIAL_CHAR.toExchangeFormat();
-                        }
-                        else {
-                            s = ObfusString.obfuscate(hint).toExchangeFormat();
-                        }
+                String hint = getHint(index, key);
+                if (hint != null) {
+                    if (hint.equals(Constants.EMPTY)) {
+                        //TODO not set hints as special char for representation
+                        //TODO nothing, use char from pattern // s = ObfusChar.SPECIAL_CHAR.toExchangeFormat();
+                    }
+                    else {
+                        s = ObfusString.obfuscate(hint).toExchangeFormat();
                     }
                 }
                 sb.append(s);
@@ -74,16 +72,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (getPattern(key) != null && getPattern(key).getObfusChars() != null) {
             for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
                 String s = obfusChar.toRepresentation(representation);
-                if (obfusChar.isPlaceholder()) {
-                    String hint = getHint(index, key);
-                    if (hint != null) {
-                        if (hint.equals(Constants.EMPTY)) {
-                            //TODO not set hints as special char for representation
-                            s = ObfusChar.SPECIAL_CHAR.toRepresentation(representation);
-                        }
-                        else {
-                            s = ObfusString.obfuscate(hint).toRepresentation(representation);
-                        }
+                String hint = getHint(index, key);
+                if (hint != null) {
+                    if (hint.equals(Constants.EMPTY)) {
+                        //TODO not set hints as special char for representation
+                        //TODO nothing, use char from pattern // s = ObfusChar.SPECIAL_CHAR.toRepresentation(representation);
+                    }
+                    else {
+                        s = ObfusString.obfuscate(hint).toRepresentation(representation);
                     }
                 }
                 sb.append(s);
@@ -103,11 +99,9 @@ public abstract class SecurePatternHolder extends PatternHolder {
         int index = 0;
         for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
             String s = obfusChar.toRepresentation(representation);
-            if (obfusChar.isPlaceholder()) {
-                String hint = getHint(index, key);
-                if (hint != null) {
-                    s = hint;
-                }
+            String hint = getHint(index, key);
+            if (hint != null) {
+                s = hint;
             }
             sb.append(s);
             index++;

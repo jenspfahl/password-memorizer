@@ -192,7 +192,7 @@ public enum Representation {
             case DIGIT: return getDigit();
             case SPECIAL_CHAR: return getSpecialChar();
             case ANY_CHAR: return getAnyChar();
-            case PLACEHOLDER: return getPlaceholderChar();
+            case PLACEHOLDER: return getSpecialChar(); //TODO migration code
         }
         throw new IllegalStateException("Unknown ObfusChar: " + obfusChar);
     }

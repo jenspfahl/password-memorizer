@@ -239,7 +239,6 @@ public abstract class SecurePatternHolder extends PatternHolder {
         return getHints().remove(encryptedIndex);
     }
 
-
     @Ignore
     public Pair<Integer, String> getHintDataByPosition(int position, byte[] key) {
         if (key == Secret.INVALID_DIGEST) {
@@ -308,7 +307,6 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     private void setPattern(@NonNull ObfusString pattern, byte[] key) {
 
-        cutOverlapingHints(pattern.length(), key);
         recryptAllHints(getPatternLength(), pattern.length(), key);
 
         ObfusString tbs = new ObfusString(pattern);
@@ -334,33 +332,26 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 })).toRepresentation(representation);
     }
 
-    private void cutOverlapingHints(int patternSize, byte[] key) {
-        if (patternSize == 0) {
-            getHints().clear();
-        }
-        else {
-            Set<Integer> deleteCandidates = new HashSet<>();
-            for (Integer hintIndex : getHints(key).keySet()) {
-                if (hintIndex >= patternSize) {
-                    deleteCandidates.add(hintIndex);
-                }
-            }
-            for (Integer deleteCandidate : deleteCandidates) {
-                getHints(key).remove(deleteCandidate);
-            }
-        }
-    }
 
 
     private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key) {
-        if (getHintsCount() != 0) {
-            Map<Integer, String> newHints = new HashMap<>();
-            for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, key);
-                int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, key);
-                newHints.put(encryptedIndex, entry.getValue());
+        if (newPatternLength == 0) {
+            getHints().clear();
+        }
+        else {
+            if (getHintsCount() != 0) {
+                Map<Integer, String> newHints = new HashMap<>();
+                for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
+                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, key);
+
+                    if (decryptedIndex < newPatternLength) {
+                        int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, key);
+                        newHints.put(encryptedIndex, entry.getValue());
+                    }
+
+                }
+                setHints(newHints);
             }
-            setHints(newHints);
         }
     }
 

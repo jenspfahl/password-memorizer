@@ -14,7 +14,7 @@ public enum ObfusChar {
     DIGIT('0', 0.2),
     SPECIAL_CHAR( '!', 0.1),
     ANY_CHAR('*', null),
-    PLACEHOLDER('?', null),
+    PLACEHOLDER('?', null), //TODO remove
     ;
 
 

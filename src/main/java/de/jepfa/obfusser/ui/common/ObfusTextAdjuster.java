@@ -1,14 +1,17 @@
 package de.jepfa.obfusser.ui.common;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.widget.TextView;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.model.Representation;
 
 public class ObfusTextAdjuster {
@@ -41,7 +44,19 @@ public class ObfusTextAdjuster {
         String text = textView.getText().toString();
         float nowWidth = paint.measureText(text);
         float newSize = displayWidth / nowWidth * paint.getTextSize();
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
 
+        int dp = pxToDp(newSize);
+        if (dp < Constants.MAX_PATTERN_DETAIL_DIP) {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
+        }
+        else {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.MAX_PATTERN_DETAIL_DIP);
+        }
+
+    }
+
+    public static int pxToDp(float px)
+    {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 }

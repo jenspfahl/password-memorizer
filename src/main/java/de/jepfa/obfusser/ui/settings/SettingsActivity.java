@@ -106,7 +106,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             inputPasswordAndCrypt(activity, preference, enabled);
 
-            return true;
+            return false; // above method will save the preference, therefor false here
         }
     }
 
@@ -168,17 +168,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
-
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                SharedPreferences.Editor editor = preference.getEditor();
-                editor.putBoolean(PREF_ENABLE_PASSWORD, !encrypt);
-                editor.commit();
-                SwitchPreference switchPreference = (SwitchPreference) preference;
-                switchPreference.setChecked(!encrypt);
-            }
-        });
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
@@ -242,6 +231,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             }
                         }
 
+                        // save it
+                        SharedPreferences.Editor editor = preference.getEditor();
+                        editor.putBoolean(PREF_ENABLE_PASSWORD, encrypt);
+                        editor.commit();
+                        SwitchPreference switchPreference = (SwitchPreference) preference;
+                        switchPreference.setChecked(encrypt);
+
                         dialog.dismiss();
                     }
                 });
@@ -251,11 +247,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     @Override
                     public void onClick(View view) {
-                        SharedPreferences.Editor editor = preference.getEditor();
-                        editor.putBoolean(PREF_ENABLE_PASSWORD, !encrypt);
-                        editor.commit();
-                        SwitchPreference switchPreference = (SwitchPreference) preference;
-                        switchPreference.setChecked(!encrypt);
 
                         dialog.dismiss();
                     }

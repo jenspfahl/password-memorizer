@@ -8,4 +8,5 @@ public interface Constants {
     int MIN_PATTERN_LENGTH = 4;
     int MAX_PATTERN_LENGTH = 32;
     String EMPTY = "";
+    int MAX_PASSWD_ATTEMPTS = 3;
 }

@@ -1,8 +1,11 @@
 package de.jepfa.obfusser.util;
 
+import android.support.v4.util.Pair;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.security.SecureRandom;
 import java.util.Random;
 import java.util.UUID;
 
@@ -13,6 +16,7 @@ import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 
 public class EncryptUtilTest {
+
 
     @Test
     public void showCharLoop() throws Exception {

@@ -5,18 +5,24 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
@@ -60,9 +66,13 @@ public abstract class SecureActivity extends BaseActivity {
      */
     public static class SecretChecker {
 
+        public static final String PREF_PASSWD = "passwd";
+        public static final String PREF_PASSWD_IV = "passwd_iv";
+        public static final String KEY_ALIAS = "key_passwd";
 
         private static final String PREF_APPLICATION_UUID = "application.salt";
         private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
+
         private static volatile long secretDialogOpened;
 
         public static byte[] getOrAskForSecret(SecureActivity activity) {
@@ -149,6 +159,7 @@ public abstract class SecureActivity extends BaseActivity {
                 @Override
                 public void onShow(DialogInterface dialogInterface) {
 
+                    final AtomicInteger failCounter = new AtomicInteger();
                     Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                     buttonPositive.setOnClickListener(new View.OnClickListener() {
 
@@ -158,6 +169,11 @@ public abstract class SecureActivity extends BaseActivity {
                             if (TextUtils.isEmpty(pwd)) {
                                 input.setError(activity.getString(R.string.title_encryption_password_required));
                                 return;
+                            } else if (!isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
+                                input.setError(activity.getString(R.string.wrong_password));
+                                if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
+                                    return; // try again
+                                }
                             } else {
                                 secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
                                 activity.refresh(false); // show correct encrypted data
@@ -174,6 +190,29 @@ public abstract class SecureActivity extends BaseActivity {
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             dialog.show();
 
+        }
+
+        private static boolean isPasswordValid(String pwd, SecureActivity activity, byte[] salt) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+            String encPasswdBase64 = defaultSharedPreferences
+                    .getString(PREF_PASSWD, null);
+            String ivBase64 = defaultSharedPreferences
+                    .getString(PREF_PASSWD_IV, null);
+
+            if (encPasswdBase64 != null && ivBase64 != null) {
+                byte[] encPasswd = Base64.decode(encPasswdBase64, 0);
+                byte[] iv = Base64.decode(ivBase64, 0);
+
+                String passwdBase64 = EncryptUtil.decryptData(KEY_ALIAS,
+                        new Pair<>(iv, encPasswd));
+                byte[] key = EncryptUtil.generateKey(pwd, salt);
+                byte[] storedKey = Base64.decode(passwdBase64, 0);
+
+                return Arrays.equals(key, storedKey);
+            }
+
+            return true; //bypass
         }
 
         private static boolean isRecentlyOpened(long secretDialogOpened) {

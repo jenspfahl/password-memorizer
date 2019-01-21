@@ -13,16 +13,20 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,11 +183,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                             Secret secret = Secret.getOrCreate();
                             secret.setDigest(key);
+                            storeKeySavely(key, activity);
                         }
                         else {
                             SecurityService.startDecryptAll(preference.getContext(), key);
                             Secret secret = Secret.getOrCreate();
                             secret.setDigest(null);
+                            removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
                         }
 
                         dialog.dismiss();
@@ -210,6 +216,40 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
     }
+
+    private static void storeKeySavely(byte[] key, Activity activity) {
+
+        String keyAsBase64 = Base64.encodeToString(key, 0);
+        Pair<byte[], byte[]> encrypted = EncryptUtil.encryptText(SecureActivity.SecretChecker.KEY_ALIAS, keyAsBase64);
+        SharedPreferences defaultSharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(activity);
+
+        String passwdAsBase64 = Base64.encodeToString(encrypted.second, 0);
+        SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
+        passwdEditor.putString(SecureActivity.SecretChecker.PREF_PASSWD, passwdAsBase64);
+        passwdEditor.commit();
+
+        String ivAsBase64 = Base64.encodeToString(encrypted.first, 0);
+        SharedPreferences.Editor ivEditor = defaultSharedPreferences.edit();
+        ivEditor.putString(SecureActivity.SecretChecker.PREF_PASSWD_IV, ivAsBase64);
+        ivEditor.commit();
+
+    }
+
+
+    private static void removeSavelyStoredKey(byte[] key, PreferenceManager preferenceManager, Activity activity) {
+        SharedPreferences defaultSharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(activity);
+
+        SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
+        passwdEditor.remove(SecureActivity.SecretChecker.PREF_PASSWD);
+        passwdEditor.commit();
+
+        SharedPreferences.Editor ivEditor = defaultSharedPreferences.edit();
+        ivEditor.remove(SecureActivity.SecretChecker.PREF_PASSWD_IV);
+        ivEditor.commit();
+    }
+
 
     /**
      * Helper method to determine if the device has an extra-large screen. For

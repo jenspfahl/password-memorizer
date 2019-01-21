@@ -18,11 +18,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.jepfa.obfusser.BuildConfig;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.model.SecurePatternHolder;
@@ -133,13 +135,14 @@ public abstract class PatternDetailFragment extends SecureFragment {
         });
 
         final GestureDetector longPressGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(MotionEvent e) {
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Debug pattern")
-                        .setMessage(pattern.toString())
-                        .show();
+            public void onLongPress(MotionEvent event) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Debug pattern")
+                            .setMessage(pattern.toString())
+                            .show();
             }
         });
+
 
         obfusTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -148,7 +151,10 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     return scaleGestureDetector.onTouchEvent(motionEvent);
                 }
                 else {
-                    return longPressGestureDetector.onTouchEvent(motionEvent);
+                    if (BuildConfig.DEBUG) {
+                        return longPressGestureDetector.onTouchEvent(motionEvent);
+                    }
+                    return false;
                 }
             }
         });

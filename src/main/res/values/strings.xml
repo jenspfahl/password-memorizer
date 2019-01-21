@@ -114,8 +114,8 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="pref_header_security">Security</string>
-    <string name="pref_title_enable_password">Ensure data with password</string>
-    <string name="pref_description_enable_password">It is recommended to ensure your data with a password. Note: a wrong password will also show data, but other data. Only you knows your correct data!</string>
+    <string name="pref_title_enable_password">Ensure patterns with password</string>
+    <string name="pref_description_enable_password">It is recommended to ensure your patterns with a password to prevent reading them by unauthorized people. </string>
     <string name="pattern_style">Pattern style</string>
     <string name="pref_header_general">General</string>
     <string name="pref_title_show_patterns">Show patterns in overview list</string>
@@ -134,14 +134,19 @@
     <string name="fill_hints">Please fill all placeholders.</string>
     <string name="title_about_the_app">About the app</string>
 
-    <string name="message_password_to_encrypt">Your password is used to encrypt all data. It is important to remember this password, there is no recovery. It can be an easy one, since wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns look like.</string>
+    <string name="message_password_to_encrypt">Your password is used to encrypt all patterns. It is important to remember this password, there is no recovery. Wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns usually look like.</string>
     <string name="message_password_to_decrypt">Enter your password to disable pattern encryption. It is important to type it correctly, otherwise the patterns will be decrypted in a different way. This is not undo-able.</string>
-    <string name="title_enter_and_confirm_password">Enter and confirm a password</string>
+    <string name="message_password_to_encrypt_single">Your password is used to encrypt all patterns. It is important to remember this password, there is no recovery. If you enable password checking, the password is encrypted and stored. Wrong entered passwords won\'t unlock the patterns. If you disable password checking, wrong entered passwords unlock the patterns, but in a different way and only you should know how your patterns usually look like.</string>
+    <string name="message_password_to_decrypt_single">Enter your password to disable pattern encryption.</string>
+    <string name="title_enter_password_for_encryption">Enter and confirm a password</string>
+    <string name="title_enter_password_for_decryption">Enter your password</string>
     <string name="password_required">Password required</string>
     <string name="password_confirmation_required">Password confirmation required</string>
     <string name="password_not_equal">Password not equal</string>
     <string name="nothing_revealed">Nothing revealed</string>
     <string name="wrong_password">Wrong password</string>
+    <string name="store_password_hint">Enable password checking</string>
+
 
 
 </resources>

@@ -1,5 +1,6 @@
 package de.jepfa.obfusser.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -169,7 +170,8 @@ public abstract class SecureActivity extends BaseActivity {
                             if (TextUtils.isEmpty(pwd)) {
                                 input.setError(activity.getString(R.string.title_encryption_password_required));
                                 return;
-                            } else if (!isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
+                            } else if (EncryptUtil.isPasswdEncryptionSupported() &&
+                                    !isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
                                 input.setError(activity.getString(R.string.wrong_password));
                                 if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
                                     return; // try again
@@ -192,7 +194,18 @@ public abstract class SecureActivity extends BaseActivity {
 
         }
 
-        private static boolean isPasswordValid(String pwd, SecureActivity activity, byte[] salt) {
+        public static boolean isPasswordStored(Activity activity) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+            String encPasswdBase64 = defaultSharedPreferences
+                    .getString(PREF_PASSWD, null);
+            String ivBase64 = defaultSharedPreferences
+                    .getString(PREF_PASSWD_IV, null);
+
+            return (encPasswdBase64 != null && ivBase64 != null);
+        }
+
+        public static boolean isPasswordValid(String pwd, Activity activity, byte[] salt) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
             String encPasswdBase64 = defaultSharedPreferences
@@ -212,7 +225,7 @@ public abstract class SecureActivity extends BaseActivity {
                 return Arrays.equals(key, storedKey);
             }
 
-            return true; //bypass
+            return true; //bypass if nothing is stored
         }
 
         private static boolean isRecentlyOpened(long secretDialogOpened) {

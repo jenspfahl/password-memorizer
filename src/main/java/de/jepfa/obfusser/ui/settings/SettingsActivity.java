@@ -24,9 +24,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,18 +133,52 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static void inputPasswordAndCrypt(final Activity activity, final Preference preference, final boolean encrypt) {
         LayoutInflater inflater = activity.getLayoutInflater();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+        String title = encrypt
+                ? activity.getString(R.string.title_enter_password_for_encryption)
+                : activity.getString(R.string.title_enter_password_for_decryption);
         String message = encrypt
                 ? activity.getString(R.string.message_password_to_encrypt)
                 : activity.getString(R.string.message_password_to_decrypt);
+
         final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
-        final AlertDialog dialog = builder.setTitle(R.string.title_enter_and_confirm_password)
+        final TextView firstPassword = passwordView.findViewById(R.id.first_password);
+        final TextView secondPassword = passwordView.findViewById(R.id.second_password);
+        final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
+
+        final boolean isSingleDecryptionMode = !encrypt && SecureActivity.SecretChecker.isPasswordStored(activity);
+
+        if (isSingleDecryptionMode) {
+            secondPassword.setVisibility(View.GONE);
+            message = activity.getString(R.string.message_password_to_decrypt_single);
+        }
+        if (EncryptUtil.isPasswdEncryptionSupported() && encrypt) {
+            message = activity.getString(R.string.message_password_to_encrypt_single);
+            storePasswdSwitch.setChecked(true);
+        }
+        else {
+            storePasswdSwitch.setVisibility(View.GONE);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+
+        final AlertDialog dialog = builder.setTitle(title)
                 .setMessage(message)
                 .setView(passwordView)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                SharedPreferences.Editor editor = preference.getEditor();
+                editor.putBoolean(PREF_ENABLE_PASSWORD, !encrypt);
+                editor.commit();
+                SwitchPreference switchPreference = (SwitchPreference) preference;
+                switchPreference.setChecked(!encrypt);
+            }
+        });
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
@@ -156,40 +190,56 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     @Override
                     public void onClick(View view) {
-                        TextView firstPassword = passwordView.findViewById(R.id.first_password);
                         String pwd = firstPassword.getText().toString();
                         if (TextUtils.isEmpty(pwd)) {
                             firstPassword.setError(activity.getString(R.string.password_required));
+                            firstPassword.requestFocus();
                             return;
                         }
 
-                        TextView secondPassword = passwordView.findViewById(R.id.second_password);
-                        String pwd2 = secondPassword.getText().toString();
-                        if (TextUtils.isEmpty(pwd2)) {
-                            secondPassword.setError(activity.getString(R.string.password_confirmation_required));
-                            return;
+                        if (!isSingleDecryptionMode) {
+                            String pwd2 = secondPassword.getText().toString();
+                            if (TextUtils.isEmpty(pwd2)) {
+                                secondPassword.setError(activity.getString(R.string.password_confirmation_required));
+                                secondPassword.requestFocus();
+                                return;
+                            }
+
+                            if (!TextUtils.equals(pwd, pwd2)) {
+                                secondPassword.setError(activity.getString(R.string.password_not_equal));
+                                secondPassword.requestFocus();
+                                return;
+                            }
                         }
 
-                        if (!TextUtils.equals(pwd, pwd2)) {
-                            secondPassword.setError(activity.getString(R.string.password_not_equal));
-                            return;
-                        }
 
-
-                        byte[] key = EncryptUtil.generateKey(pwd, SecureActivity.SecretChecker.getApplicationSalt(preference.getContext()));
+                        byte[] applicationSalt = SecureActivity.SecretChecker.getApplicationSalt(preference.getContext());
+                        byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
 
                         if (encrypt) {
                             SecurityService.startEncryptAll(preference.getContext(), key);
 
                             Secret secret = Secret.getOrCreate();
                             secret.setDigest(key);
-                            storeKeySavely(key, activity);
+
+                            if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
+                                storeKeySavely(key, activity);
+                            }
+
                         }
                         else {
-                            SecurityService.startDecryptAll(preference.getContext(), key);
-                            Secret secret = Secret.getOrCreate();
-                            secret.setDigest(null);
-                            removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+                            if (!SecureActivity.SecretChecker.isPasswordValid(pwd, activity, applicationSalt)) {
+                                firstPassword.setError(activity.getString(R.string.wrong_password));
+                                firstPassword.requestFocus();
+                                secondPassword.setText(null);
+                                return;
+                            }
+                            else {
+                                SecurityService.startDecryptAll(preference.getContext(), key);
+                                Secret secret = Secret.getOrCreate();
+                                secret.setDigest(null);
+                                removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+                            }
                         }
 
                         dialog.dismiss();

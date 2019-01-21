@@ -85,7 +85,7 @@ public class EncryptUtil {
     }
 
 
-
+    @TargetApi(Build.VERSION_CODES.M)
     public static String decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
 
         try {
@@ -117,7 +117,7 @@ public class EncryptUtil {
     private static SecretKey getSecretKey(final String alias) throws Exception {
 
         KeyGenerator keyGenerator;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (isPasswdEncryptionSupported()) {
             keyGenerator = KeyGenerator
                     .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
 
@@ -130,7 +130,12 @@ public class EncryptUtil {
             return keyGenerator.generateKey();
         }
 
+
         return null;
+    }
+
+    public static boolean isPasswdEncryptionSupported() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
     /**

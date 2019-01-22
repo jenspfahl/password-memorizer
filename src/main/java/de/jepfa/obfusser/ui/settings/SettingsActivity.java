@@ -24,10 +24,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
@@ -141,8 +143,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 : activity.getString(R.string.message_password_to_decrypt);
 
         final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
-        final TextView firstPassword = passwordView.findViewById(R.id.first_password);
-        final TextView secondPassword = passwordView.findViewById(R.id.second_password);
+        final EditText firstPassword = passwordView.findViewById(R.id.first_password);
+        final EditText secondPassword = passwordView.findViewById(R.id.second_password);
         final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
 
         final boolean isSingleDecryptionMode = !encrypt && SecureActivity.SecretChecker.isPasswordStored(activity);
@@ -179,58 +181,64 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     @Override
                     public void onClick(View view) {
-                        String pwd = firstPassword.getText().toString();
-                        if (TextUtils.isEmpty(pwd)) {
-                            firstPassword.setError(activity.getString(R.string.password_required));
-                            firstPassword.requestFocus();
-                            return;
-                        }
-
-                        if (!isSingleDecryptionMode) {
-                            String pwd2 = secondPassword.getText().toString();
-                            if (TextUtils.isEmpty(pwd2)) {
-                                secondPassword.setError(activity.getString(R.string.password_confirmation_required));
-                                secondPassword.requestFocus();
-                                return;
-                            }
-
-                            if (!TextUtils.equals(pwd, pwd2)) {
-                                secondPassword.setError(activity.getString(R.string.password_not_equal));
-                                secondPassword.requestFocus();
-                                return;
-                            }
-                        }
-
-
-                        byte[] applicationSalt = SecureActivity.SecretChecker.getApplicationSalt(preference.getContext());
-                        byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
-
-                        if (encrypt) {
-                            SecurityService.startEncryptAll(preference.getContext(), key);
-
-                            Secret secret = Secret.getOrCreate();
-                            secret.setDigest(key);
-
-                            if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
-                                storeKeySavely(key, activity);
-                            }
-
-                        }
-                        else {
-                            if (!SecureActivity.SecretChecker.isPasswordValid(pwd, activity, applicationSalt)) {
-                                firstPassword.setError(activity.getString(R.string.wrong_password));
+                        char[] pwd = EncryptUtil.getCharArray(firstPassword.getText());
+                        char[] pwd2 = null;
+                        try {
+                            if (pwd == null || pwd.length == 0) {
+                                firstPassword.setError(activity.getString(R.string.password_required));
                                 firstPassword.requestFocus();
-                                secondPassword.setText(null);
                                 return;
+                            }
+
+                            if (!isSingleDecryptionMode) {
+                                pwd2 = EncryptUtil.getCharArray(secondPassword.getText());
+                                if (pwd2 == null || pwd2.length == 0) {
+                                    secondPassword.setError(activity.getString(R.string.password_confirmation_required));
+                                    secondPassword.requestFocus();
+                                    return;
+                                }
+
+                                if (!Arrays.equals(pwd, pwd2)) {
+                                    secondPassword.setError(activity.getString(R.string.password_not_equal));
+                                    secondPassword.requestFocus();
+                                    return;
+                                }
+                            }
+
+
+                            byte[] applicationSalt = SecureActivity.SecretChecker.getApplicationSalt(preference.getContext());
+                            byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
+
+
+                            if (encrypt) {
+                                SecurityService.startEncryptAll(preference.getContext(), key);
+
+                                Secret secret = Secret.getOrCreate();
+                                secret.setDigest(key);
+
+                                if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
+                                    storeKeySavely(key, activity);
+                                }
+
                             }
                             else {
-                                SecurityService.startDecryptAll(preference.getContext(), key);
-                                Secret secret = Secret.getOrCreate();
-                                secret.setDigest(null);
-                                removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+                                if (!SecureActivity.SecretChecker.isPasswordValidAndClearPwd(pwd, activity, applicationSalt)) {
+                                    firstPassword.setError(activity.getString(R.string.wrong_password));
+                                    firstPassword.requestFocus();
+                                    secondPassword.setText(null);
+                                    return;
+                                }
+                                else {
+                                    SecurityService.startDecryptAll(preference.getContext(), key);
+                                    Secret secret = Secret.getOrCreate();
+                                    secret.setDigest(null);
+                                    removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+                                }
                             }
+                        } finally {
+                            EncryptUtil.clearPwd(pwd);
+                            EncryptUtil.clearPwd(pwd2);
                         }
-
                         // save it
                         SharedPreferences.Editor editor = preference.getEditor();
                         editor.putBoolean(PREF_ENABLE_PASSWORD, encrypt);

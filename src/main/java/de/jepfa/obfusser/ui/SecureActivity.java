@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -166,19 +164,23 @@ public abstract class SecureActivity extends BaseActivity {
 
                         @Override
                         public void onClick(View view) {
-                            String pwd = input.getText().toString();
-                            if (TextUtils.isEmpty(pwd)) {
-                                input.setError(activity.getString(R.string.title_encryption_password_required));
-                                return;
-                            } else if (EncryptUtil.isPasswdEncryptionSupported() &&
-                                    !isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
-                                input.setError(activity.getString(R.string.wrong_password));
-                                if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
-                                    return; // try again
+                            char[] pwd = EncryptUtil.getCharArray(input.getText());
+                            try {
+                                if (pwd == null || pwd.length == 0) {
+                                    input.setError(activity.getString(R.string.title_encryption_password_required));
+                                    return;
+                                } else if (EncryptUtil.isPasswdEncryptionSupported() &&
+                                        !isPasswordValidAndClearPwd(pwd, activity, getApplicationSalt(activity))) {
+                                    input.setError(activity.getString(R.string.wrong_password));
+                                    if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
+                                        return; // try again
+                                    }
+                                } else {
+                                    secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
+                                    activity.refresh(false); // show correct encrypted data
                                 }
-                            } else {
-                                secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
-                                activity.refresh(false); // show correct encrypted data
+                            } finally {
+                                EncryptUtil.clearPwd(pwd);
                             }
 
                             secretDialogOpened = 0;
@@ -205,26 +207,27 @@ public abstract class SecureActivity extends BaseActivity {
             return (encPasswdBase64 != null && ivBase64 != null);
         }
 
-        public static boolean isPasswordValid(String pwd, Activity activity, byte[] salt) {
-            SharedPreferences defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(activity);
-            String encPasswdBase64 = defaultSharedPreferences
-                    .getString(PREF_PASSWD, null);
-            String ivBase64 = defaultSharedPreferences
-                    .getString(PREF_PASSWD_IV, null);
+        public static boolean isPasswordValidAndClearPwd(char[] pwd, Activity activity, byte[] salt) {
+            if (pwd != null) {
+                SharedPreferences defaultSharedPreferences = PreferenceManager
+                        .getDefaultSharedPreferences(activity);
+                String encPasswdBase64 = defaultSharedPreferences
+                        .getString(PREF_PASSWD, null);
+                String ivBase64 = defaultSharedPreferences
+                        .getString(PREF_PASSWD_IV, null);
 
-            if (encPasswdBase64 != null && ivBase64 != null) {
-                byte[] encPasswd = Base64.decode(encPasswdBase64, 0);
-                byte[] iv = Base64.decode(ivBase64, 0);
+                if (encPasswdBase64 != null && ivBase64 != null) {
+                    byte[] encPasswd = Base64.decode(encPasswdBase64, 0);
+                    byte[] iv = Base64.decode(ivBase64, 0);
 
-                String passwdBase64 = EncryptUtil.decryptData(KEY_ALIAS,
-                        new Pair<>(iv, encPasswd));
-                byte[] key = EncryptUtil.generateKey(pwd, salt);
-                byte[] storedKey = Base64.decode(passwdBase64, 0);
+                    String passwdBase64 = EncryptUtil.decryptData(KEY_ALIAS,
+                            new Pair<>(iv, encPasswd));
+                    byte[] key = EncryptUtil.generateKey(pwd, salt);
+                    byte[] storedKey = Base64.decode(passwdBase64, 0);
 
-                return Arrays.equals(key, storedKey);
+                    return Arrays.equals(key, storedKey);
+                }
             }
-
             return true; //bypass if nothing is stored
         }
 

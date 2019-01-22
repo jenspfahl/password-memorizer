@@ -6,10 +6,15 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.text.Editable;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.EditText;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -138,16 +143,22 @@ public class EncryptUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
+    public static void clearPwd(char[] pwd) {
+        if (pwd != null) {
+            Arrays.fill(pwd, (char) 0); // clear passwd in memory
+        }
+    }
+
     /**
      * Generates a key as byte array from a user secret like password or pin.
      *
-     * @param pin
+     * @param pwd
      * @return
      */
-    public static byte[] generateKey(String pin, byte[] salt) {
+    public static byte[] generateKey(char[] pwd, byte[] salt) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            messageDigest.update(pin.getBytes());
+            messageDigest.update(toBytes(pwd));
             if (salt != null) {
                 messageDigest.update(salt);
             }
@@ -271,6 +282,25 @@ public class EncryptUtil {
 
         int forward = patternLength - (k % patternLength);
         return (index + forward) % patternLength;
+    }
+
+    public static char[] getCharArray(Editable editable) {
+        if (editable == null) {
+            return null;
+        }
+        int l = editable.length();
+        char[] chararray = new char[l];
+        editable.getChars(0, l, chararray, 0);
+        return chararray;
+    }
+
+    public static byte[] toBytes(char[] chars) {
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
+        return bytes;
     }
 
     static int getKeyForIndex(byte[] key) {

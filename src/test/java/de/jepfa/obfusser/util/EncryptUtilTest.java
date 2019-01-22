@@ -60,15 +60,15 @@ public class EncryptUtilTest {
 
             ObfusString user = ObfusString.fromExchangeFormat("0!xxxX?0!X0");
 
-            String pin = String.valueOf(i);
+            char[] pwd = String.valueOf(i).toCharArray();
             byte[] salt = UUID.randomUUID().toString().getBytes();
-            byte[] key = EncryptUtil.generateKey(pin, salt);
+            byte[] key = EncryptUtil.generateKey(pwd, salt);
             String origin = user.toRepresentation(Representation.DEFAULT_BLOCKS);
             ObfusString encryptedOS = user.encrypt(key);
             String encrypted = encryptedOS.toRepresentation(Representation.DEFAULT_BLOCKS);
             String encryptedExchangeFormat = encryptedOS.toExchangeFormat();
             String decrypted = user.decrypt(key).toRepresentation(Representation.DEFAULT_BLOCKS);
-            System.out.println(pin + ": " + origin + " --> " + encrypted + "(" + encryptedExchangeFormat + ")");
+            System.out.println(pwd + ": " + origin + " --> " + encrypted + "(" + encryptedExchangeFormat + ")");
 
             Assert.assertEquals(origin, decrypted);
         }
@@ -96,14 +96,14 @@ public class EncryptUtilTest {
         String string = "abcdefghiABCDEFG!§$/138";
 
         for (int i = 0; i < 10000; i++) {
-            String pin = String.valueOf(i);
+            char[] pwd = String.valueOf(i).toCharArray();
             byte[] salt = null;
-            byte[] key = EncryptUtil.generateKey(pin, salt);
+            byte[] key = EncryptUtil.generateKey(pwd, salt);
 
             String encrypted = EncryptUtil.encryptHint(string, 23, key);
             String decrypted = EncryptUtil.decryptHint(encrypted, 23, key);
 
-            System.out.println(pin + ": " + string + " --> " + encrypted + " --> " + decrypted);
+            System.out.println(pwd + ": " + string + " --> " + encrypted + " --> " + decrypted);
 
             Assert.assertEquals(string, decrypted);
         }
@@ -117,7 +117,7 @@ public class EncryptUtilTest {
         pattern.setHint(3, "hint2", null);
         String originalPattern = pattern.toString();
 
-        byte[] key = EncryptUtil.generateKey("1234", null);
+        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), null);
         pattern.encrypt(key);
         System.out.println(pattern);
         pattern.decrypt(key);
@@ -131,7 +131,7 @@ public class EncryptUtilTest {
 
     @Test
     public void encryptDecryptIndex() throws Exception {
-        byte[] key = EncryptUtil.generateKey("1234", null);
+        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), null);
         System.out.println("k=" + EncryptUtil.getKeyForIndex(key));
         final int PATTERN_LENGTH = 5;
         int encryptedIndex = EncryptUtil.encryptIndex(0, PATTERN_LENGTH, key);
@@ -149,7 +149,7 @@ public class EncryptUtilTest {
         Random r = new Random();
         for (int i = 0; i < 10000; i++) {
 
-            byte[] key = EncryptUtil.generateKey(String.valueOf(i), null);
+            byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), null);
             int patternLength = r.nextInt(18) + 1;
             int originIndex = r.nextInt(patternLength);
 

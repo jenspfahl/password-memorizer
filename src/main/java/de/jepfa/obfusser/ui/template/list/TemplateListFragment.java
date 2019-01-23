@@ -33,6 +33,7 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
 
     private TemplateListViewModel templateListViewModel;
     private TemplateListAdapter adapter;
+    private View view;
 
 
     public TemplateListFragment() {
@@ -53,7 +54,7 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.navtab_template_list, container, false);
+        view = inflater.inflate(R.layout.navtab_template_list, container, false);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +126,13 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
 
     @Override
     public void refresh() {
-        adapter.notifyDataSetChanged();
+        view.post(new Runnable()
+        {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
 }

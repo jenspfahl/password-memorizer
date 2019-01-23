@@ -24,6 +24,7 @@ import de.jepfa.obfusser.ui.settings.SettingsActivity;
 public class CredentialExpandableListFragment extends CredentialListFragmentBase {
 
     private CredentialExpandableListAdapter expandableAdapter;
+    private ExpandableListView listView;
 
 
     @Override
@@ -40,7 +41,7 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        final ExpandableListView listView = view.findViewById(R.id.credential_expandable_list);
+        listView = view.findViewById(R.id.credential_expandable_list);
         assert listView != null;
 
         expandableAdapter = new CredentialExpandableListAdapter(this, listView);
@@ -117,6 +118,12 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
 
     @Override
     public void refresh() {
-        expandableAdapter.notifyDataSetChanged();
+        listView.post(new Runnable()
+        {
+            @Override
+            public void run() {
+                expandableAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

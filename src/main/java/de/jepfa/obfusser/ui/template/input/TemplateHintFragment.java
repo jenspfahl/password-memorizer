@@ -18,6 +18,7 @@ public class TemplateHintFragment extends SecureFragment {
 
     private TemplateViewModel templateViewModel;
     private TemplateHintRecyclerViewAdapter adapter;
+    private View view;
 
     public TemplateHintFragment() {
     }
@@ -34,7 +35,7 @@ public class TemplateHintFragment extends SecureFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.template_hint_list, container, false);
+        view = inflater.inflate(R.layout.template_hint_list, container, false);
 
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -53,6 +54,12 @@ public class TemplateHintFragment extends SecureFragment {
 
     @Override
     public void refresh() {
-        adapter.notifyDataSetChanged();
+        view.post(new Runnable()
+        {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 }

@@ -18,6 +18,7 @@ import de.jepfa.obfusser.model.Credential;
 public class CredentialFlatListFragment extends CredentialListFragmentBase {
 
     private CredentialFlatListAdapter listAdapter;
+    private RecyclerView recyclerView;
 
 
     @Override
@@ -35,7 +36,7 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        RecyclerView recyclerView = view.findViewById(R.id.credential_flat_list);
+        recyclerView = view.findViewById(R.id.credential_flat_list);
         assert recyclerView != null;
 
         listAdapter = new CredentialFlatListAdapter(this);
@@ -56,7 +57,13 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
 
     @Override
     public void refresh() {
-        listAdapter.notifyDataSetChanged();
+        recyclerView.post(new Runnable()
+        {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
 }

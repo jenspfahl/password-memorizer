@@ -34,6 +34,7 @@ import de.jepfa.obfusser.ui.SecureFragment;
 public abstract class PatternDetailFragment extends SecureFragment {
 
     private TextView hintsTextView;
+    private TextView infoTextView;
 
     public interface HintUpdateListener {
         void onHintUpdated(int index);
@@ -61,14 +62,10 @@ public abstract class PatternDetailFragment extends SecureFragment {
         SecurePatternHolder pattern = getPattern();
 
         if (pattern != null) {
-            if (pattern.getInfo() != null) {
-                TextView infoTextView = rootView.findViewById(R.id.pattern_info_textview);
-                infoTextView.setText(pattern.getInfo());
-            }
-
             final TextView obfusTextView = rootView.findViewById(R.id.pattern_detail_obfuschar);
             ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
 
+            infoTextView = rootView.findViewById(R.id.pattern_info_textview);
             hintsTextView = rootView.findViewById(R.id.pattern_hints_textview);
 
 
@@ -98,11 +95,15 @@ public abstract class PatternDetailFragment extends SecureFragment {
     }
 
     private void onCreateForShowPatternDetails(final SecurePatternHolder pattern, final TextView obfusTextView) {
+        if (pattern.getInfo() != null) {
+            infoTextView.setText(pattern.getInfo());
+        }
+
         String patternString = getPatternRepresentationForDetails(pattern);
         SpannableString span = getSpannableString(pattern, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
-        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView);
+        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
 
         final AtomicInteger clickCounter = new AtomicInteger(1);
         obfusTextView.setOnClickListener(new View.OnClickListener() {
@@ -161,6 +162,9 @@ public abstract class PatternDetailFragment extends SecureFragment {
     }
 
     private void onCreateForNewPatternSelectHints(final SecurePatternHolder pattern, final TextView obfusTextView) {
+        infoTextView.setVisibility(TextView.GONE);
+        hintsTextView.setVisibility(TextView.GONE);
+
         byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
         String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                 secret,
@@ -255,6 +259,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         obfusTextView.setText(span);
         obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
+
+        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
         ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
     }
 

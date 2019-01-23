@@ -16,7 +16,7 @@ import de.jepfa.obfusser.model.Representation;
 
 public class ObfusTextAdjuster {
 
-    public static final int MARGIN = 100;
+    public static final int DEFAULT_MARGIN = 100;
 
     public static void adjustTextForRepresentation(Representation representation, TextView textView) {
         if (representation.getLetterSpacing() != null) {
@@ -33,11 +33,11 @@ public class ObfusTextAdjuster {
         }
     }
 
-    public static void fitSizeToScreen(Activity activity, TextView textView) {
+    public static void fitSizeToScreen(Activity activity, TextView textView, int margin) {
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int displayWidth = size.x - (MARGIN * 2); // margin left and right
+        int displayWidth = size.x - (margin * 2); // margin left and right
 
         Paint paint = textView.getPaint();
 

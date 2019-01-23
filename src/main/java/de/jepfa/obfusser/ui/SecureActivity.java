@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,9 +66,11 @@ public abstract class SecureActivity extends BaseActivity {
 
         public static final String PREF_PASSWD = "passwd";
         public static final String PREF_PASSWD_IV = "passwd_iv";
-        public static final String KEY_ALIAS = "key_passwd";
+        public static final String KEY_ALIAS_PASSWD = "key_passwd";
+        public static final String KEY_ALIAS_SALT = "key_salt";
 
-        private static final String PREF_APPLICATION_UUID = "application.salt";
+        private static final String PREF_SALT = "application.salt";
+        private static final String PREF_SALT_IV = "application.salt_iv";
         private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
 
         private static volatile long secretDialogOpened;
@@ -98,29 +99,64 @@ public abstract class SecureActivity extends BaseActivity {
         }
 
 
-        public static synchronized String getApplicationUuid(Context context) {
+        public static synchronized byte[] getSalt(Context context) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(context);
-            String uuid = defaultSharedPreferences
-                    .getString(PREF_APPLICATION_UUID, null);
-            if (uuid == null) {
+            String saltBase64 = defaultSharedPreferences
+                    .getString(PREF_SALT, null);
+            byte[] salt;
+            if (saltBase64 == null) {
                 SharedPreferences.Editor editor = defaultSharedPreferences.edit();
-                uuid = UUID.randomUUID().toString();
-                editor.putString(PREF_APPLICATION_UUID, uuid);
+                salt = EncryptUtil.generateSalt();
+                if (EncryptUtil.isPasswdEncryptionSupported()) {
+                    encryptAndStoreSalt(salt, editor);
+                }
+                else {
+                    saltBase64 = Base64.encodeToString(salt, 0);
+                    editor.putString(PREF_SALT, saltBase64);
+                }
                 editor.commit();
             }
+            else {
 
-            return uuid;
-        }
-
-        public static byte[] getApplicationSalt(Context context) {
-            String uuid = getApplicationUuid(context);
-            Log.d("SALT", uuid);
-            if (uuid != null) {
-                return uuid.getBytes();
+                if (EncryptUtil.isPasswdEncryptionSupported()) {
+                    String ivBase64 = defaultSharedPreferences
+                            .getString(PREF_SALT_IV, null);
+                    if (ivBase64 == null) {
+                        // salt not encrypted, do it now
+                        salt = Base64.decode(saltBase64, 0);
+                        SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+                        encryptAndStoreSalt(salt, editor);
+                        editor.commit();
+                    }
+                    else {
+                        // decrypt salt
+                        byte[] iv = Base64.decode(ivBase64, 0);
+                        byte[] encSalt = Base64.decode(saltBase64, 0);
+                        Pair<byte[], byte[]> encrypted = new Pair<>(iv, encSalt);
+                        salt = EncryptUtil.decryptData(SecretChecker.KEY_ALIAS_SALT, encrypted);
+                    }
+                }
+                else {
+                    // get unencrypted salt
+                    salt = Base64.decode(saltBase64, 0);
+                }
             }
 
-            return null;
+
+            Log.d("SALT", Arrays.toString(salt));
+            return salt;
+        }
+
+        private static void encryptAndStoreSalt(byte[] salt, SharedPreferences.Editor editor) {
+
+            Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecretChecker.KEY_ALIAS_SALT, salt);
+
+            String encSaltBase64 = Base64.encodeToString(encrypted.second, 0);
+            String ivBase64 = Base64.encodeToString(encrypted.first, 0);
+
+            editor.putString(PREF_SALT, encSaltBase64);
+            editor.putString(PREF_SALT_IV, ivBase64);
         }
 
 
@@ -170,13 +206,13 @@ public abstract class SecureActivity extends BaseActivity {
                                     input.setError(activity.getString(R.string.title_encryption_password_required));
                                     return;
                                 } else if (EncryptUtil.isPasswdEncryptionSupported() &&
-                                        !isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
+                                        !isPasswordValid(pwd, activity, getSalt(activity))) {
                                     input.setError(activity.getString(R.string.wrong_password));
                                     if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
                                         return; // try again
                                     }
                                 } else {
-                                    secret.setDigest(EncryptUtil.generateKey(pwd, getApplicationSalt(activity)));
+                                    secret.setDigest(EncryptUtil.generateKey(pwd, getSalt(activity)));
                                     activity.refresh(false); // show correct encrypted data
                                 }
                             } finally {
@@ -220,10 +256,8 @@ public abstract class SecureActivity extends BaseActivity {
                     byte[] encPasswd = Base64.decode(encPasswdBase64, 0);
                     byte[] iv = Base64.decode(ivBase64, 0);
 
-                    String passwdBase64 = EncryptUtil.decryptData(KEY_ALIAS,
-                            new Pair<>(iv, encPasswd));
                     byte[] key = EncryptUtil.generateKey(pwd, salt);
-                    byte[] storedKey = Base64.decode(passwdBase64, 0);
+                    byte[] storedKey = EncryptUtil.decryptData(KEY_ALIAS_PASSWD, new Pair<>(iv, encPasswd));
 
                     byte[] hashedPwd = EncryptUtil.fastHash(key, salt);
                     byte[] hashedStoredPwd = EncryptUtil.fastHash(storedKey, salt);

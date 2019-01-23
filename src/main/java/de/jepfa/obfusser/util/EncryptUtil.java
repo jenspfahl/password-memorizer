@@ -21,6 +21,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.ArrayList;
@@ -81,13 +82,13 @@ public class EncryptUtil {
 
 
     @TargetApi(Build.VERSION_CODES.M)
-    public static Pair<byte[],byte[]> encryptText(final String alias, final String textToEncrypt) {
+    public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
         try {
             final Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(alias));
 
-            return new Pair<>(cipher.getIV(), cipher.doFinal(textToEncrypt.getBytes("UTF-8")));
+            return new Pair<>(cipher.getIV(), cipher.doFinal(data));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,7 +97,7 @@ public class EncryptUtil {
 
 
     @TargetApi(Build.VERSION_CODES.M)
-    public static String decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
+    public static byte[] decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
 
         try {
             byte[] encryptionIv = encryptedIvAndData.first;
@@ -109,7 +110,7 @@ public class EncryptUtil {
             SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
-            return new String(cipher.doFinal(encryptedData), "UTF-8");
+            return cipher.doFinal(encryptedData);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,17 +162,12 @@ public class EncryptUtil {
      * @return
      */
     public static byte[] generateKey(char[] pwd, byte[] salt) {
-        byte[] hash = strongHash(pwd, salt);
-        //Log.e("KEY", Arrays.toString(hash));
-        return hash;
-    }
-
-    public static byte[] strongHash(char[] pwd, byte[] salt)  {
         PBEKeySpec spec = null;
         try {
             spec = new PBEKeySpec(pwd, salt, 16384, Constants.KEY_LENGTH);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1"); //PBKDF2WithHmacSHA256 would be better but is not supported until APIL 26+
             byte[] hash = factory.generateSecret(spec).getEncoded();
+            //Log.e("KEY", Arrays.toString(hash));
             return hash;
         } catch (Exception e) {
             //Log.e("KEY", "Cannot generate key ", e);
@@ -326,13 +322,11 @@ public class EncryptUtil {
         return chararray;
     }
 
-    public static byte[] toBytes(char[] chars) {
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
-        return bytes;
+    public static byte[] generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[Constants.KEY_LENGTH];
+        random.nextBytes(salt);
+        return salt;
     }
 
     static int getKeyForIndex(byte[] key) {
@@ -347,6 +341,5 @@ public class EncryptUtil {
 
         return left <= i && i < right;
     }
-
 
 }

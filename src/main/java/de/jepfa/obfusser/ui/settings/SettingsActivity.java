@@ -204,7 +204,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             }
 
 
-                            byte[] applicationSalt = SecureActivity.SecretChecker.getApplicationSalt(preference.getContext());
+                            byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(preference.getContext());
                             byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
 
 
@@ -266,8 +266,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static void storeKeySavely(byte[] key, Activity activity) {
 
-        String keyAsBase64 = Base64.encodeToString(key, 0);
-        Pair<byte[], byte[]> encrypted = EncryptUtil.encryptText(SecureActivity.SecretChecker.KEY_ALIAS, keyAsBase64);
+        Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecureActivity.SecretChecker.KEY_ALIAS_PASSWD, key);
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(activity);
 

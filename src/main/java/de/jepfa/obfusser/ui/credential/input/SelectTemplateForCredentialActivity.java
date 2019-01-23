@@ -74,7 +74,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (checkedId == Constants.NO_ID) {
-                    credential.setTemplateId(null);
+                    selectedTemplate = null;
                 }
                 else {
                     //copy from template

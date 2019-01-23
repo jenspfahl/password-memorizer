@@ -42,7 +42,7 @@ public class Credential extends SecurePatternHolder {
 
     public void copyFrom(Template template) {
         super.copyFrom(template);
-        setTemplateId(template.getId());
+        //setTemplateId(template.getId()); Don't do this, this may reveal pattern belonging
     }
 
 }

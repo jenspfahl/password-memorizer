@@ -170,7 +170,7 @@ public abstract class SecureActivity extends BaseActivity {
                                     input.setError(activity.getString(R.string.title_encryption_password_required));
                                     return;
                                 } else if (EncryptUtil.isPasswdEncryptionSupported() &&
-                                        !isPasswordValidAndClearPwd(pwd, activity, getApplicationSalt(activity))) {
+                                        !isPasswordValid(pwd, activity, getApplicationSalt(activity))) {
                                     input.setError(activity.getString(R.string.wrong_password));
                                     if (failCounter.incrementAndGet() < Constants.MAX_PASSWD_ATTEMPTS) {
                                         return; // try again
@@ -207,7 +207,7 @@ public abstract class SecureActivity extends BaseActivity {
             return (encPasswdBase64 != null && ivBase64 != null);
         }
 
-        public static boolean isPasswordValidAndClearPwd(char[] pwd, Activity activity, byte[] salt) {
+        public static boolean isPasswordValid(char[] pwd, Activity activity, byte[] salt) {
             if (pwd != null) {
                 SharedPreferences defaultSharedPreferences = PreferenceManager
                         .getDefaultSharedPreferences(activity);
@@ -225,7 +225,10 @@ public abstract class SecureActivity extends BaseActivity {
                     byte[] key = EncryptUtil.generateKey(pwd, salt);
                     byte[] storedKey = Base64.decode(passwdBase64, 0);
 
-                    return Arrays.equals(key, storedKey);
+                    byte[] hashedPwd = EncryptUtil.fastHash(key, salt);
+                    byte[] hashedStoredPwd = EncryptUtil.fastHash(storedKey, salt);
+
+                    return Arrays.equals(hashedPwd, hashedStoredPwd);
                 }
             }
             return true; //bypass if nothing is stored

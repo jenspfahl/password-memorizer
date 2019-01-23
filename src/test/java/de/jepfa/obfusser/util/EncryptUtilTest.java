@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ public class EncryptUtilTest {
     @Test
     public void encryptDecryptObfusStrings() throws Exception {
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
 
             ObfusString user = ObfusString.fromExchangeFormat("0!xxxX?0!X0");
 
@@ -94,10 +95,10 @@ public class EncryptUtilTest {
     public void encryptDecryptHints() throws Exception {
 
         String string = "abcdefghiABCDEFG!§$/138";
+        byte[] salt = new SecureRandom().generateSeed(32);
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             char[] pwd = String.valueOf(i).toCharArray();
-            byte[] salt = null;
             byte[] key = EncryptUtil.generateKey(pwd, salt);
 
             String encrypted = EncryptUtil.encryptHint(string, 23, key);
@@ -117,7 +118,7 @@ public class EncryptUtilTest {
         pattern.setHint(3, "hint2", null);
         String originalPattern = pattern.toString();
 
-        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), null);
+        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), new SecureRandom().generateSeed(32));
         pattern.encrypt(key);
         System.out.println(pattern);
         pattern.decrypt(key);
@@ -131,13 +132,10 @@ public class EncryptUtilTest {
 
     @Test
     public void encryptDecryptIndex() throws Exception {
-        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), null);
+        byte[] key = EncryptUtil.generateKey("1234".toCharArray(), new SecureRandom().generateSeed(32));
         System.out.println("k=" + EncryptUtil.getKeyForIndex(key));
         final int PATTERN_LENGTH = 5;
         int encryptedIndex = EncryptUtil.encryptIndex(0, PATTERN_LENGTH, key);
-
-        Assert.assertEquals(2, encryptedIndex);
-
         int decryptedIndex = EncryptUtil.decryptIndex(encryptedIndex, PATTERN_LENGTH, key);
 
         Assert.assertEquals(0, decryptedIndex);
@@ -147,9 +145,10 @@ public class EncryptUtilTest {
     @Test
     public void encryptDecryptRandomIndexes() throws Exception {
         Random r = new Random();
-        for (int i = 0; i < 10000; i++) {
+        byte[] salt = new SecureRandom().generateSeed(32);
+        for (int i = 0; i < 100; i++) {
 
-            byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), null);
+            byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), salt);
             int patternLength = r.nextInt(18) + 1;
             int originIndex = r.nextInt(patternLength);
 

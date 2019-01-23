@@ -18,7 +18,6 @@ import android.preference.SwitchPreference;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -26,7 +25,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -222,7 +220,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                             }
                             else {
-                                if (!SecureActivity.SecretChecker.isPasswordValidAndClearPwd(pwd, activity, applicationSalt)) {
+                                if (!SecureActivity.SecretChecker.isPasswordValid(pwd, activity, applicationSalt)) {
                                     firstPassword.setError(activity.getString(R.string.wrong_password));
                                     firstPassword.requestFocus();
                                     secondPassword.setText(null);

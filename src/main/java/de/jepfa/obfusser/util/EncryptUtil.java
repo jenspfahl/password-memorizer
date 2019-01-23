@@ -21,6 +21,8 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,10 +33,13 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
 
@@ -156,14 +161,40 @@ public class EncryptUtil {
      * @return
      */
     public static byte[] generateKey(char[] pwd, byte[] salt) {
+        byte[] hash = strongHash(pwd, salt);
+        //Log.e("KEY", Arrays.toString(hash));
+        return hash;
+    }
+
+    public static byte[] strongHash(char[] pwd, byte[] salt)  {
+        PBEKeySpec spec = null;
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            messageDigest.update(toBytes(pwd));
+            spec = new PBEKeySpec(pwd, salt, 16384, Constants.KEY_LENGTH);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] hash = factory.generateSecret(spec).getEncoded();
+            return hash;
+        } catch (Exception e) {
+            //Log.e("KEY", "Cannot generate key ", e);
+            e.printStackTrace();
+        } finally {
+            if (spec != null) {
+                spec.clearPassword();
+            }
+        }
+
+        return null;
+    }
+
+    public static byte[] fastHash(byte[] pwd, byte[] salt) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+            messageDigest.update(pwd);
             if (salt != null) {
                 messageDigest.update(salt);
             }
             byte[] digest = messageDigest.digest();
- //           Log.e("KEY", Arrays.toString(digest));
+            //Log.e("pwd", Arrays.toString(pwd));
+            //Log.e("sha", Arrays.toString(digest));
             return digest;
         } catch (NoSuchAlgorithmException e) {
             Log.e("KEY", "Cannot get ", e);
@@ -172,6 +203,7 @@ public class EncryptUtil {
 
         return null;
     }
+
 
     /**
      * Transform the given key to a possible likely {@link ObfusString}.

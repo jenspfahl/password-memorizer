@@ -7,38 +7,22 @@ import android.security.keystore.KeyProperties;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.text.Editable;
-import android.util.Base64;
 import android.util.Log;
-import android.widget.EditText;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.model.ObfusChar;
@@ -52,7 +36,7 @@ import de.jepfa.obfusser.model.ObfusString;
 public class EncryptUtil {
 
     private static final int BYTE_COUNT = 256;
-    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final String CIPHER_AES = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
 
 
@@ -85,12 +69,12 @@ public class EncryptUtil {
     public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
         try {
-            final Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(alias));
 
             return new Pair<>(cipher.getIV(), cipher.doFinal(data));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
         }
         return null;
     }
@@ -105,21 +89,21 @@ public class EncryptUtil {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
 
-            final Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
             final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
             SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             return cipher.doFinal(encryptedData);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
         }
         return null;
     }
 
 
     /**
-     * Returns null if ont target api
+     * Returns null if not target api
      * @param alias
      * @return
      * @throws Exception
@@ -140,7 +124,6 @@ public class EncryptUtil {
 
             return keyGenerator.generateKey();
         }
-
 
         return null;
     }
@@ -164,14 +147,13 @@ public class EncryptUtil {
     public static byte[] generateKey(char[] pwd, byte[] salt) {
         PBEKeySpec spec = null;
         try {
-            spec = new PBEKeySpec(pwd, salt, 16384, Constants.KEY_LENGTH);
+            spec = new PBEKeySpec(pwd, salt, 5000, Constants.KEY_LENGTH);
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1"); //PBKDF2WithHmacSHA256 would be better but is not supported until APIL 26+
             byte[] hash = factory.generateSecret(spec).getEncoded();
-            //Log.e("KEY", Arrays.toString(hash));
+            //Log.d("GENKEY", Arrays.toString(hash));
             return hash;
         } catch (Exception e) {
-            //Log.e("KEY", "Cannot generate key ", e);
-            e.printStackTrace();
+            Log.e("GENKEY", "Cannot generate key ", e);
         } finally {
             if (spec != null) {
                 spec.clearPassword();
@@ -189,12 +171,10 @@ public class EncryptUtil {
                 messageDigest.update(salt);
             }
             byte[] digest = messageDigest.digest();
-            //Log.e("pwd", Arrays.toString(pwd));
-            //Log.e("sha", Arrays.toString(digest));
+            //Log.d("FSTHSH", Arrays.toString(digest));
             return digest;
         } catch (NoSuchAlgorithmException e) {
-            Log.e("KEY", "Cannot get ", e);
-            e.printStackTrace();
+            Log.e("FSTHSH", "Programming error", e);
         }
 
         return null;

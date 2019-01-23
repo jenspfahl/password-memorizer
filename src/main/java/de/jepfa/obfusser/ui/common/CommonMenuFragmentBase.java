@@ -24,6 +24,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filterable;
 
+import java.util.Arrays;
+
+import de.jepfa.obfusser.BuildConfig;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
@@ -151,9 +154,15 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
             Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
+            String message = getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
+                    Constants.NL + " (c) Jens Pfahl 2018,2019";
+            if (BuildConfig.DEBUG) {
+                message += Constants.NL + Constants.NL
+                        + "AppSalt="
+                        + Arrays.toString(SecureActivity.SecretChecker.getSalt(getActivity()));
+            }
             builder.setTitle(R.string.title_about_the_app)
-                    .setMessage(getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
-                            Constants.NL + " (c) Jens Pfahl 2018,2019")
+                    .setMessage(message)
                     .setIcon(icon)
                     .show();
 

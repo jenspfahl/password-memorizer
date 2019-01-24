@@ -48,6 +48,6 @@ public class Credential extends SecurePatternHolder {
     @Override
     public String toString() {
         return "Credential:" + super.toString()
-         + "templateId=" + templateId;
+         + ", templateId=" + templateId;
     }
 }

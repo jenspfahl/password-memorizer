@@ -160,4 +160,20 @@ public class EncryptUtilTest {
         }
     }
 
+    @Test
+    public void genUUIDKeys() throws Exception {
+        Random r = new Random();
+        byte[] salt = new SecureRandom().generateSeed(32);
+        for (int i = 0; i < 100; i++) {
+
+            byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), salt);
+
+            byte[] indexKey = EncryptUtil.genUUIDKey(key, String.valueOf(i));
+            System.out.println("key(" + i + ")=" + Arrays.toString(key));
+            System.out.println("ink(" + i + ")=" + Arrays.toString(indexKey));
+
+            Assert.assertEquals(key.length, indexKey.length);
+        }
+    }
+
 }

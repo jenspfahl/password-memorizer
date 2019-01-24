@@ -9,6 +9,7 @@ import java.util.Map;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.model.PatternHolder;
+import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.model.Template;
 
 /**
@@ -21,12 +22,14 @@ public class IntentUtil {
 
     public static final String KV_DELIMITER = "_";
 
-    private static void fillPatternFromIntent(PatternHolder pattern, Intent intent) {
+    private static void fillPatternFromIntent(SecurePatternHolder pattern, Intent intent) {
 
-        pattern.setId(intent.getIntExtra(PatternHolder.ATTRIB_ID, 0));
-        pattern.setName(intent.getStringExtra(PatternHolder.ATTRIB_NAME));
-        pattern.setInfo(intent.getStringExtra(PatternHolder.ATTRIB_INFO));
-        pattern.setPatternInternal(intent.getStringExtra(PatternHolder.ATTRIB_PATTERN_INTERNAL));
+        pattern.setId(intent.getIntExtra(SecurePatternHolder.ATTRIB_ID, 0));
+        pattern.setName(intent.getStringExtra(SecurePatternHolder.ATTRIB_NAME));
+        pattern.setInfo(intent.getStringExtra(SecurePatternHolder.ATTRIB_INFO));
+        pattern.setPatternInternal(intent.getStringExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL));
+        pattern.setUuid(intent.getStringExtra(SecurePatternHolder.ATTRIB_UUID));
+
 
         int groupId = intent.getIntExtra(PatternHolder.ATTRIB_GROUP_ID, 0);
         if (groupId != 0) {
@@ -74,12 +77,13 @@ public class IntentUtil {
         return group;
     }
 
-    private static void setPatternExtra(Intent intent, PatternHolder pattern) {
-        intent.putExtra(Credential.ATTRIB_ID, pattern.getId());
-        intent.putExtra(Credential.ATTRIB_NAME, pattern.getName());
-        intent.putExtra(Credential.ATTRIB_INFO, pattern.getInfo());
-        intent.putExtra(Credential.ATTRIB_GROUP_ID, pattern.getGroupId());
-        intent.putExtra(Credential.ATTRIB_PATTERN_INTERNAL, pattern.getPatternInternal());
+    private static void setPatternExtra(Intent intent, SecurePatternHolder pattern) {
+        intent.putExtra(SecurePatternHolder.ATTRIB_ID, pattern.getId());
+        intent.putExtra(SecurePatternHolder.ATTRIB_NAME, pattern.getName());
+        intent.putExtra(SecurePatternHolder.ATTRIB_INFO, pattern.getInfo());
+        intent.putExtra(SecurePatternHolder.ATTRIB_GROUP_ID, pattern.getGroupId());
+        intent.putExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL, pattern.getPatternInternal());
+        intent.putExtra(SecurePatternHolder.ATTRIB_UUID, pattern.getUuid());
 
         ArrayList<String> hints = new ArrayList<>(pattern.getHintsCount());
         for (Map.Entry<Integer, String> hintsEntry : pattern.getHints().entrySet()) {

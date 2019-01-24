@@ -2,6 +2,7 @@ package de.jepfa.obfusser.model;
 
 import android.arch.persistence.room.Ignore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.util.EncryptUtil;
@@ -23,6 +25,23 @@ import de.jepfa.obfusser.util.EncryptUtil;
  */
 public abstract class SecurePatternHolder extends PatternHolder {
 
+    public static final String ATTRIB_UUID = "uuid";
+
+
+    @Nullable
+    private String uuid;
+
+    @Nullable
+    public synchronized String getUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
+    }
+
+    public synchronized void setUuid(@Nullable String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getPatternAsExchangeFormatHinted(byte[] key) {
         StringBuilder sb = new StringBuilder();
@@ -255,6 +274,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
         return null;
     }
 
+    @Ignore
+    public byte[] getUUIDKey(byte[] secret) {
+        if (secret == null) {
+            return null;
+        }
+        return EncryptUtil.genUUIDKey(secret, getUuid());
+    }
+
 
     @Ignore
     public void encrypt(byte[] key) {
@@ -355,4 +382,9 @@ public abstract class SecurePatternHolder extends PatternHolder {
         }
     }
 
+    @Override
+    public String toString() {
+        return super.toString()
+                + ", uuid='" + uuid;
+    }
 }

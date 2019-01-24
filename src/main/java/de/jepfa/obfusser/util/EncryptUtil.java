@@ -163,10 +163,10 @@ public class EncryptUtil {
         return null;
     }
 
-    public static byte[] fastHash(byte[] pwd, byte[] salt) {
+    public static byte[] fastHash(byte[] key, byte[] salt) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
-            messageDigest.update(pwd);
+            messageDigest.update(key);
             if (salt != null) {
                 messageDigest.update(salt);
             }
@@ -175,6 +175,25 @@ public class EncryptUtil {
             return digest;
         } catch (NoSuchAlgorithmException e) {
             Log.e("FSTHSH", "Programming error", e);
+        }
+
+        return null;
+    }
+
+    public static byte[] genUUIDKey(byte[] key, String uuid) {
+        if (uuid == null) {
+            return key;
+        }
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+            messageDigest.update(key);
+            byte[] input = uuid.getBytes();
+            messageDigest.update(input);
+            byte[] digest = messageDigest.digest();
+            //Log.d("INK", Arrays.toString(digest));
+            return digest;
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("INK", "Programming error", e);
         }
 
         return null;

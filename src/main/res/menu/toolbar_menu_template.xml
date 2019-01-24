@@ -4,18 +4,18 @@
     tools:context=".ui.navigation.NavigationActivity">
 
     <item
-        android:id="@+id/menu_lock_items"
-        android:icon="@drawable/ic_lock_outline_white_24dp"
-        android:title="@string/lock_items"
-        app:showAsAction="ifRoom">
-    </item>
-
-    <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:title="Search">
+    </item>
+
+    <item
+        android:id="@+id/menu_lock_items"
+        android:icon="@drawable/ic_lock_outline_white_24dp"
+        android:title="@string/lock_items"
+        app:showAsAction="ifRoom">
     </item>
 
     <item

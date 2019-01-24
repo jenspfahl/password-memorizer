@@ -45,4 +45,9 @@ public class Credential extends SecurePatternHolder {
         //setTemplateId(template.getId()); Don't do this, this may reveal pattern belonging
     }
 
+    @Override
+    public String toString() {
+        return "Credential:" + super.toString()
+         + "templateId=" + templateId;
+    }
 }

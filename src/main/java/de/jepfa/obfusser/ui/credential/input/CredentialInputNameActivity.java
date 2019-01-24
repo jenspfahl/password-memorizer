@@ -12,7 +12,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import de.jepfa.obfusser.ui.common.Debug;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.ui.SecureActivity;
@@ -34,6 +36,17 @@ public class CredentialInputNameActivity extends SecureActivity {
 
         credentialViewModel = CredentialViewModel.getFromIntent(this, getIntent());
         Credential credential = credentialViewModel.getCredential().getValue();
+
+        View explanationView = findViewById(R.id.credential_explanation);
+        explanationView.setLongClickable(true);
+        explanationView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Debug.toggleDebug();
+                Toast.makeText(CredentialInputNameActivity.this, "Debug mode " + (Debug.isDebug() ? "ON" : "OFF"), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
 
         nameView = findViewById(R.id.credential_name);
         String name = credential.getName();

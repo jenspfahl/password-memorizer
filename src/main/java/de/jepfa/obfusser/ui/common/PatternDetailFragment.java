@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.jepfa.obfusser.BuildConfig;
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.ui.common.Debug;
 import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
@@ -152,7 +153,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     return scaleGestureDetector.onTouchEvent(motionEvent);
                 }
                 else {
-                    if (BuildConfig.DEBUG) {
+                    if (Debug.isDebug()) {
                         return longPressGestureDetector.onTouchEvent(motionEvent);
                     }
                     return false;

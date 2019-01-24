@@ -19,4 +19,8 @@ import android.arch.persistence.room.Index;
                 onDelete = ForeignKey.SET_NULL)})
 public class Template extends SecurePatternHolder {
 
+    @Override
+    public String toString() {
+        return "Template:" + super.toString();
+    }
 }

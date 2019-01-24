@@ -268,6 +268,14 @@ public abstract class SecureActivity extends BaseActivity {
             return true; //bypass if nothing is stored
         }
 
+        public static boolean isSaltEncrypted(Activity activity) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+            String ivBase64 = defaultSharedPreferences
+                    .getString(PREF_SALT_IV, null);
+            return  ivBase64 != null;
+        }
+
         private static boolean isRecentlyOpened(long secretDialogOpened) {
             long current = System.currentTimeMillis();
 

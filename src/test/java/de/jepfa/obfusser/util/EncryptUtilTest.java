@@ -116,6 +116,7 @@ public class EncryptUtilTest {
         pattern.setPatternFromUser("pa$Sw0rd", null);
         pattern.setHint(2, "hint1", null);
         pattern.setHint(3, "hint2", null);
+        pattern.setUuid("uuid");
         String originalPattern = pattern.toString();
 
         byte[] key = EncryptUtil.generateKey("1234".toCharArray(), new SecureRandom().generateSeed(32));
@@ -124,6 +125,7 @@ public class EncryptUtilTest {
         pattern.decrypt(key);
         System.out.println(pattern);
 
+        pattern.setUuid("uuid");
         String decryptedPattern = pattern.toString();
 
         Assert.assertEquals(originalPattern, decryptedPattern);

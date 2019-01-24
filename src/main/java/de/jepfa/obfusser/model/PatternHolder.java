@@ -122,14 +122,12 @@ public abstract class PatternHolder extends IdEntity {
     }
 
     public String toString() {
-        return "Pattern {" +
-                "id=" + id +
+        return "id=" + id +
                 ", name='" + name + '\'' +
                 ", info='" + info + '\'' +
                 ", patternInternal='" + patternInternal + '\'' +
                 ", hints=" + hints +
-                ", groupId=" + groupId +
-                '}';
+                ", groupId=" + groupId;
     }
 
 }

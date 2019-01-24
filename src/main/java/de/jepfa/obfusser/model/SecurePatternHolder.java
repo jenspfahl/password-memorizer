@@ -157,9 +157,10 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (key == Secret.INVALID_DIGEST) {
             return null;
         }
-        int encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        byte[] uuidKey = getUUIDKey(key);
+        int encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), uuidKey);
         String hint = getHints().get(encryptedIndex);
-        return EncryptUtil.decryptHint(hint, encryptedIndex, key);
+        return EncryptUtil.decryptHint(hint, encryptedIndex, uuidKey);
     }
 
     @Ignore
@@ -168,10 +169,11 @@ public abstract class SecurePatternHolder extends PatternHolder {
             return Collections.emptyMap();
         }
         Map<Integer, String> hints = new TreeMap<>();
+        byte[] uuidKey = getUUIDKey(key);
 
         for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-            Integer decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), key);
-            String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), key);
+            Integer decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), uuidKey);
+            String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), uuidKey);
 
             hints.put(decryptedIndex, decryptedHint);
         }
@@ -206,7 +208,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
      */
     @Ignore
     public boolean hasHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
         return getHints().containsKey(encryptedIndex);
     }
 
@@ -218,7 +220,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
      */
     @Ignore
     public boolean isFilledHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
         return getHints().containsKey(encryptedIndex) && !getHints().get(encryptedIndex).isEmpty();
     }
 
@@ -230,7 +232,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
      */
     @Ignore
     public void addHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
         getHints().put(encryptedIndex, Constants.EMPTY);
     }
 
@@ -242,8 +244,9 @@ public abstract class SecurePatternHolder extends PatternHolder {
      */
     @Ignore
     public void setHint(int index, String value, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
-        getHints().put(encryptedIndex, EncryptUtil.encryptHint(value, encryptedIndex, key));
+        byte[] uuidKey = getUUIDKey(key);
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), uuidKey);
+        getHints().put(encryptedIndex, EncryptUtil.encryptHint(value, encryptedIndex, uuidKey));
     }
 
     /**
@@ -254,7 +257,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
      */
     @Ignore
     public String removeHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), key);
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
         return getHints().remove(encryptedIndex);
     }
 
@@ -291,10 +294,11 @@ public abstract class SecurePatternHolder extends PatternHolder {
             synchronized (this) {
                 Map<Integer, String> originHints = getHints();
                 Map<Integer, String> newHints = new TreeMap<>();
+                byte[] uuidKey = getUUIDKey(key);
                 for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
-                    int encryptedIndex = EncryptUtil.encryptIndex(entry.getKey(), getPatternLength(), key);
+                    int encryptedIndex = EncryptUtil.encryptIndex(entry.getKey(), getPatternLength(), uuidKey);
                     // encrypt hint data with encrypted index
-                    String encryptedHint = EncryptUtil.encryptHint(entry.getValue(), encryptedIndex, key);
+                    String encryptedHint = EncryptUtil.encryptHint(entry.getValue(), encryptedIndex, uuidKey);
                     newHints.put(encryptedIndex, encryptedHint);
                 }
                 setHints(newHints);
@@ -310,10 +314,12 @@ public abstract class SecurePatternHolder extends PatternHolder {
             synchronized (this) {
                 Map<Integer, String> originHints = getHints();
                 Map<Integer, String> newHints = new TreeMap<>();
+                byte[] uuidKey = getUUIDKey(key);
+
                 for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
                     // decrypt hint data with encrypted index
-                    String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), key);
-                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), key);
+                    String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), uuidKey);
+                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), uuidKey);
                     newHints.put(decryptedIndex, decryptedHint);
                 }
                 setHints(newHints);
@@ -326,7 +332,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         ObfusString pattern = ObfusString.fromExchangeFormat(getPatternInternal());
 
         if (pattern != null && key != null) {
-            pattern.decrypt(key);
+            pattern.decrypt(getUUIDKey(key));
         }
         return pattern;
     }
@@ -338,7 +344,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
         ObfusString tbs = new ObfusString(pattern);
         if (key != null) {
-            tbs.encrypt(key);
+            tbs.encrypt(getUUIDKey(key));
         }
         setPatternInternal(tbs.toExchangeFormat());
     }
@@ -368,11 +374,12 @@ public abstract class SecurePatternHolder extends PatternHolder {
         else {
             if (getHintsCount() != 0) {
                 Map<Integer, String> newHints = new HashMap<>();
+                byte[] uuidKey = getUUIDKey(key);
                 for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
-                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, key);
+                    int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, uuidKey);
 
                     if (decryptedIndex < newPatternLength) {
-                        int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, key);
+                        int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, uuidKey);
                         newHints.put(encryptedIndex, entry.getValue());
                     }
 

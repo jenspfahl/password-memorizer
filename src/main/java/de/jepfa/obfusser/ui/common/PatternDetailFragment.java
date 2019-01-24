@@ -140,7 +140,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
                 if (secret != null) {
                     message = message + Constants.NL
-                            + "ink="
+                            + "uuidkey="
                             + Debug.endOfArrayToString(pattern.getUUIDKey(secret), 4);
                 }
                 new AlertDialog.Builder(getActivity())

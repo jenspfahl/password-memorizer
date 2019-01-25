@@ -5,23 +5,19 @@ package de.jepfa.obfusser.model;
  *
  * @author Jens Pfahl
  */
-public enum NumberedPlaceholder {
-    PLACEHOLDER_1('\u2460'),   // "\u2460" '①'
-    PLACEHOLDER_2('\u2461'),   // "\u2460" '②'
-    PLACEHOLDER_3('\u2462'),   // "\u2460" '③'
-    PLACEHOLDER_4('\u2463'),   // "\u2460" '④'
-    PLACEHOLDER_5('\u2464'),   // "\u2460" '⑤'
-    PLACEHOLDER_6('\u2465'),   // "\u2460" '⑥'
-    PLACEHOLDER_7('\u2466'),   // "\u2460" '⑦'
-    PLACEHOLDER_8('\u2467'),   // "\u2460" '⑧'
-    PLACEHOLDER_9('\u2468'),   // "\u2460" '⑨'
+public class NumberedPlaceholder {
 
-    ;
+    private static final char NUMBER_1 = '\u2460';   // "\u2460" '①'
+
+    private static final int MIN_NUMBER = 1;
+    private static final int MAX_NUMBER = 20;
 
     private char representation;
+    private int number;
 
-    private NumberedPlaceholder(char representation) {
+    private NumberedPlaceholder(char representation, int number) {
         this.representation = representation;
+        this.number = number;
     }
 
     public char getRepresentation() {
@@ -29,7 +25,7 @@ public enum NumberedPlaceholder {
     }
 
     public Integer getPlaceholderNumber() {
-        return ordinal() + 1;
+        return number;
     }
 
     public String toRepresentation() {
@@ -43,35 +39,19 @@ public enum NumberedPlaceholder {
 
 
     public static NumberedPlaceholder fromPlaceholderNumber(int placeholder) {
-        if (placeholder == 1) {
-            return(NumberedPlaceholder.PLACEHOLDER_1);
+        if (placeholder >= MIN_NUMBER && placeholder <= MAX_NUMBER) {
+            return new NumberedPlaceholder(getCharForNumber(placeholder), placeholder);
         }
-        else if (placeholder == 2) {
-            return(NumberedPlaceholder.PLACEHOLDER_2);
-        }
-        else if (placeholder == 3) {
-            return(NumberedPlaceholder.PLACEHOLDER_3);
-        }
-        else if (placeholder == 4) {
-            return(NumberedPlaceholder.PLACEHOLDER_4);
-        }
-        else if (placeholder == 5) {
-            return(NumberedPlaceholder.PLACEHOLDER_5);
-        }
-        else if (placeholder == 6) {
-            return(NumberedPlaceholder.PLACEHOLDER_6);
-        }
-        else if (placeholder == 7) {
-            return(NumberedPlaceholder.PLACEHOLDER_7);
-        }
-        else if (placeholder == 8) {
-            return(NumberedPlaceholder.PLACEHOLDER_8);
-        }
-        else if (placeholder == 9) {
-            return(NumberedPlaceholder.PLACEHOLDER_9);
-        }
-
         throw new IllegalStateException("Unknown placeholder number: " + placeholder);
+    }
+
+
+    public static int count() {
+        return MAX_NUMBER;
+    }
+
+    private static char getCharForNumber(int placeholder) {
+        return (char)(((int)NUMBER_1) + placeholder - 1);
     }
 
 }

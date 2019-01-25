@@ -204,7 +204,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 @Override
                 public void onClick(View yourTextView) {
 
-                    if (!enabled && pattern.getHintsCount() == NumberedPlaceholder.values().length) {
+                    if (!enabled && pattern.getHintsCount() == NumberedPlaceholder.count()) {
                         new AlertDialog.Builder(getContext())
                                 .setTitle(R.string.title_set_revealed)
                                 .setMessage(R.string.message_set_revealed)
@@ -266,8 +266,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
         obfusTextView.setText(span);
         obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
         ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
+        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
     }
 
     protected String buildHintsString(SecurePatternHolder pattern) {

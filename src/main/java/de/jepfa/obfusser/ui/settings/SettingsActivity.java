@@ -166,6 +166,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
         else {
             storePasswdSwitch.setVisibility(View.GONE);
+        }
+
+        if (!encrypt) {
             disturbPatternsSwitch.setVisibility(View.GONE);
         }
 

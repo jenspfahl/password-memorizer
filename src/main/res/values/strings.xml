@@ -146,6 +146,7 @@
     <string name="nothing_revealed">Nothing revealed</string>
     <string name="wrong_password">Wrong password</string>
     <string name="store_password_hint">Enable password checking</string>
+    <string name="disturb_equal_patterns">Distort equal patterns (strong password recommended)</string>
 
 
 

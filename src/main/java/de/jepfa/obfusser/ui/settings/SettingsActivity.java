@@ -144,6 +144,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         final EditText firstPassword = passwordView.findViewById(R.id.first_password);
         final EditText secondPassword = passwordView.findViewById(R.id.second_password);
         final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
+        final Switch disturbPatternsSwitch = passwordView.findViewById(R.id.disturb_equal_patterns);
 
         final boolean isSingleDecryptionMode = !encrypt && SecureActivity.SecretChecker.isPasswordStored(activity);
 
@@ -157,6 +158,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
         else {
             storePasswdSwitch.setVisibility(View.GONE);
+            disturbPatternsSwitch.setVisibility(View.GONE);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
@@ -209,12 +211,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
                             if (encrypt) {
-                                boolean encryptAndStorePasswd = EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked();
-
                                 SharedPreferences defaultSharedPreferences = PreferenceManager
                                         .getDefaultSharedPreferences(activity);
                                 SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
-                                passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, encryptAndStorePasswd);
+                                passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, disturbPatternsSwitch.isChecked());
                                 passwdEditor.commit();
 
                                 SecurityService.startEncryptAll(preference.getContext(), key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
@@ -222,7 +222,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 Secret secret = Secret.getOrCreate();
                                 secret.setDigest(key);
 
-                                if (encryptAndStorePasswd) {
+                                if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
                                     storeKeySavely(key, applicationSalt, activity);
                                 }
 

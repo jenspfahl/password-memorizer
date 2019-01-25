@@ -33,17 +33,20 @@ public class CredentialDetailFragment extends PatternDetailFragment {
         if (counter % 3 == 0) {
             finalPatternString = pattern.getPatternRepresentationHinted(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation());
+                    getSecureActivity().getPatternRepresentation(),
+                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
         }
         else if (counter % 3 == 1) {
             finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation());
+                    getSecureActivity().getPatternRepresentation(),
+                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
         }
         else {
             finalPatternString = pattern.getPatternRepresentationRevealed(
                     SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                    getSecureActivity().getPatternRepresentation());
+                    getSecureActivity().getPatternRepresentation(),
+                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
         }
         return finalPatternString;
     }
@@ -57,7 +60,8 @@ public class CredentialDetailFragment extends PatternDetailFragment {
     protected String getPatternRepresentationForDetails(SecurePatternHolder pattern) {
         return pattern.getPatternRepresentationHinted(
                 SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                getSecureActivity().getPatternRepresentation());
+                getSecureActivity().getPatternRepresentation(),
+                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
     }
 
 

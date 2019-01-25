@@ -141,7 +141,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 if (secret != null) {
                     message = message + Constants.NL
                             + "uuidkey="
-                            + Debug.endOfArrayToString(pattern.getUUIDKey(secret), 4);
+                            + Debug.endOfArrayToString(
+                                    pattern.getUUIDKey(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity())), 4);
                 }
                 new AlertDialog.Builder(getActivity())
                             .setTitle("Debug pattern")
@@ -174,12 +175,13 @@ public abstract class PatternDetailFragment extends SecureFragment {
         byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
         String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                 secret,
-                getSecureActivity().getPatternRepresentation());
+                getSecureActivity().getPatternRepresentation(),
+                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
         final SpannableStringBuilder span = new SpannableStringBuilder(patternString);
 
         for (int i = 0; i < patternString.length(); i++) {
 
-            final boolean fenabled = pattern.hasHint(i, secret);
+            final boolean fenabled = pattern.hasHint(i, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
 
             final int fi = i;
             ClickableSpan clickSpan = new ClickableSpan() {
@@ -214,10 +216,11 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     }
 
                     final byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
+                    final boolean withUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity());
 
                     enabled = !enabled;
                     if (enabled) {
-                        pattern.addHint(index, secret);
+                        pattern.addHint(index, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
 
                         if (hintUpdateListener != null) {
                             hintUpdateListener.onHintUpdated(index);
@@ -225,17 +228,17 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     }
                     else {
 
-                        if (pattern.isFilledHint(index, secret)) {
+                        if (pattern.isFilledHint(index, secret, withUuid)) {
                             new AlertDialog.Builder(getContext())
                                     .setTitle(R.string.title_delete_revealed_character)
                                     .setMessage(getString(R.string.message_delete_revealed_character,
-                                            pattern.getNumberedPlaceholder(index, secret).toRepresentation()))
+                                            pattern.getNumberedPlaceholder(index, secret, withUuid).toRepresentation()))
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                                            pattern.removeHint(index, secret);
+                                            pattern.removeHint(index, secret, withUuid);
 
                                             if (hintUpdateListener != null) {
                                                 hintUpdateListener.onHintUpdated(index);
@@ -247,7 +250,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                                     .show();
                         }
                         else {
-                            pattern.removeHint(index, secret);
+                            pattern.removeHint(index, secret, withUuid);
 
                             if (hintUpdateListener != null) {
                                 hintUpdateListener.onHintUpdated(index);
@@ -273,9 +276,10 @@ public abstract class PatternDetailFragment extends SecureFragment {
     protected String buildHintsString(SecurePatternHolder pattern) {
         StringBuilder sb = new StringBuilder();
         byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
+        final boolean withUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity());
         if (pattern.getHintsCount() > 0) {
             int counter = 0;
-            for (String hint : pattern.getHints(secret).values()) {
+            for (String hint : pattern.getHints(secret, withUuid).values()) {
                 counter++;
                 sb.append(System.lineSeparator());
                 sb.append(NumberedPlaceholder.fromPlaceholderNumber(counter).toRepresentation());
@@ -297,10 +301,12 @@ public abstract class PatternDetailFragment extends SecureFragment {
     @NonNull
     private SpannableString getSpannableString(SecurePatternHolder pattern, String patternString) {
         SpannableString span = new SpannableString(patternString);;
+        byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
+        boolean withUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity());
 
         for (int i = 0; i < pattern.getPatternLength(); i++) {
             int j = i + 1;
-            String hint = pattern.getHint(i, SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()));
+            String hint = pattern.getHint(i, secret, withUuid);
             if (hint != null) {
                 span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), i, j, Spanned.SPAN_MARK_MARK);
             }

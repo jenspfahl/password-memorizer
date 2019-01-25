@@ -31,12 +31,14 @@ public class TemplateDetailFragment extends PatternDetailFragment {
         if (counter % 2 == 0) {
             finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                             SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                            getSecureActivity().getPatternRepresentation());
+                            getSecureActivity().getPatternRepresentation(),
+                            SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
         }
         else {
             finalPatternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
                             SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                            getSecureActivity().getPatternRepresentation());
+                            getSecureActivity().getPatternRepresentation(),
+                            SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
         }
         return finalPatternString;
     }
@@ -50,7 +52,8 @@ public class TemplateDetailFragment extends PatternDetailFragment {
     protected String getPatternRepresentationForDetails(SecurePatternHolder pattern) {
         return pattern.getPatternRepresentationWithNumberedPlaceholder(
                 SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                getSecureActivity().getPatternRepresentation());
+                getSecureActivity().getPatternRepresentation(),
+                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
     }
 
 }

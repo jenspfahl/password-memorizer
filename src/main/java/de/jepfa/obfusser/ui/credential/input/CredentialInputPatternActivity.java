@@ -56,7 +56,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         });
 
         byte[] secret = SecretChecker.getOrAskForSecret(this);
-        String pattern = credential.getPatternAsExchangeFormatHinted(secret);
+        String pattern = credential.getPatternAsExchangeFormatHinted(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
         obfusEditText = new ObfusEditText(editText,
                 getPatternRepresentation(), pattern, savedInstanceState != null);
 
@@ -155,7 +155,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         else {
             Credential credential = credentialViewModel.getCredential().getValue();
             byte[] secret = SecretChecker.getOrAskForSecret(this);
-            credential.setPatternFromUser(pattern, secret);
+            credential.setPatternFromUser(pattern, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
 
             Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
             IntentUtil.setCredentialExtra(intent, credential);

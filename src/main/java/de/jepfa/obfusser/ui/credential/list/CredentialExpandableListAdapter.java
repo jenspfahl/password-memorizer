@@ -236,7 +236,8 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         if (showPattern) {
             patternView.setText(credential.getPatternRepresentationHinted(
                     SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
-                    fragment.getSecureActivity().getPatternRepresentation()));
+                    fragment.getSecureActivity().getPatternRepresentation(),
+                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(fragment.getSecureActivity())));
         }
         else {
             patternView.setText(credential.getHiddenPatternRepresentation(

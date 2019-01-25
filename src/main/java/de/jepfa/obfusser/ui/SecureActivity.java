@@ -66,6 +66,7 @@ public abstract class SecureActivity extends BaseActivity {
 
         public static final String PREF_PASSWD = "passwd";
         public static final String PREF_PASSWD_IV = "passwd_iv";
+        public static final String PREF_ENC_WITH_UUID = "enc_with_uuid";
         public static final String KEY_ALIAS_PASSWD = "key_passwd";
         public static final String KEY_ALIAS_SALT = "key_salt";
 
@@ -272,6 +273,13 @@ public abstract class SecureActivity extends BaseActivity {
             String ivBase64 = defaultSharedPreferences
                     .getString(PREF_SALT_IV, null);
             return  ivBase64 != null;
+        }
+
+        public static boolean isEncWithUUIDEnabled(Activity activity) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+            return defaultSharedPreferences
+                    .getBoolean(PREF_ENC_WITH_UUID, false);
         }
 
         private static boolean isRecentlyOpened(long secretDialogOpened) {

@@ -120,7 +120,8 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
                 holder.patternView.setText(
                         templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
                                 SecureActivity.SecretChecker.getOrAskForSecret(activity),
-                                activity.getPatternRepresentation()
+                                activity.getPatternRepresentation(),
+                                SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity)
                         ));
             }
             else {

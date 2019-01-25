@@ -30,6 +30,7 @@ public class Debug {
         addParam(sb, "Enc supported", String.valueOf(EncryptUtil.isPasswdEncryptionSupported()));
         addParam(sb, "Key stored", String.valueOf(SecureActivity.SecretChecker.isPasswordStored(activity)));
         addParam(sb, "Salt encrypted", String.valueOf(SecureActivity.SecretChecker.isSaltEncrypted(activity)));
+        addParam(sb, "Enc with UUID", String.valueOf(SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity)));
 
         Drawable icon = activity.getApplicationInfo().loadIcon(activity.getPackageManager());
         builder.setTitle("Debug info")

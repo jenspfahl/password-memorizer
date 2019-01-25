@@ -1,13 +1,22 @@
 package de.jepfa.obfusser.util;
 
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import de.jepfa.obfusser.model.Credential;
@@ -112,17 +121,15 @@ public class EncryptUtilTest {
 
     @Test
     public void encryptDecryptPattern() throws Exception {
-        SecurePatternHolder pattern = new Credential();
-        pattern.setPatternFromUser("pa$Sw0rd", null);
-        pattern.setHint(2, "hint1", null);
-        pattern.setHint(3, "hint2", null);
+        SecurePatternHolder pattern = createCredential(null, "pa$Sw0rd", 2, "hint1");
+        pattern.setHint(3, "hint2", null, true);
         pattern.setUuid("uuid");
         String originalPattern = pattern.toString();
 
         byte[] key = EncryptUtil.generateKey("1234".toCharArray(), new SecureRandom().generateSeed(32));
-        pattern.encrypt(key);
+        pattern.encrypt(key, true);
         System.out.println(pattern);
-        pattern.decrypt(key);
+        pattern.decrypt(key, true);
         System.out.println(pattern);
 
         pattern.setUuid("uuid");
@@ -176,6 +183,79 @@ public class EncryptUtilTest {
 
             Assert.assertEquals(key.length, indexKey.length);
         }
+    }
+
+    @Ignore
+    public void tryBruteForce() throws Exception {
+        byte[] appSalt = EncryptUtil.generateSalt();
+        char[] pwd = "987".toCharArray();
+        byte[] key = EncryptUtil.generateKey(pwd, appSalt);
+
+        int credentialCount = 5;
+        List<Credential> credentials = createCredentials(credentialCount, key, "abcdeFGH123");
+
+
+        for (int i = 0; i < 100000; i++) {
+
+            if (i % 10 == 0) {
+                System.out.print(".");
+                if (i % 100 == 0) {
+                    System.out.println(i);
+                }
+            }
+            char[] p = String.valueOf(i).toCharArray();
+            byte[] k = EncryptUtil.generateKey(p, appSalt);
+
+            List<String> patterns = getPatterns(credentials, k);
+
+
+            Map<String, Integer> pCounter = new HashMap<>();
+            for (String pattern : patterns) {
+                Integer pCount = pCounter.get(pattern);
+                if (pCount == null) {
+                    pCounter.put(pattern, 1);
+                }
+                else {
+                    pCounter.put(pattern, pCount + 1);
+                }
+            }
+
+            if (pCounter.size() == 1) {
+                System.err.println("all are the same, pwd: " + i);
+            }
+            else  if (pCounter.size() <= 3) {
+              //  System.err.println(pCounter.size() + " candidates, potentional pwd: " + i);
+            }
+            else {
+                //System.err.println(pCounter.size() + " candidates, weak pwd: " + i);
+            }
+        }
+    }
+
+    private List<String> getPatterns(List<Credential> credentials, byte[] k) {
+        List<String> p = new ArrayList<>(credentials.size());
+        for (Credential credential : credentials) {
+            p.add(credential.getPatternAsExchangeFormatHinted(k, true));
+        }
+        return p;
+    }
+
+    private List<Credential> createCredentials(int count, byte[] key, String pattern) {
+        List<Credential> credentials = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            Credential credential = createCredential(key, pattern, 0, String.valueOf(i));
+            System.out.println(Arrays.toString(credential.getUUIDKey(key, true)));
+            credentials.add(credential);
+        }
+        return credentials;
+    }
+
+    @NonNull
+    private Credential createCredential(byte[] key, String pattern, int i2, String a) {
+        Credential credential1 = new Credential();
+        credential1.setPatternFromUser(pattern, key, true);
+        credential1.setHint(i2, a, key, true);
+        return credential1;
     }
 
 }

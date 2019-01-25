@@ -209,12 +209,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
                             if (encrypt) {
-                                SecurityService.startEncryptAll(preference.getContext(), key);
+                                boolean encryptAndStorePasswd = EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked();
+
+                                SharedPreferences defaultSharedPreferences = PreferenceManager
+                                        .getDefaultSharedPreferences(activity);
+                                SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
+                                passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, encryptAndStorePasswd);
+                                passwdEditor.commit();
+
+                                SecurityService.startEncryptAll(preference.getContext(), key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
 
                                 Secret secret = Secret.getOrCreate();
                                 secret.setDigest(key);
 
-                                if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
+                                if (encryptAndStorePasswd) {
                                     storeKeySavely(key, applicationSalt, activity);
                                 }
 
@@ -227,7 +235,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                     return;
                                 }
                                 else {
-                                    SecurityService.startDecryptAll(preference.getContext(), key);
+                                    SecurityService.startDecryptAll(preference.getContext(), key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
                                     Secret secret = Secret.getOrCreate();
                                     secret.setDigest(null);
                                     removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);

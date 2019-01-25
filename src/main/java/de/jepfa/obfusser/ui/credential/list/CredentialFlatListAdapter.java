@@ -121,7 +121,8 @@ implements Filterable {
             if (showPattern) {
                 holder.patternView.setText(credential.getPatternRepresentationHinted(
                         SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
-                        fragment.getSecureActivity().getPatternRepresentation()));
+                        fragment.getSecureActivity().getPatternRepresentation(),
+                        SecureActivity.SecretChecker.isEncWithUUIDEnabled(fragment.getActivity())));
             }
             else {
                 holder.patternView.setText(credential.getHiddenPatternRepresentation(

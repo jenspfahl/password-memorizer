@@ -43,14 +43,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
         this.uuid = uuid;
     }
 
-    public String getPatternAsExchangeFormatHinted(byte[] key) {
+    public String getPatternAsExchangeFormatHinted(byte[] key, boolean encWithUuid) {
         StringBuilder sb = new StringBuilder();
         int index = 0;
-        ObfusString pattern = getPattern(key);
+        ObfusString pattern = getPattern(key, encWithUuid);
         if (pattern != null && pattern.getObfusChars() != null) {
             for (ObfusChar obfusChar : pattern.getObfusChars()) {
                 String s = obfusChar.toExchangeFormat();
-                String hint = getHint(index, key);
+                String hint = getHint(index, key, encWithUuid);
                 if (hint != null) {
                     if (hint.equals(Constants.EMPTY)) {
                         //TODO not set hints as special char for representation
@@ -68,14 +68,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationWithNumberedPlaceholder(byte[] key, Representation representation) {
+    public String getPatternRepresentationWithNumberedPlaceholder(byte[] key, Representation representation, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return getHiddenPatternRepresentation(representation);
         }
 
-        StringBuilder sb = new StringBuilder(getPattern(key).toRepresentation(representation));
+        StringBuilder sb = new StringBuilder(getPattern(key, encWithUuid).toRepresentation(representation));
         int placeholder = 1;
-        for (Map.Entry<Integer, String> entry : getHints(key).entrySet()) {
+        for (Map.Entry<Integer, String> entry : getHints(key, encWithUuid).entrySet()) {
             int index = entry.getKey();
             sb.replace(index, index + 1, NumberedPlaceholder.fromPlaceholderNumber(placeholder).toRepresentation());
             placeholder++;
@@ -84,17 +84,17 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationHinted(byte[] key, Representation representation) {
+    public String getPatternRepresentationHinted(byte[] key, Representation representation, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return getHiddenPatternRepresentation(representation);
         }
 
         StringBuilder sb = new StringBuilder();
         int index = 0;
-        if (getPattern(key) != null && getPattern(key).getObfusChars() != null) {
-            for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
+        if (getPattern(key, encWithUuid) != null && getPattern(key, encWithUuid).getObfusChars() != null) {
+            for (ObfusChar obfusChar : getPattern(key, encWithUuid).getObfusChars()) {
                 String s = obfusChar.toRepresentation(representation);
-                String hint = getHint(index, key);
+                String hint = getHint(index, key, encWithUuid);
                 if (hint != null) {
                     if (hint.equals(Constants.EMPTY)) {
                         //TODO not set hints as special char for representation
@@ -112,16 +112,16 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public String getPatternRepresentationRevealed(byte[] key, Representation representation) {
+    public String getPatternRepresentationRevealed(byte[] key, Representation representation, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return getHiddenPatternRepresentation(representation);
         }
 
         StringBuilder sb = new StringBuilder();
         int index = 0;
-        for (ObfusChar obfusChar : getPattern(key).getObfusChars()) {
+        for (ObfusChar obfusChar : getPattern(key, encWithUuid).getObfusChars()) {
             String s = obfusChar.toRepresentation(representation);
-            String hint = getHint(index, key);
+            String hint = getHint(index, key, encWithUuid);
             if (hint != null) {
                 s = hint;
             }
@@ -133,16 +133,16 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
 
     @Ignore
-    public void setPatternFromUser(String userInput, byte[] key) {
+    public void setPatternFromUser(String userInput, byte[] key, boolean encWithUuid) {
         if (userInput != null) {
-            setPattern(ObfusString.obfuscate(userInput), key);
+            setPattern(ObfusString.obfuscate(userInput), key, encWithUuid);
         }
     }
 
     @Ignore
-    public void setPatternFromExchangeFormat(String pattern, byte[] key) {
+    public void setPatternFromExchangeFormat(String pattern, byte[] key, boolean encWithUuid) {
         if (pattern != null) {
-            setPattern(ObfusString.obfuscate(pattern), key);
+            setPattern(ObfusString.obfuscate(pattern), key, encWithUuid);
         }
     }
 
@@ -153,23 +153,23 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @return
      */
     @Ignore
-    public String getHint(int index, byte[] key) {
+    public String getHint(int index, byte[] key, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return null;
         }
-        byte[] uuidKey = getUUIDKey(key);
+        byte[] uuidKey = getUUIDKey(key, encWithUuid);
         int encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), uuidKey);
         String hint = getHints().get(encryptedIndex);
         return EncryptUtil.decryptHint(hint, encryptedIndex, uuidKey);
     }
 
     @Ignore
-    public Map<Integer, String> getHints(byte[] key) {
+    public Map<Integer, String> getHints(byte[] key, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return Collections.emptyMap();
         }
         Map<Integer, String> hints = new TreeMap<>();
-        byte[] uuidKey = getUUIDKey(key);
+        byte[] uuidKey = getUUIDKey(key, encWithUuid);
 
         for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
             Integer decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), getPatternLength(), uuidKey);
@@ -188,9 +188,9 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @return
      */
     @Ignore
-    public NumberedPlaceholder getNumberedPlaceholder(int index, byte[] key) {
+    public NumberedPlaceholder getNumberedPlaceholder(int index, byte[] key, boolean encWithUuid) {
         int placeholder = 1;
-        for (Map.Entry<Integer, String> entry : getHints(key).entrySet()) {
+        for (Map.Entry<Integer, String> entry : getHints(key, encWithUuid).entrySet()) {
             if (index == entry.getKey()) {
                 return NumberedPlaceholder.fromPlaceholderNumber(placeholder);
             }
@@ -207,8 +207,8 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @return
      */
     @Ignore
-    public boolean hasHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
+    public boolean hasHint(int index, byte[] key, boolean encWithUuid) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key, encWithUuid));
         return getHints().containsKey(encryptedIndex);
     }
 
@@ -219,8 +219,8 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @return
      */
     @Ignore
-    public boolean isFilledHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
+    public boolean isFilledHint(int index, byte[] key, boolean encWithUuid) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key, encWithUuid));
         return getHints().containsKey(encryptedIndex) && !getHints().get(encryptedIndex).isEmpty();
     }
 
@@ -231,8 +231,8 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @param key
      */
     @Ignore
-    public void addHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
+    public void addHint(int index, byte[] key, boolean encWithUuid) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key, encWithUuid));
         getHints().put(encryptedIndex, Constants.EMPTY);
     }
 
@@ -243,8 +243,8 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @param key
      */
     @Ignore
-    public void setHint(int index, String value, byte[] key) {
-        byte[] uuidKey = getUUIDKey(key);
+    public void setHint(int index, String value, byte[] key, boolean encWithUuid) {
+        byte[] uuidKey = getUUIDKey(key, encWithUuid);
         Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), uuidKey);
         getHints().put(encryptedIndex, EncryptUtil.encryptHint(value, encryptedIndex, uuidKey));
     }
@@ -256,18 +256,18 @@ public abstract class SecurePatternHolder extends PatternHolder {
      * @return
      */
     @Ignore
-    public String removeHint(int index, byte[] key) {
-        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key));
+    public String removeHint(int index, byte[] key, boolean encWithUuid) {
+        Integer encryptedIndex = EncryptUtil.encryptIndex(index, getPatternLength(), getUUIDKey(key, encWithUuid));
         return getHints().remove(encryptedIndex);
     }
 
     @Ignore
-    public Pair<Integer, String> getHintDataByPosition(int position, byte[] key) {
+    public Pair<Integer, String> getHintDataByPosition(int position, byte[] key, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return null;
         }
         int count = 0;
-        Map<Integer, String> hints = getHints(key);
+        Map<Integer, String> hints = getHints(key, encWithUuid);
         for (Map.Entry<Integer, String> entry : hints.entrySet()) {
             if (position == count) {
                 return new Pair<>(entry.getKey(), entry.getValue());
@@ -278,23 +278,26 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public byte[] getUUIDKey(byte[] secret) {
+    public byte[] getUUIDKey(byte[] secret, boolean doit) {
         if (secret == null) {
             return null;
+        }
+        if (!doit) {
+            return secret;
         }
         return EncryptUtil.genUUIDKey(secret, getUuid());
     }
 
 
     @Ignore
-    public void encrypt(byte[] key) {
-        setPattern(getPattern(null), key); // load as is and save encrypted
+    public void encrypt(byte[] key, boolean encWithUuid) {
+        setPattern(getPattern(null, encWithUuid), key, encWithUuid); // load as is and save encrypted
 
         if (key != null) {
             synchronized (this) {
                 Map<Integer, String> originHints = getHints();
                 Map<Integer, String> newHints = new TreeMap<>();
-                byte[] uuidKey = getUUIDKey(key);
+                byte[] uuidKey = getUUIDKey(key, encWithUuid);
                 for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
                     int encryptedIndex = EncryptUtil.encryptIndex(entry.getKey(), getPatternLength(), uuidKey);
                     // encrypt hint data with encrypted index
@@ -307,14 +310,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
-    public void decrypt(byte[] key) {
-        setPattern(getPattern(key), null); // load decrypted and save as is
+    public void decrypt(byte[] key, boolean encWithUuid) {
+        setPattern(getPattern(key, encWithUuid), null, encWithUuid); // load decrypted and save as is
 
         if (key != null) {
             synchronized (this) {
                 Map<Integer, String> originHints = getHints();
                 Map<Integer, String> newHints = new TreeMap<>();
-                byte[] uuidKey = getUUIDKey(key);
+                byte[] uuidKey = getUUIDKey(key, encWithUuid);
 
                 for (Map.Entry<Integer, String> entry : originHints.entrySet()) {
                     // decrypt hint data with encrypted index
@@ -328,23 +331,23 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     }
 
-    private ObfusString getPattern(byte[] key) {
+    private ObfusString getPattern(byte[] key, boolean encWithUuid) {
         ObfusString pattern = ObfusString.fromExchangeFormat(getPatternInternal());
 
         if (pattern != null && key != null) {
-            pattern.decrypt(getUUIDKey(key));
+            pattern.decrypt(getUUIDKey(key, encWithUuid));
         }
         return pattern;
     }
 
 
-    private void setPattern(@NonNull ObfusString pattern, byte[] key) {
+    private void setPattern(@NonNull ObfusString pattern, byte[] key, boolean encWithUuid) {
 
-        recryptAllHints(getPatternLength(), pattern.length(), key);
+        recryptAllHints(getPatternLength(), pattern.length(), key, encWithUuid);
 
         ObfusString tbs = new ObfusString(pattern);
         if (key != null) {
-            tbs.encrypt(getUUIDKey(key));
+            tbs.encrypt(getUUIDKey(key, encWithUuid));
         }
         setPatternInternal(tbs.toExchangeFormat());
     }
@@ -367,14 +370,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
 
 
-    private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key) {
+    private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key, boolean encWithUuid) {
         if (newPatternLength == 0) {
             getHints().clear();
         }
         else {
             if (getHintsCount() != 0) {
                 Map<Integer, String> newHints = new HashMap<>();
-                byte[] uuidKey = getUUIDKey(key);
+                byte[] uuidKey = getUUIDKey(key, encWithUuid);
                 for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
                     int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, uuidKey);
 

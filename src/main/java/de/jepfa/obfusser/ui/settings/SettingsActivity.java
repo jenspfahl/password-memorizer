@@ -215,7 +215,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 secret.setDigest(key);
 
                                 if (EncryptUtil.isPasswdEncryptionSupported() && storePasswdSwitch.isChecked()) {
-                                    storeKeySavely(key, activity);
+                                    storeKeySavely(key, applicationSalt, activity);
                                 }
 
                             }
@@ -264,9 +264,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     }
 
-    private static void storeKeySavely(byte[] key, Activity activity) {
+    private static void storeKeySavely(byte[] key, byte[] salt, Activity activity) {
 
-        Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecureActivity.SecretChecker.KEY_ALIAS_PASSWD, key);
+        byte[] hashedKey = EncryptUtil.fastHash(key, salt);
+        Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecureActivity.SecretChecker.KEY_ALIAS_PASSWD, hashedKey);
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(activity);
 

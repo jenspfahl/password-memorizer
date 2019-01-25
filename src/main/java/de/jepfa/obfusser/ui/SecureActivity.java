@@ -257,12 +257,10 @@ public abstract class SecureActivity extends BaseActivity {
                     byte[] iv = Base64.decode(ivBase64, 0);
 
                     byte[] key = EncryptUtil.generateKey(pwd, salt);
-                    byte[] storedKey = EncryptUtil.decryptData(KEY_ALIAS_PASSWD, new Pair<>(iv, encPasswd));
-
+                    byte[] hashedStoredKey = EncryptUtil.decryptData(KEY_ALIAS_PASSWD, new Pair<>(iv, encPasswd));
                     byte[] hashedPwd = EncryptUtil.fastHash(key, salt);
-                    byte[] hashedStoredPwd = EncryptUtil.fastHash(storedKey, salt);
 
-                    return Arrays.equals(hashedPwd, hashedStoredPwd);
+                    return Arrays.equals(hashedPwd, hashedStoredKey);
                 }
             }
             return true; //bypass if nothing is stored

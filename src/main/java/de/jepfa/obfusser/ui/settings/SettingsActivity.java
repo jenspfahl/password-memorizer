@@ -103,6 +103,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             boolean enabled = Boolean.parseBoolean(value.toString());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle(android.R.string.dialog_alert_title)
+                        .setMessage(R.string.not_supported)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return false;
+            }
 
             inputPasswordAndCrypt(activity, preference, enabled);
 

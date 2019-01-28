@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util;
+package de.jepfa.obfusser.util.encrypt;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -27,6 +27,8 @@ import javax.crypto.spec.PBEKeySpec;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
+import de.jepfa.obfusser.util.encrypt.hints.EncryptedHintChar;
+import de.jepfa.obfusser.util.encrypt.hints.HintChar;
 
 /**
  * Utils to help with en-/decrypt data and generate keys from user secrets like passwords or pins.
@@ -35,34 +37,44 @@ import de.jepfa.obfusser.model.ObfusString;
  */
 public class EncryptUtil {
 
-    private static final int BYTE_COUNT = 256;
+    private static final int BYTE_COUNT = 1 << Byte.SIZE;
     private static final String CIPHER_AES = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
 
+    /*
+     * To encypt special chars, we need to define which chars are common in credentials.
+     */
+    static final Character[] KNOWN_SPECIAL_CHARS = new Character[]{
+            ' ','!','"','§','$','%','&','/','(',')','=','?','`','´','+','#','-','.',',','<','>',';',
+            ':','_','\'','\\','*','¡','“','^','°','¢','[',']','|','{','}','¿','–','@','€'};
 
     /*
-     * To encypt single chars, we need to define which chars are common in credentials.
+     * We also add all possible digits and letters.
      */
-    static final Character[] USED_CHARS = new Character[]{
-            '0','1','2','3','4','5','6','7','8','9',
-            ' ','!','"','§','$','%','&','/','(',')','=','?','`','´','+','#','-','.',',','<','>',';',
-            ':','_','\'','*','¡','“','^','°','¢','[',']','|','{','}','¿','–','@','€'};
-    /*
-     * We also add all possible letters.
-     */
-    static final List<Character> CHARACTERS = new ArrayList<>(Arrays.asList(USED_CHARS));
+    static final List<HintChar> CHARACTERS = new ArrayList<>();
     static {
+        // add special chars
+        for (Character c : Arrays.asList(KNOWN_SPECIAL_CHARS)) {
+            CHARACTERS.add(new HintChar(c, true));
+        }
+
+        // add letters and digits
         for (int i = 0; i < BYTE_COUNT; i++) {
             char c = (char) i;
 
-            if (Character.isLetter(c)) {
-                CHARACTERS.add(c);
+            if (Character.isDigit(c)) {
+                CHARACTERS.add(new HintChar(c, false));
+            }
+            else if (Character.isLetter(c)) {
+                boolean isCommonLetter =
+                        (c >= 'a' && c <= 'z') ||
+                        (c >= 'A' && c <= 'Z');
+                CHARACTERS.add(new HintChar(c, !isCommonLetter));
             }
         }
     }
 
-
-    static final Loop<Character> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
+    static final Loop<HintChar> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
 
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -243,19 +255,20 @@ public class EncryptUtil {
         if (s != null && !s.isEmpty() && key != null) {
             StringBuilder sb = new StringBuilder();
 //            Log.e("DEC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
-
             for (int i = 0; i < s.length() && i < key.length; i++) {
-                char c =  s.charAt(i);
+                char c = s.charAt(i);
                 int b = key[(index + i) % key.length];
 
-                if (LOOP_ENCRYPT_CHARS.applies(c)) {
-                    Character encryptedChar = LOOP_ENCRYPT_CHARS.forwards(c, b);
-//                    Log.e("DEC_CHAR", "in=" + c + " key=" + b + " out=" + encryptedChar);
-                    sb.append(encryptedChar.charValue());
+                EncryptedHintChar encryptedHintChar = EncryptedHintChar.ofDecrypted(c);
+                if (LOOP_ENCRYPT_CHARS.applies(encryptedHintChar)) {
+
+                    do {
+                        HintChar hint = LOOP_ENCRYPT_CHARS.forwards(encryptedHintChar, b);
+                        encryptedHintChar.apply(hint);
+                    } while (encryptedHintChar.doNext());
+//                    Log.e("ENC_CHAR", "in=" + c + " key=" + b + " out=" + encryptedHintChar);
                 }
-                else {
-                    sb.append(c);
-                }
+                sb.append(encryptedHintChar.getHintStoreString());
             }
             return sb.toString();
         }
@@ -270,21 +283,21 @@ public class EncryptUtil {
      * @return
      */
     public static String decryptHint(String s, int index, byte[] key) {
-        if (s != null && !s.isEmpty() && key != null) {
+        if (s != null && s.length() > 1 && key != null) {
             StringBuilder sb = new StringBuilder();
 //            Log.e("ENC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
-
-            for (int i = 0; i < s.length() && i < key.length; i++) {
-                char c =  s.charAt(i);
+            for (int i = 0; i < s.length() / 2 && i < key.length; i++) {
+                String decHint = s.substring(i * 2, i * 2 + 2);
                 int b = key[(index + i) % key.length];
+                EncryptedHintChar decryptedHint = EncryptedHintChar.ofEncrypted(decHint);
 
-                if (LOOP_ENCRYPT_CHARS.applies(c)) {
-                    Character encryptedChar = LOOP_ENCRYPT_CHARS.backwards(c, b);
+                if (LOOP_ENCRYPT_CHARS.applies(decryptedHint)) {
+                    int br = b * decryptedHint.getRoundTrips();
+                    HintChar encryptedHint = LOOP_ENCRYPT_CHARS.backwards(decryptedHint, br);
 //                    Log.e("ENC_CHAR", "in=" + c + " key=" + b + " out=" + encryptedChar);
-                    sb.append(encryptedChar.charValue());
-                }
-                else {
-                    sb.append(c);
+                    sb.append(encryptedHint.getHint());
+                } else {
+                    sb.append(decryptedHint.getHint());
                 }
             }
             return sb.toString();

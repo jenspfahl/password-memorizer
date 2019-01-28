@@ -8,7 +8,7 @@ import de.jepfa.obfusser.BuildConfig;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.util.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 public class Debug {
 

@@ -1,9 +1,11 @@
-package de.jepfa.obfusser.util;
+package de.jepfa.obfusser.util.encrypt;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+
+import de.jepfa.obfusser.util.encrypt.Loop;
 
 public class LoopTest {
 

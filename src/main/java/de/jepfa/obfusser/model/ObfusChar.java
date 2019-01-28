@@ -2,7 +2,7 @@ package de.jepfa.obfusser.model;
 
 import java.util.Arrays;
 
-import de.jepfa.obfusser.util.Loop;
+import de.jepfa.obfusser.util.encrypt.Loop;
 
 /**
  * A set of types used to obfuscate characters.

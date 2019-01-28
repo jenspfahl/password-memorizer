@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util;
+package de.jepfa.obfusser.util.encrypt;
 
 import java.util.ArrayList;
 import java.util.HashMap;

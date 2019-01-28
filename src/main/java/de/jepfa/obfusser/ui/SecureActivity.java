@@ -24,7 +24,7 @@ import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
-import de.jepfa.obfusser.util.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 public abstract class SecureActivity extends BaseActivity {
 

@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import de.jepfa.obfusser.Constants;
-import de.jepfa.obfusser.util.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 /**
  * Base class for {@link Credential} and {@link Template} but adding

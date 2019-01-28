@@ -35,7 +35,7 @@ import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.util.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

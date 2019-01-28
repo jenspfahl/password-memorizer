@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import de.jepfa.obfusser.util.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 /**
  * This class representens an obfuscated string.

@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util;
+package de.jepfa.obfusser.util.encrypt;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
@@ -24,6 +24,7 @@ import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
 import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
+import de.jepfa.obfusser.util.encrypt.hints.HintChar;
 
 public class EncryptUtilTest {
 
@@ -103,19 +104,23 @@ public class EncryptUtilTest {
     @Test
     public void encryptDecryptHints() throws Exception {
 
-        String string = "abcdefghiABCDEFG!§$/138";
         byte[] salt = new SecureRandom().generateSeed(32);
 
-        for (int i = 0; i < 100; i++) {
+        int i = 0;
+        List<HintChar> characters = EncryptUtil.CHARACTERS;
+        characters.add(0, new HintChar('՜'));
+        for (HintChar hintChar : characters) {
+            String hint = String.valueOf(hintChar.getHint());
             char[] pwd = String.valueOf(i).toCharArray();
             byte[] key = EncryptUtil.generateKey(pwd, salt);
 
-            String encrypted = EncryptUtil.encryptHint(string, 23, key);
+            String encrypted = EncryptUtil.encryptHint(hint, 23, key);
             String decrypted = EncryptUtil.decryptHint(encrypted, 23, key);
 
-            System.out.println(pwd + ": " + string + " --> " + encrypted + " --> " + decrypted);
+            System.out.println(i + ") k=" + key[23] + ": " + hint + " --> " + encrypted + " --> " + decrypted);
 
-            Assert.assertEquals(string, decrypted);
+            Assert.assertEquals(hint, decrypted);
+            i++;
         }
     }
 

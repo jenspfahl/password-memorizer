@@ -81,7 +81,7 @@ public abstract class PatternHolder extends IdEntity {
     }
 
     /**
-     * Not encrypted!!! Use {@link SecurePatternHolder#getHints(byte[])} instead.
+     * Not encrypted!!! Use {@link SecurePatternHolder#getHints(byte[], boolean)} instead.
      */
     @NonNull
     public Map<Integer, String> getHints() {

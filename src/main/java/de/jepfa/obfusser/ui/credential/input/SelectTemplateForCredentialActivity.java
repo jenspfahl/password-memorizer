@@ -1,5 +1,6 @@
 package de.jepfa.obfusser.ui.credential.input;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -122,6 +123,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                 .getRepo()
                 .getAllTemplatesSortByName()
                 .observe(this, new Observer<List<Template>>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onChanged(@Nullable final List<Template> templates) {
 

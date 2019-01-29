@@ -148,6 +148,7 @@
     <string name="store_password_hint">Enable password checking</string>
     <string name="disturb_equal_patterns">Distort equal patterns (strong password recommended)</string>
     <string name="not_supported">This feature is not supported for your Android version.</string>
+    <string name="search">Search</string>
 
 
 </resources>

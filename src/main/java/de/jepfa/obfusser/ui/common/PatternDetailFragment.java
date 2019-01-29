@@ -162,7 +162,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     if (Debug.isDebug()) {
                         return longPressGestureDetector.onTouchEvent(motionEvent);
                     }
-                    return false;
+                    return false;//obfusTextView.performClick();
                 }
             }
         });

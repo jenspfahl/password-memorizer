@@ -135,14 +135,14 @@ public abstract class SecurePatternHolder extends PatternHolder {
     @Ignore
     public void setPatternFromUser(String userInput, byte[] key, boolean encWithUuid) {
         if (userInput != null) {
-            setPattern(ObfusString.obfuscate(userInput), key, encWithUuid);
+            setPattern(ObfusString.obfuscate(userInput), key, encWithUuid, true);
         }
     }
 
     @Ignore
     public void setPatternFromExchangeFormat(String pattern, byte[] key, boolean encWithUuid) {
         if (pattern != null) {
-            setPattern(ObfusString.obfuscate(pattern), key, encWithUuid);
+            setPattern(ObfusString.obfuscate(pattern), key, encWithUuid, true);
         }
     }
 
@@ -291,7 +291,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     @Ignore
     public void encrypt(byte[] key, boolean encWithUuid) {
-        setPattern(getPattern(null, encWithUuid), key, encWithUuid); // load as is and save encrypted
+        setPattern(getPattern(null, encWithUuid), key, encWithUuid, false); // load as is and save encrypted
 
         if (key != null) {
             synchronized (this) {
@@ -311,7 +311,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     @Ignore
     public void decrypt(byte[] key, boolean encWithUuid) {
-        setPattern(getPattern(key, encWithUuid), null, encWithUuid); // load decrypted and save as is
+        setPattern(getPattern(key, encWithUuid), null, encWithUuid, false); // load decrypted and save as is
 
         if (key != null) {
             synchronized (this) {
@@ -341,9 +341,11 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
 
-    private void setPattern(@NonNull ObfusString pattern, byte[] key, boolean encWithUuid) {
+    private void setPattern(@NonNull ObfusString pattern, byte[] key, boolean encWithUuid, boolean recryptHints) {
 
-        recryptAllHints(getPatternLength(), pattern.length(), key, encWithUuid);
+        if (recryptHints) {
+            recryptAllHints(getPatternLength(), pattern.length(), key, encWithUuid);
+        }
 
         ObfusString tbs = new ObfusString(pattern);
         if (key != null) {
@@ -371,6 +373,9 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
 
     private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key, boolean encWithUuid) {
+        if (oldPatternLength == newPatternLength) {
+            return;
+        }
         if (newPatternLength == 0) {
             getHints().clear();
         }
@@ -380,10 +385,12 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 byte[] uuidKey = getUUIDKey(key, encWithUuid);
                 for (Map.Entry<Integer, String> entry : getHints().entrySet()) {
                     int decryptedIndex = EncryptUtil.decryptIndex(entry.getKey(), oldPatternLength, uuidKey);
+                    String decryptedHint = EncryptUtil.decryptHint(entry.getValue(), entry.getKey(), uuidKey);
 
                     if (decryptedIndex < newPatternLength) {
                         int encryptedIndex = EncryptUtil.encryptIndex(decryptedIndex, newPatternLength, uuidKey);
-                        newHints.put(encryptedIndex, entry.getValue());
+                        String encryptedHint = EncryptUtil.encryptHint(decryptedHint, encryptedIndex, uuidKey);
+                        newHints.put(encryptedIndex, encryptedHint);
                     }
 
                 }

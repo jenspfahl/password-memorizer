@@ -1,0 +1,16 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:defaultValue="-1"
+        android:key="pref_backup"
+        android:title="@string/pref_title_backup"
+        android:summary="@string/pref_description_backup"/>
+
+    <Preference
+        android:defaultValue="-1"
+        android:key="pref_restore"
+        android:title="@string/pref_title_restore"
+        android:summary="@string/pref_description_restore"/>
+
+
+</PreferenceScreen>

@@ -10,5 +10,10 @@
         android:icon="@drawable/ic_security_black_24dp"
         android:title="@string/pref_header_security" />
 
+    <header
+        android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$BackupRestorePreferenceFragment"
+        android:icon="@drawable/ic_import_export_black_24dp"
+        android:title="@string/pref_header_backuprestore" />
+
 
 </preference-headers>

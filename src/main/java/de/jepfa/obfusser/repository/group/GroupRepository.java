@@ -26,6 +26,10 @@ public class GroupRepository {
         return groupDao.getAllGroupsSortByName();
     }
 
+    public List<Group> getAllGroupsSync() {
+        return groupDao.getAllGroupsSync();
+    }
+
     public LiveData<Group> getGroupById(int id) {
         return groupDao.getGroupById(id);
     }

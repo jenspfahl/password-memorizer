@@ -103,6 +103,7 @@
     <string name="upper_char">A..Z</string>
     <string name="digit">0..9</string>
     <string name="special_char">#/+..</string>
+    <string name="search">Search</string>
 
     <string name="backspace">⌫</string>
     <string name="title_legend">Legend</string>
@@ -120,7 +121,7 @@
     <string name="pref_header_general">General</string>
     <string name="pref_title_show_patterns">Show patterns in overview list</string>
     <string name="pref_description_show_patterns">To prevent others seeing all your patterns in the overview lists, deactivate this option.</string>
-
+    <string name="pref_header_backuprestore">Backup / Restore</string>
 
 
 
@@ -148,7 +149,17 @@
     <string name="store_password_hint">Enable password checking</string>
     <string name="disturb_equal_patterns">Distort equal patterns (strong password recommended)</string>
     <string name="not_supported">This feature is not supported for your Android version.</string>
-    <string name="search">Search</string>
+
+
+    <string name="pref_title_backup">Backup your data</string>
+    <string name="pref_description_backup">All your pattern, templates and groups are stored in a file which can be backed up to a save store of your choice.</string>
+    <string name="pref_title_restore">Restore your data</string>
+    <string name="pref_description_restore">You can restore all patterns, templates and groups you have previously backed up. Use this to migrate your data between devices.</string>
+
+    <string name="title_backup_dialog">Backup your data</string>
+    <string name="message_backup_dialog_encrypted">Enter your password to backup your data. It is important to type it correctly, otherwise the patterns will be exported in a different way.</string>
+    <string name="message_backup_dialog_encrypted_single">Your data is encrypted, please enter your password.</string>
+    <string name="message_backup_dialog_noenc">Your data is not encrypted, so the backup data will also not be encrypted.</string>
 
 
 </resources>

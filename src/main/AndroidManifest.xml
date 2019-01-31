@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.jepfa.obfusser">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -100,6 +103,10 @@
         <service
             android:name=".service.SecurityService"
             android:exported="false" />
+        <service
+            android:name=".service.BackupRestoreService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

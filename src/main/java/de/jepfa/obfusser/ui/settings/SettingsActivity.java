@@ -1,11 +1,13 @@
 package de.jepfa.obfusser.ui.settings;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +36,7 @@ import java.util.List;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.Secret;
+import de.jepfa.obfusser.service.BackupRestoreService;
 import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
@@ -55,6 +59,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_PATTERN_STYLE = "pref_pattern_style";
     public static final String PREF_SHOW_PATTERN_IN_OVERVIEW = "pref_show_pattern_in_overview";
     public static final String PREF_EXPANDED_GROUPS = "pref_expanded_groups";
+    public static final String PREF_BACKUP = "pref_backup";
+    public static final String PREF_RESTORE = "pref_restore";
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
 
 
     private static class PatternStylePreferenceListener implements Preference.OnPreferenceChangeListener {
@@ -135,6 +148,141 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             editor.commit();
 
             return true;
+        }
+    }
+
+    private static class BackupPreferenceListener implements Preference.OnPreferenceClickListener {
+
+        private final Activity activity;
+
+        public BackupPreferenceListener(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public boolean onPreferenceClick(final Preference preference) {
+
+            verifyStoragePermissions(activity);
+
+            LayoutInflater inflater = activity.getLayoutInflater();
+
+            final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
+            final EditText firstPassword = passwordView.findViewById(R.id.first_password);
+            final EditText secondPassword = passwordView.findViewById(R.id.second_password);
+            final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
+            storePasswdSwitch.setVisibility(View.GONE);
+            final Switch disturbPatternsSwitch = passwordView.findViewById(R.id.disturb_equal_patterns);
+            disturbPatternsSwitch.setVisibility(View.GONE);
+
+            final boolean passwordCheckEnabled = PreferenceManager
+                    .getDefaultSharedPreferences(activity)
+                    .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
+
+            String message;
+            if (SecureActivity.SecretChecker.isPasswordStored(activity)) {
+                message = activity.getString(R.string.message_backup_dialog_encrypted_single);
+                secondPassword.setVisibility(View.GONE);
+            }
+            else if (passwordCheckEnabled) {
+                message = activity.getString(R.string.message_backup_dialog_encrypted);
+            }
+            else {
+                message = activity.getString(R.string.message_backup_dialog_noenc);
+                firstPassword.setVisibility(View.GONE);
+                secondPassword.setVisibility(View.GONE);
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+
+            final AlertDialog dialog = builder.setTitle(activity.getString(R.string.title_backup_dialog))
+                    .setMessage(message)
+                    .setView(passwordView)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+
+                    Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    buttonPositive.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            byte[] key = null;
+                            byte[] transferSalt = EncryptUtil.generateSalt();
+                            byte[] transferKey = null;
+
+                            if (passwordCheckEnabled) {
+                                char[] pwd = EncryptUtil.getCharArray(firstPassword.getText());
+                                char[] pwd2 = null;
+                                try {
+                                    if (pwd == null || pwd.length == 0) {
+                                        firstPassword.setError(activity.getString(R.string.password_required));
+                                        firstPassword.requestFocus();
+                                        return;
+                                    }
+
+                                    if (!SecureActivity.SecretChecker.isPasswordStored(activity)) {
+                                        pwd2 = EncryptUtil.getCharArray(secondPassword.getText());
+                                        if (pwd2 == null || pwd2.length == 0) {
+                                            secondPassword.setError(activity.getString(R.string.password_confirmation_required));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+
+                                        if (!Arrays.equals(pwd, pwd2)) {
+                                            secondPassword.setError(activity.getString(R.string.password_not_equal));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+                                    }
+
+
+                                    byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(preference.getContext());
+                                    key = EncryptUtil.generateKey(pwd, applicationSalt);
+
+                                    if (!SecureActivity.SecretChecker.isPasswordValid(pwd, activity, applicationSalt)) {
+                                        firstPassword.setError(activity.getString(R.string.wrong_password));
+                                        firstPassword.requestFocus();
+                                        secondPassword.setText(null);
+                                        return;
+                                    }
+
+                                    transferKey = EncryptUtil.generateKey(pwd, transferSalt);
+
+                                } finally {
+                                    EncryptUtil.clearPwd(pwd);
+                                    EncryptUtil.clearPwd(pwd2);
+                                }
+                            }
+                            // export it
+                            BackupRestoreService.startBackupAll(preference.getContext(), key,
+                                    transferKey, transferSalt,
+                                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
+
+
+                            dialog.dismiss();
+                        }
+                    });
+
+                    Button buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                    buttonNegative.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+
+                            dialog.dismiss();
+                        }
+                    });
+                }
+            });
+            dialog.show();
+
+            return false; // it is a pseudo preference
         }
     }
 
@@ -279,8 +427,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
         dialog.show();
-
-
     }
 
     private static void storeKeySavely(byte[] key, byte[] salt, Activity activity) {
@@ -368,7 +514,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || SecurityPreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName);
+                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
+                || BackupRestorePreferenceFragment.class.getName().equals(fragmentName);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -446,6 +593,46 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class BackupRestorePreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_backuprestore);
+            setHasOptionsMenu(true);
+
+            Preference backupPref = findPreference(PREF_BACKUP);
+            backupPref.setOnPreferenceClickListener(
+                    new BackupPreferenceListener(getActivity()));
+
+            Preference restorePref = findPreference(PREF_RESTORE);
+           //TODO restorePref.setOnPreferenceClickListener(
+             //       new RestorePreferenceListener(getActivity()));
+        }
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class)); //TODO
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
 
 }

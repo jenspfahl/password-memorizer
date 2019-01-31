@@ -26,6 +26,9 @@ public interface GroupDao {
     @Query("SELECT * FROM Groups ORDER BY UPPER(name)")
     LiveData<List<Group>> getAllGroupsSortByName();
 
+    @Query("SELECT * FROM Groups")
+    List<Group> getAllGroupsSync();
+
     @Query("SELECT * FROM Groups WHERE id=:id")
     LiveData<Group> getGroupById(int id);
 }

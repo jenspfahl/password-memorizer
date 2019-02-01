@@ -22,7 +22,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
@@ -32,7 +34,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
@@ -57,7 +61,22 @@ public class BackupRestoreService extends IntentService {
     private static final String PARAM_TRANSFER_KEY = "de.jepfa.obfusser.service.param.transferkey";
     private static final String PARAM_TRANSFER_SALT = "de.jepfa.obfusser.service.param.transfersalt";
     private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
-    private static final String BACKUP_FILE_BASE = "password-memorizer-data-";
+    private static final String PARAM_CONTENT = "de.jepfa.obfusser.service.param.content";
+    public static final String BACKUP_FILE_BASE = "password-memorizer-data-";
+    public static final String JSON_APP_VERSION = "appVersion";
+    public static final String JSON_DATE = "date";
+    public static final String JSON_ENC = "enc";
+    public static final String JSON_ENC_WITH_UUID = "encWithUuid";
+    public static final String JSON_SALT = "salt";
+    public static final String JSON_CREDENTIALS = "Credentials";
+    public static final String JSON_TEMPLATES = "Templates";
+    public static final String JSON_GROUPS = "Groups";
+    public static final String JSON_CREDENTIALS_COUNT = "CredentialsCount";
+    public static final String JSON_TEMPLATES_COUNT = "TemplatesCount";
+    public static final String JSON_GROUPS_COUNT = "GroupsCount";
+    public static final Type CREDENTIALS_TYPE = new TypeToken<List<Credential>>(){}.getType();
+    public static final Type TEMPLATES_TYPE = new TypeToken<List<Template>>(){}.getType();
+    public static final Type GROUPS_TYPE = new TypeToken<List<Group>>(){}.getType();
 
 
     private final CredentialRepository credentialRepo;
@@ -88,11 +107,13 @@ public class BackupRestoreService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startRestoreAll(Context context, byte[] key, byte[] salt, boolean withUuid) {
+    public static void startRestoreAll(Context context, String jsonContent, byte[] transferKey, byte[] key, boolean withUuid) {
         Intent intent = new Intent(context, BackupRestoreService.class);
         intent.setAction(ACTION_RESTORE_ALL);
         intent.putExtra(PARAM_KEY, key);
         intent.putExtra(PARAM_WITH_UUID, withUuid);
+        intent.putExtra(PARAM_CONTENT, jsonContent);
+        intent.putExtra(PARAM_TRANSFER_KEY, transferKey);
         context.startService(intent);
     }
 
@@ -108,7 +129,11 @@ public class BackupRestoreService extends IntentService {
                         withUuid);
             }
             if (ACTION_RESTORE_ALL.equals(action)) {
-                restoreAll(intent.getByteArrayExtra(PARAM_KEY), withUuid);
+                restoreAll(
+                        intent.getStringExtra(PARAM_CONTENT),
+                        intent.getByteArrayExtra(PARAM_TRANSFER_KEY),
+                        intent.getByteArrayExtra(PARAM_KEY),
+                        withUuid);
             }
         }
     }
@@ -117,16 +142,16 @@ public class BackupRestoreService extends IntentService {
         JsonObject root = new JsonObject();
         try {
             PackageInfo pInfo = getApplication().getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
-            root.addProperty("appVersion", pInfo.versionCode);
+            root.addProperty(JSON_APP_VERSION, pInfo.versionCode);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("BACKUPALL", "cannot get version code", e);
         }
 
 
-        root.addProperty("date", new Date().toString());
-        root.addProperty("enc", encryptKey != null);
-        root.addProperty("encWithUuid", encWithUuid);
-        root.addProperty("salt", Base64.encodeToString(transferSalt, Base64.NO_WRAP));
+        root.addProperty(JSON_DATE, new Date().toString());
+        root.addProperty(JSON_ENC, encryptKey != null);
+        root.addProperty(JSON_ENC_WITH_UUID, encWithUuid);
+        root.addProperty(JSON_SALT, Base64.encodeToString(transferSalt, Base64.NO_WRAP));
         Gson gson = new Gson();
 
         List<Credential> credentials = credentialRepo.getAllCredentialsSync();
@@ -136,9 +161,8 @@ public class BackupRestoreService extends IntentService {
                 credential.encrypt(transferKey, encWithUuid);
             }
         }
-
-        Type credentialsType = new TypeToken<List<Credential>>(){}.getType();
-        root.add("Credentials", gson.toJsonTree(credentials, credentialsType));
+        root.add(JSON_CREDENTIALS, gson.toJsonTree(credentials, CREDENTIALS_TYPE));
+        root.addProperty(JSON_CREDENTIALS_COUNT, credentials.size());
 
 
         List<Template> templates = templateRepo.getAllTemplatesSync();
@@ -148,15 +172,12 @@ public class BackupRestoreService extends IntentService {
                 template.decrypt(transferKey, encWithUuid);
             }
         }
-
-        Type templatesType = new TypeToken<List<Template>>(){}.getType();
-        root.add("Templates", gson.toJsonTree(templates, templatesType));
+        root.add(JSON_TEMPLATES, gson.toJsonTree(templates, TEMPLATES_TYPE));
+        root.addProperty(JSON_TEMPLATES_COUNT, templates.size());
 
         List<Group> groups = groupRepo.getAllGroupsSync();
-
-        Type groupsType = new TypeToken<List<Group>>(){}.getType();
-        root.add("Groups", gson.toJsonTree(groups, groupsType));
-
+        root.add(JSON_GROUPS, gson.toJsonTree(groups, GROUPS_TYPE));
+        root.addProperty(JSON_GROUPS_COUNT, groups.size());
 
 
         NotificationHelper.createNotificationChannel(this, NotificationHelper.CHANNEL_ID_BACKUP, "Password Memorizer Backup Notifications");
@@ -225,18 +246,107 @@ public class BackupRestoreService extends IntentService {
         }
     }
 
-    private void restoreAll(byte[] key, boolean decWithUuid) {
-        List<Template> allTemplates = templateRepo.getAllTemplatesSync();
-        for (Template template : allTemplates) {
-            template.decrypt(key, decWithUuid);
-            templateRepo.update(template);
+    private void restoreAll(String content, byte[] transferKey, byte[] key, boolean withUuid) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonContent = parser.parse(content).getAsJsonObject();
+        boolean decWithUuid = jsonContent.get(JSON_ENC_WITH_UUID).getAsBoolean();
+
+        Gson gson = new Gson();
+
+        JsonArray jsonCredentials = jsonContent.get(JSON_CREDENTIALS).getAsJsonArray();
+        List<Credential> otherCredentials = gson.fromJson(jsonCredentials, CREDENTIALS_TYPE);
+
+        JsonArray jsonTemplates = jsonContent.get(JSON_TEMPLATES).getAsJsonArray();
+        List<Template> otherTemplates = gson.fromJson(jsonTemplates, TEMPLATES_TYPE);
+
+        JsonArray jsonGroups = jsonContent.get(JSON_GROUPS).getAsJsonArray();
+        List<Group> otherGroups = gson.fromJson(jsonGroups, GROUPS_TYPE);
+
+        Map<Integer, Group> groupIdMap = new HashMap<>();
+
+        List<Group> existingGroups = groupRepo.getAllGroupsSync();
+        outer: for (Group otherGroup : otherGroups) {
+            for (Group existingGroup : existingGroups) {
+                if (existingGroup.getName().equals(otherGroup.getName())) {
+                    existingGroup.setInfo(otherGroup.getInfo());
+                    existingGroup.setColor(otherGroup.getColor());
+                    groupRepo.update(existingGroup);
+                    groupIdMap.put(otherGroup.getId(), existingGroup);
+                    continue outer;
+                }
+            }
+            otherGroup.unsetId();
+            groupRepo.insertSync(otherGroup);
+            groupIdMap.put(otherGroup.getId(), otherGroup);
         }
 
-        List<Credential> allCredentials = credentialRepo.getAllCredentialsSync();
-        for (Credential credential : allCredentials) {
-            credential.decrypt(key, decWithUuid);
-            credentialRepo.update(credential);
+        List<Template> existingTemplates = templateRepo.getAllTemplatesSync();
+        outer: for (Template otherTemplate : otherTemplates) {
+            Group group = groupIdMap.get(otherTemplate.getGroupId());
+            for (Template existingTemplate : existingTemplates) {
+                if (existingTemplate.getName().equals(otherTemplate.getName())) {
+                    existingTemplate.setInfo(otherTemplate.getInfo());
+
+                    existingTemplate.setPatternFromExchangeFormat(
+                            otherTemplate.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
+                            key,
+                            withUuid);
+
+                    existingTemplate.setHints(otherTemplate.getHints(transferKey, decWithUuid),
+                            key, withUuid);
+
+                    if (group != null) {
+                        existingTemplate.setGroupId(group.getId());
+                    }
+                    templateRepo.update(existingTemplate);
+                    continue outer;
+                }
+            }
+            if (group != null) {
+                otherTemplate.setGroupId(group.getId());
+            }
+            otherTemplate.unsetId();
+            templateRepo.insert(otherTemplate);
         }
+
+        List<Credential> existingCredentials = credentialRepo.getAllCredentialsSync();
+        outer: for (Credential otherCredential : otherCredentials) {
+            Group group = groupIdMap.get(otherCredential.getGroupId());
+            for (Credential existingCredential : existingCredentials) {
+                if (existingCredential.getName().equals(otherCredential.getName())) {
+                    existingCredential.setInfo(otherCredential.getInfo());
+                    existingCredential.setTemplateId(otherCredential.getTemplateId());
+
+                    existingCredential.setPatternFromExchangeFormat(
+                            otherCredential.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
+                            key,
+                            withUuid);
+
+                    existingCredential.setHints(otherCredential.getHints(transferKey, decWithUuid),
+                            key, withUuid);
+
+                    if (group != null) {
+                        existingCredential.setGroupId(group.getId());
+                    }
+                    credentialRepo.update(existingCredential);
+                    continue outer;
+                }
+            }
+            if (group != null) {
+                otherCredential.setGroupId(group.getId());
+            }
+            otherCredential.unsetId();
+            credentialRepo.insert(otherCredential);
+        }
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getBaseContext(), "File imported.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
     }
 
 

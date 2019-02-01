@@ -76,7 +76,7 @@ public abstract class SecureActivity extends BaseActivity {
 
         private static volatile long secretDialogOpened;
 
-        public static byte[] getOrAskForSecret(SecureActivity activity) {
+        public static byte[] getOrAskForSecret(Activity activity) {
             boolean passwordCheckEnabled = PreferenceManager
                     .getDefaultSharedPreferences(activity)
                     .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
@@ -161,14 +161,16 @@ public abstract class SecureActivity extends BaseActivity {
         }
 
 
-        private synchronized static void openDialog(final Secret secret, final SecureActivity activity) {
+        private synchronized static void openDialog(final Secret secret, final Activity activity) {
 
             if (isRecentlyOpened(secretDialogOpened)) {
                 return;
             }
             secretDialogOpened = System.currentTimeMillis();
 
-            activity.refresh(true); // show all data as invalid
+            if (activity instanceof SecureActivity) {
+                ((SecureActivity)activity).refresh(true); // show all data as invalid
+            }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
@@ -214,7 +216,9 @@ public abstract class SecureActivity extends BaseActivity {
                                     }
                                 } else {
                                     secret.setDigest(EncryptUtil.generateKey(pwd, getSalt(activity)));
-                                    activity.refresh(false); // show correct encrypted data
+                                    if (activity instanceof SecureActivity) {
+                                        ((SecureActivity)activity).refresh(true); // show correct encrypted data
+                                    }
                                 }
                             } finally {
                                 EncryptUtil.clearPwd(pwd);

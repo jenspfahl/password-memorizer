@@ -23,10 +23,10 @@ public interface CredentialDao {
     @Delete
     void delete(Credential credential);
 
-    @Query("SELECT * FROM Credential ORDER BY UPPER(name)")
+    @Query("SELECT * FROM Credential ORDER BY UPPER(name), id")
     LiveData<List<Credential>> getAllCredentialsSortByName();
 
-    @Query("SELECT c.* FROM Credential c LEFT JOIN Groups g ON c.group_id=g.id ORDER BY UPPER(g.name), UPPER(c.name)")
+    @Query("SELECT c.* FROM Credential c LEFT JOIN Groups g ON c.group_id=g.id ORDER BY UPPER(g.name), UPPER(c.name), c.id")
     LiveData<List<Credential>> getAllCredentialsSortByGroupAndName();
 
     @Query("SELECT * FROM Credential")

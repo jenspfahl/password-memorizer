@@ -1,14 +1,13 @@
 package de.jepfa.obfusser.ui.settings;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -17,18 +16,25 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +47,7 @@ import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.PermissionChecker;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
+import de.jepfa.obfusser.util.encrypt.FileUtil;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -62,7 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_EXPANDED_GROUPS = "pref_expanded_groups";
     public static final String PREF_BACKUP = "pref_backup";
     public static final String PREF_RESTORE = "pref_restore";
-
+    public static final int REQUEST_CODE_RESTORE_FILE = 1001;
 
 
     private static class PatternStylePreferenceListener implements Preference.OnPreferenceChangeListener {
@@ -157,7 +164,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceClick(final Preference preference) {
 
-            PermissionChecker.verifyStoragePermissions(activity);
+            PermissionChecker.verifyRWStoragePermissions(activity);
 
             LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -280,6 +287,176 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return false; // it is a pseudo preference
         }
     }
+
+    private static class RestorePreferenceListener implements Preference.OnPreferenceClickListener {
+
+        private final Activity activity;
+
+        public RestorePreferenceListener(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public boolean onPreferenceClick(final Preference preference) {
+
+            PermissionChecker.verifyReadStoragePermissions(activity);
+
+            Intent intent = new Intent()
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT);
+            activity.startActivityForResult(Intent.createChooser(intent, "Select a file to restore"),
+                    REQUEST_CODE_RESTORE_FILE);
+
+            return false; // it is a pseudo preference
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CODE_RESTORE_FILE && resultCode==RESULT_OK) {
+            Uri selectedFile = data.getData();
+
+            String content = null;
+            JsonObject jsonContent = null;
+
+            if (FileUtil.isExternalStorageReadable()) {
+                try {
+                    content = FileUtil.readFile(this, selectedFile);
+                    if (content != null) {
+                        JsonParser parser = new JsonParser();
+                        jsonContent = parser.parse(content).getAsJsonObject();
+                    }
+                } catch (Exception e) {
+                    Log.e("RESTORE", "cannot import file " + selectedFile, e);
+                }
+            }
+            final String fcontent = content;
+            final JsonObject fjsonContent = jsonContent;
+
+
+            if (jsonContent == null) {
+                Toast.makeText(this, "The selected file cannot be imported.", Toast.LENGTH_LONG).show();
+            }
+            else {
+                LayoutInflater inflater = getLayoutInflater();
+
+                final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
+                final EditText firstPassword = passwordView.findViewById(R.id.first_password);
+                final EditText secondPassword = passwordView.findViewById(R.id.second_password);
+                final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
+                storePasswdSwitch.setVisibility(View.GONE);
+                final Switch disturbPatternsSwitch = passwordView.findViewById(R.id.disturb_equal_patterns);
+                disturbPatternsSwitch.setVisibility(View.GONE);
+
+                final boolean passwordCheckEnabled = jsonContent.get(BackupRestoreService.JSON_ENC).getAsBoolean();
+                final int credentialsCount = jsonContent.get(BackupRestoreService.JSON_CREDENTIALS_COUNT).getAsInt();
+                final int templatesCount = jsonContent.get(BackupRestoreService.JSON_TEMPLATES_COUNT).getAsInt();
+                final int groupsCount = jsonContent.get(BackupRestoreService.JSON_GROUPS_COUNT).getAsInt();
+
+                if (credentialsCount == 0 && templatesCount == 0 && groupsCount == 0) {
+                    Toast.makeText(this, "This file doesn't contain any data.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                String message;
+                if (passwordCheckEnabled) {
+                    message = getString(R.string.message_restore_dialog_encrypted, credentialsCount, templatesCount, groupsCount);
+                }
+                else {
+                    message = getString(R.string.message_restore_dialog_noenc, credentialsCount, templatesCount, groupsCount);
+                    firstPassword.setVisibility(View.GONE);
+                    secondPassword.setVisibility(View.GONE);
+                }
+
+                final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(SettingsActivity.this);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                final AlertDialog dialog = builder.setTitle(getString(R.string.title_restore_dialog))
+                        .setMessage(message)
+                        .setView(passwordView)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .create();
+
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                    @Override
+                    public void onShow(DialogInterface dialogInterface) {
+
+                        Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        buttonPositive.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                byte[] transferKey = null;
+
+                                if (passwordCheckEnabled) {
+                                    char[] pwd = EncryptUtil.getCharArray(firstPassword.getText());
+                                    char[] pwd2 = null;
+                                    try {
+                                        if (pwd == null || pwd.length == 0) {
+                                            firstPassword.setError(getString(R.string.password_required));
+                                            firstPassword.requestFocus();
+                                            return;
+                                        }
+
+                                        pwd2 = EncryptUtil.getCharArray(secondPassword.getText());
+                                        if (pwd2 == null || pwd2.length == 0) {
+                                            secondPassword.setError(getString(R.string.password_confirmation_required));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+
+                                        if (!Arrays.equals(pwd, pwd2)) {
+                                            secondPassword.setError(getString(R.string.password_not_equal));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+
+
+                                        String saltBase64 = fjsonContent.get(BackupRestoreService.JSON_SALT).getAsString();
+                                        if (saltBase64 != null) {
+                                            byte[] transferSalt = Base64.decode(saltBase64, Base64.NO_WRAP);
+                                            transferKey = EncryptUtil.generateKey(pwd, transferSalt);
+                                        }
+
+                                    } finally {
+                                        EncryptUtil.clearPwd(pwd);
+                                        EncryptUtil.clearPwd(pwd2);
+                                    }
+                                }
+                                // import it
+                                BackupRestoreService.startRestoreAll(
+                                        SettingsActivity.this, fcontent,
+                                        transferKey,
+                                        key,
+                                        SecureActivity.SecretChecker.isEncWithUUIDEnabled(SettingsActivity.this));
+
+
+                                dialog.dismiss();
+                            }
+                        });
+
+                        Button buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                        buttonNegative.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                });
+                dialog.show();
+            }
+        }
+    }
+
+
 
     private static void inputPasswordAndCrypt(final Activity activity, final Preference preference, final boolean encrypt) {
         LayoutInflater inflater = activity.getLayoutInflater();
@@ -601,8 +778,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     new BackupPreferenceListener(getActivity()));
 
             Preference restorePref = findPreference(PREF_RESTORE);
-           //TODO restorePref.setOnPreferenceClickListener(
-             //       new RestorePreferenceListener(getActivity()));
+            restorePref.setOnPreferenceClickListener(
+                    new RestorePreferenceListener(getActivity()));
         }
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {

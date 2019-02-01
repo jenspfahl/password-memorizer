@@ -161,5 +161,9 @@
     <string name="message_backup_dialog_encrypted_single">Your data is encrypted, please enter your password.</string>
     <string name="message_backup_dialog_noenc">Your data is not encrypted, so the backup data will also not be encrypted.</string>
 
+    <string name="title_restore_dialog">Restore your data</string>
+    <string name="message_restore_dialog_encrypted">Enter your password to restore your data. It is important to type it correctly, otherwise the patterns will be restored in a different way. %1$d Patterns, %2$d Templates and %3$d Groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
+    <string name="message_restore_dialog_noenc">%1$d Patterns, %2$d Templates and %3$d Groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
+
 
 </resources>

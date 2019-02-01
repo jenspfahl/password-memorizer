@@ -23,10 +23,10 @@ public interface TemplateDao {
     @Delete
     void delete(Template template);
 
-    @Query("SELECT * FROM Template ORDER BY UPPER(name)")
+    @Query("SELECT * FROM Template ORDER BY UPPER(name), id")
     LiveData<List<Template>> getAllTemplatesSortByName();
 
-    @Query("SELECT t.* FROM Template t LEFT JOIN Groups g ON t.group_id=g.id ORDER BY UPPER(g.name), UPPER(t.name)")
+    @Query("SELECT t.* FROM Template t LEFT JOIN Groups g ON t.group_id=g.id ORDER BY UPPER(g.name), UPPER(t.name), t.id")
     LiveData<List<Template>> getAllTemplatesSortByGroupAndName();
 
     @Query("SELECT * FROM Template")

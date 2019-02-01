@@ -1,9 +1,16 @@
 package de.jepfa.obfusser.util.encrypt;
 
+import android.app.Activity;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class FileUtil {
 
@@ -26,4 +33,25 @@ public class FileUtil {
         return false;
     }
 
+    public static String readFile(Activity activity, Uri uri) {
+        //Read text from file
+        StringBuilder text = new StringBuilder();
+
+        try (InputStream is = activity.getContentResolver().openInputStream(uri);
+             InputStreamReader isr = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(isr)) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+        }
+        catch (IOException e) {
+            Log.e("READFILE", "Cannot read " + uri, e);
+            return null;
+        }
+
+        return text.toString();
+    }
 }

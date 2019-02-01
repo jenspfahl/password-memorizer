@@ -15,7 +15,7 @@ import de.jepfa.obfusser.model.Group;
 public interface GroupDao {
 
     @Insert
-    void insert(Group group);
+    long insert(Group group);
 
     @Update
     void update(Group group);
@@ -23,7 +23,7 @@ public interface GroupDao {
     @Delete
     void delete(Group group);
 
-    @Query("SELECT * FROM Groups ORDER BY UPPER(name)")
+    @Query("SELECT * FROM Groups ORDER BY UPPER(name), id")
     LiveData<List<Group>> getAllGroupsSortByName();
 
     @Query("SELECT * FROM Groups")

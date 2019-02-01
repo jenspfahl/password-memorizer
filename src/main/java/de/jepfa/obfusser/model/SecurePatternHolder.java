@@ -236,6 +236,17 @@ public abstract class SecurePatternHolder extends PatternHolder {
         getHints().put(encryptedIndex, Constants.EMPTY);
     }
 
+    @Ignore
+    public void setHints(@NonNull Map<Integer, String> hints, byte[] key, boolean encWithUuid) {
+        Map<Integer, String> newHints = new HashMap<>(hints.size());
+        byte[] uuidKey = getUUIDKey(key, encWithUuid);
+        for (Map.Entry<Integer, String> entry : hints.entrySet()) {
+            Integer encryptedIndex = EncryptUtil.encryptIndex(entry.getKey(), getPatternLength(), uuidKey);
+            newHints.put(encryptedIndex, EncryptUtil.encryptHint(entry.getValue(), encryptedIndex, uuidKey));
+        }
+        setHints(newHints);
+    }
+
     /**
      *
      * @param index the real (UI) index

@@ -45,6 +45,10 @@ public class GroupRepository {
         new InsertAsyncTask(groupDao).execute(group);
     }
 
+    public long insertSync(Group group) {
+        return groupDao.insert(group);
+    }
+
     public void update(Group group) {
         new UpdateAsyncTask(groupDao).execute(group);
     }

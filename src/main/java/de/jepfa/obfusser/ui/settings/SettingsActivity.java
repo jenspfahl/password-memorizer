@@ -39,6 +39,7 @@ import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.BackupRestoreService;
 import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.PermissionChecker;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 /**
@@ -61,12 +62,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_EXPANDED_GROUPS = "pref_expanded_groups";
     public static final String PREF_BACKUP = "pref_backup";
     public static final String PREF_RESTORE = "pref_restore";
-
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
 
 
@@ -162,7 +157,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceClick(final Preference preference) {
 
-            verifyStoragePermissions(activity);
+            PermissionChecker.verifyStoragePermissions(activity);
 
             LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -617,20 +612,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
         }
     }
 

@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.FileProvider;
@@ -40,6 +41,7 @@ import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.repository.credential.CredentialRepository;
 import de.jepfa.obfusser.repository.group.GroupRepository;
 import de.jepfa.obfusser.repository.template.TemplateRepository;
+import de.jepfa.obfusser.ui.common.NotificationHelper;
 import de.jepfa.obfusser.util.encrypt.FileUtil;
 
 /**
@@ -56,11 +58,13 @@ public class BackupRestoreService extends IntentService {
     private static final String PARAM_TRANSFER_SALT = "de.jepfa.obfusser.service.param.transfersalt";
     private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
     private static final String BACKUP_FILE_BASE = "password-memorizer-data-";
-    private static final String CHANNEL_ID = "de.jepfa.notificationchannel.0";
+
 
     private final CredentialRepository credentialRepo;
     private final TemplateRepository templateRepo;
     private final GroupRepository groupRepo;
+
+    private Handler handler;
 
 
     public BackupRestoreService() {
@@ -69,6 +73,8 @@ public class BackupRestoreService extends IntentService {
         credentialRepo = new CredentialRepository(getApplication());
         templateRepo = new TemplateRepository(getApplication());
         groupRepo = new GroupRepository(getApplication());
+
+        handler = new Handler();
     }
 
 
@@ -111,7 +117,7 @@ public class BackupRestoreService extends IntentService {
         JsonObject root = new JsonObject();
         try {
             PackageInfo pInfo = getApplication().getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
-            root.addProperty("version", pInfo.versionCode);
+            root.addProperty("appVersion", pInfo.versionCode);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("BACKUPALL", "cannot get version code", e);
         }
@@ -153,7 +159,7 @@ public class BackupRestoreService extends IntentService {
 
 
 
-        createNotificationChannel();
+        NotificationHelper.createNotificationChannel(this, NotificationHelper.CHANNEL_ID_BACKUP, "Password Memorizer Backup Notifications");
 
         boolean success = false;
 
@@ -169,41 +175,53 @@ public class BackupRestoreService extends IntentService {
                     file.write(root.toString());
                 }
 
-                Log.d("BACKUP", "to file " + backupFile);
+                Log.i("BACKUP", "to file " + backupFile);
 
                 Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
                 PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
 
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                        .setAutoCancel(true)
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.CHANNEL_ID_BACKUP)
                         .setSmallIcon(android.R.drawable.stat_notify_sdcard)
                         .setContentTitle("Backup ready")
                         .setContentText("Backup file " + backupFileName + " created under Download folder.")
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .addAction(new NotificationCompat.Action(android.R.drawable.stat_notify_sdcard,"open download folder", pIntent));
-
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                ;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mBuilder.addAction(new NotificationCompat.Action(android.R.drawable.stat_notify_sdcard,"open download folder", pIntent));
+                }
+                else {
+                    mBuilder.setContentIntent(pIntent);
+                }
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-                notificationManager.notify(10001, mBuilder.build());
+                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_BACKUP_SUCCESS, mBuilder.build());
 
                 success = true;
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getBaseContext(), "Backup file ready. You've got a notification.", Toast.LENGTH_LONG).show();
+                    }
+                });
+
 
             } catch (IOException e) {
                 Log.e("BACKUP", "cannot write to file " + backupFile, e);
             }
         }
 
+
+
         if (!success) {
 
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                    .setAutoCancel(true)
-                    .setSmallIcon(android.R.drawable.stat_notify_error)
-                    .setContentTitle("Backup failure")
-                    .setContentText("Cannot create backup file.")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), "Cannot create backup file.", Toast.LENGTH_LONG).show();
+                }
+            });
 
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-            notificationManager.notify(10002, mBuilder.build());
         }
     }
 
@@ -218,18 +236,6 @@ public class BackupRestoreService extends IntentService {
         for (Credential credential : allCredentials) {
             credential.decrypt(key, decWithUuid);
             credentialRepo.update(credential);
-        }
-    }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = ("Password Memorizer Notifications");
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 

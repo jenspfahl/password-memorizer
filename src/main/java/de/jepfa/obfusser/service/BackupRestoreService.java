@@ -2,21 +2,16 @@ package de.jepfa.obfusser.service;
 
 import android.app.DownloadManager;
 import android.app.IntentService;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,11 +23,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,14 +50,18 @@ import de.jepfa.obfusser.util.encrypt.FileUtil;
  */
 public class BackupRestoreService extends IntentService {
 
+    private static final DateFormat SDF = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM);
+
     private static final String ACTION_BACKUP_ALL = "de.jepfa.obfusser.service.action.backup_all";
     private static final String ACTION_RESTORE_ALL = "de.jepfa.obfusser.service.action.restore_all";
-    private static final String PARAM_KEY = "de.jepfa.obfusser.service.param.key";
+    private static final String PARAM_ENCRYPT_KEY = "de.jepfa.obfusser.service.param.encryptkey";
+    private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
     private static final String PARAM_TRANSFER_KEY = "de.jepfa.obfusser.service.param.transferkey";
     private static final String PARAM_TRANSFER_SALT = "de.jepfa.obfusser.service.param.transfersalt";
-    private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
     private static final String PARAM_CONTENT = "de.jepfa.obfusser.service.param.content";
+
     public static final String BACKUP_FILE_BASE = "password-memorizer-data-";
+
     public static final String JSON_APP_VERSION = "appVersion";
     public static final String JSON_DATE = "date";
     public static final String JSON_ENC = "enc";
@@ -100,17 +99,17 @@ public class BackupRestoreService extends IntentService {
     public static void startBackupAll(Context context, byte[] encryptKey, byte[] transferKey, byte[] transferSalt, boolean withUuid) {
         Intent intent = new Intent(context, BackupRestoreService.class);
         intent.setAction(ACTION_BACKUP_ALL);
-        intent.putExtra(PARAM_KEY, encryptKey);
+        intent.putExtra(PARAM_ENCRYPT_KEY, encryptKey);
         intent.putExtra(PARAM_TRANSFER_KEY, transferKey);
         intent.putExtra(PARAM_TRANSFER_SALT, transferSalt);
         intent.putExtra(PARAM_WITH_UUID, withUuid);
         context.startService(intent);
     }
 
-    public static void startRestoreAll(Context context, String jsonContent, byte[] transferKey, byte[] key, boolean withUuid) {
+    public static void startRestoreAll(Context context, String jsonContent, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
         Intent intent = new Intent(context, BackupRestoreService.class);
         intent.setAction(ACTION_RESTORE_ALL);
-        intent.putExtra(PARAM_KEY, key);
+        intent.putExtra(PARAM_ENCRYPT_KEY, encryptKey);
         intent.putExtra(PARAM_WITH_UUID, withUuid);
         intent.putExtra(PARAM_CONTENT, jsonContent);
         intent.putExtra(PARAM_TRANSFER_KEY, transferKey);
@@ -123,7 +122,7 @@ public class BackupRestoreService extends IntentService {
             boolean withUuid = intent.getBooleanExtra(PARAM_WITH_UUID, false);
             final String action = intent.getAction();
             if (ACTION_BACKUP_ALL.equals(action)) {
-                backupAll(intent.getByteArrayExtra(PARAM_KEY),
+                backupAll(intent.getByteArrayExtra(PARAM_ENCRYPT_KEY),
                         intent.getByteArrayExtra(PARAM_TRANSFER_KEY),
                         intent.getByteArrayExtra(PARAM_TRANSFER_SALT),
                         withUuid);
@@ -132,7 +131,7 @@ public class BackupRestoreService extends IntentService {
                 restoreAll(
                         intent.getStringExtra(PARAM_CONTENT),
                         intent.getByteArrayExtra(PARAM_TRANSFER_KEY),
-                        intent.getByteArrayExtra(PARAM_KEY),
+                        intent.getByteArrayExtra(PARAM_ENCRYPT_KEY),
                         withUuid);
             }
         }
@@ -147,8 +146,7 @@ public class BackupRestoreService extends IntentService {
             Log.e("BACKUPALL", "cannot get version code", e);
         }
 
-
-        root.addProperty(JSON_DATE, new Date().toString());
+        root.addProperty(JSON_DATE, SDF.format(new Date()));
         root.addProperty(JSON_ENC, encryptKey != null);
         root.addProperty(JSON_ENC_WITH_UUID, encWithUuid);
         root.addProperty(JSON_SALT, Base64.encodeToString(transferSalt, Base64.NO_WRAP));
@@ -180,7 +178,8 @@ public class BackupRestoreService extends IntentService {
         root.addProperty(JSON_GROUPS_COUNT, groups.size());
 
 
-        NotificationHelper.createNotificationChannel(this, NotificationHelper.CHANNEL_ID_BACKUP, "Password Memorizer Backup Notifications");
+        NotificationHelper.createNotificationChannel(this,
+                NotificationHelper.CHANNEL_ID_BACKUP, getString(R.string.notification_channel_backup_title));
 
         boolean success = false;
 
@@ -204,12 +203,15 @@ public class BackupRestoreService extends IntentService {
 
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.CHANNEL_ID_BACKUP)
                         .setSmallIcon(android.R.drawable.stat_notify_sdcard)
-                        .setContentTitle("Backup ready")
-                        .setContentText("Backup file " + backupFileName + " created under Download folder.")
+                        .setContentTitle(getString(R.string.notification_backup_title))
+                        .setContentText(getString(R.string.notification_backup_message, backupFileName))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                 ;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mBuilder.addAction(new NotificationCompat.Action(android.R.drawable.stat_notify_sdcard,"open download folder", pIntent));
+                    mBuilder.addAction(
+                            new NotificationCompat.Action(
+                                    android.R.drawable.stat_notify_sdcard,
+                                    getString(R.string.notification_action_backup_done), pIntent));
                 }
                 else {
                     mBuilder.setContentIntent(pIntent);
@@ -222,7 +224,7 @@ public class BackupRestoreService extends IntentService {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getBaseContext(), "Backup file ready. You've got a notification.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), R.string.toast_backup_done, Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -239,16 +241,17 @@ public class BackupRestoreService extends IntentService {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getBaseContext(), "Cannot create backup file.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), R.string.toast_backup_failed, Toast.LENGTH_LONG).show();
                 }
             });
 
         }
     }
 
-    private void restoreAll(String content, byte[] transferKey, byte[] key, boolean withUuid) {
+    private void restoreAll(String content, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
         JsonParser parser = new JsonParser();
         JsonObject jsonContent = parser.parse(content).getAsJsonObject();
+
         boolean decWithUuid = jsonContent.get(JSON_ENC_WITH_UUID).getAsBoolean();
 
         Gson gson = new Gson();
@@ -289,11 +292,13 @@ public class BackupRestoreService extends IntentService {
 
                     existingTemplate.setPatternFromExchangeFormat(
                             otherTemplate.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
-                            key,
+                            encryptKey,
                             withUuid);
 
-                    existingTemplate.setHints(otherTemplate.getHints(transferKey, decWithUuid),
-                            key, withUuid);
+                    existingTemplate.setHints(
+                            otherTemplate.getHints(transferKey, decWithUuid),
+                            encryptKey,
+                            withUuid);
 
                     if (group != null) {
                         existingTemplate.setGroupId(group.getId());
@@ -319,11 +324,13 @@ public class BackupRestoreService extends IntentService {
 
                     existingCredential.setPatternFromExchangeFormat(
                             otherCredential.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
-                            key,
+                            encryptKey,
                             withUuid);
 
-                    existingCredential.setHints(otherCredential.getHints(transferKey, decWithUuid),
-                            key, withUuid);
+                    existingCredential.setHints(
+                            otherCredential.getHints(transferKey, decWithUuid),
+                            encryptKey,
+                            withUuid);
 
                     if (group != null) {
                         existingCredential.setGroupId(group.getId());
@@ -342,7 +349,7 @@ public class BackupRestoreService extends IntentService {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getBaseContext(), "File imported.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), R.string.toast_restore_done, Toast.LENGTH_LONG).show();
             }
         });
 

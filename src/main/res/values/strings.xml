@@ -152,18 +152,27 @@
 
 
     <string name="pref_title_backup">Backup your data</string>
-    <string name="pref_description_backup">All your pattern, templates and groups are stored in a file which can be backed up to a save store of your choice.</string>
+    <string name="pref_description_backup">All your pattern, templates and groups are stored in a file which can be backed up to a save store of your choice. You can also use this file to migrate your data to another device.</string>
     <string name="pref_title_restore">Restore your data</string>
-    <string name="pref_description_restore">You can restore all patterns, templates and groups you have previously backed up. Use this to migrate your data between devices.</string>
+    <string name="pref_description_restore">You can restore all patterns, templates and groups you have previously backed up. Use this to migrate your data between devices or to restore your data.</string>
 
     <string name="title_backup_dialog">Backup your data</string>
-    <string name="message_backup_dialog_encrypted">Enter your password to backup your data. It is important to type it correctly, otherwise the patterns will be exported in a different way.</string>
-    <string name="message_backup_dialog_encrypted_single">Your data is encrypted, please enter your password.</string>
-    <string name="message_backup_dialog_noenc">Your data is not encrypted, so the backup data will also not be encrypted.</string>
+    <string name="message_backup_dialog_encrypted">Enter your password to backup your data. This must be the same password as you encrypted your data. It is important to type it correctly, otherwise the patterns will be exported in a different way. This password is also needed to restore the backup file on any device.</string>
+    <string name="message_backup_dialog_encrypted_single">Your data is encrypted, please enter your password to backup your data. This password is also needed to restore the backup file on any device.</string>
+    <string name="message_backup_dialog_noenc">Your data is not encrypted, so the backup data will also not be encrypted. Be careful with the backup file.</string>
 
-    <string name="title_restore_dialog">Restore your data</string>
-    <string name="message_restore_dialog_encrypted">Enter your password to restore your data. It is important to type it correctly, otherwise the patterns will be restored in a different way. %1$d Patterns, %2$d Templates and %3$d Groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
-    <string name="message_restore_dialog_noenc">%1$d Patterns, %2$d Templates and %3$d Groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
-
+    <string name="title_restore_dialog">Restore backup file from %1$s</string>
+    <string name="message_restore_dialog_encrypted">Enter the password of the backup file to restore your data. It is important to type it correctly, otherwise the patterns will be restored in a different way. %1$d patterns, %2$d templates and %3$d groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
+    <string name="message_restore_dialog_noenc">%1$d patterns, %2$d templates and %3$d groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
+    <string name="notification_channel_backup_title">Password Memorizer Backup Notifications</string>
+    <string name="notification_backup_title">Backup ready</string>
+    <string name="notification_backup_message">Backup file %1$s created under download folder.</string>
+    <string name="notification_action_backup_done">Open download folder</string>
+    <string name="toast_backup_done">Backup file ready. You\'ve got a notification.</string>
+    <string name="toast_backup_failed">Cannot create backup file.</string>
+    <string name="toast_restore_done">File imported.</string>
+    <string name="toast_restore_failure">The selected file cannot be imported.</string>
+    <string name="toast_restore_nodata">This file doesn\'t contain any data.</string>
+    <string name="chooser_select_restore_file">Select a file to restore</string>
 
 </resources>

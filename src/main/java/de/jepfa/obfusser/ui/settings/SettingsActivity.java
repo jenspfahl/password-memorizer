@@ -69,6 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_EXPANDED_GROUPS = "pref_expanded_groups";
     public static final String PREF_BACKUP = "pref_backup";
     public static final String PREF_RESTORE = "pref_restore";
+
     public static final int REQUEST_CODE_RESTORE_FILE = 1001;
 
 
@@ -304,7 +305,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Intent intent = new Intent()
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT);
-            activity.startActivityForResult(Intent.createChooser(intent, "Select a file to restore"),
+            activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.chooser_select_restore_file)),
                     REQUEST_CODE_RESTORE_FILE);
 
             return false; // it is a pseudo preference
@@ -336,7 +337,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
             if (jsonContent == null) {
-                Toast.makeText(this, "The selected file cannot be imported.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.toast_restore_failure), Toast.LENGTH_LONG).show();
             }
             else {
                 LayoutInflater inflater = getLayoutInflater();
@@ -353,9 +354,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 final int credentialsCount = jsonContent.get(BackupRestoreService.JSON_CREDENTIALS_COUNT).getAsInt();
                 final int templatesCount = jsonContent.get(BackupRestoreService.JSON_TEMPLATES_COUNT).getAsInt();
                 final int groupsCount = jsonContent.get(BackupRestoreService.JSON_GROUPS_COUNT).getAsInt();
+                final String fromDate = jsonContent.get(BackupRestoreService.JSON_DATE).getAsString();
 
                 if (credentialsCount == 0 && templatesCount == 0 && groupsCount == 0) {
-                    Toast.makeText(this, "This file doesn't contain any data.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.toast_restore_nodata, Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -369,11 +371,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     secondPassword.setVisibility(View.GONE);
                 }
 
-                final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(SettingsActivity.this);
+                final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(this);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-                final AlertDialog dialog = builder.setTitle(getString(R.string.title_restore_dialog))
+                final AlertDialog dialog = builder.setTitle(getString(R.string.title_restore_dialog, fromDate))
                         .setMessage(message)
                         .setView(passwordView)
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -430,7 +432,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 }
                                 // import it
                                 BackupRestoreService.startRestoreAll(
-                                        SettingsActivity.this, fcontent,
+                                        SettingsActivity.this,
+                                        fcontent,
                                         transferKey,
                                         key,
                                         SecureActivity.SecretChecker.isEncWithUUIDEnabled(SettingsActivity.this));
@@ -785,7 +788,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class)); //TODO
+                startActivity(new Intent(getActivity(), SettingsActivity.class)); 
                 return true;
             }
             return super.onOptionsItemSelected(item);

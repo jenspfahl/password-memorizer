@@ -100,110 +100,116 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
             final Switch disturbPatternsSwitch = passwordView.findViewById(R.id.disturb_equal_patterns);
             disturbPatternsSwitch.setVisibility(View.GONE);
 
-            final boolean passwordCheckEnabled = jsonContent.get(BackupRestoreService.JSON_ENC).getAsBoolean();
-            final int credentialsCount = jsonContent.get(BackupRestoreService.JSON_CREDENTIALS_COUNT).getAsInt();
-            final int templatesCount = jsonContent.get(BackupRestoreService.JSON_TEMPLATES_COUNT).getAsInt();
-            final int groupsCount = jsonContent.get(BackupRestoreService.JSON_GROUPS_COUNT).getAsInt();
-            final String fromDate = jsonContent.get(BackupRestoreService.JSON_DATE).getAsString();
-
-            if (credentialsCount == 0 && templatesCount == 0 && groupsCount == 0) {
-                Toast.makeText(activity, R.string.toast_restore_nodata, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            String message;
-            if (passwordCheckEnabled) {
-                message = activity.getString(R.string.message_restore_dialog_encrypted, credentialsCount, templatesCount, groupsCount);
-            }
-            else {
-                message = activity.getString(R.string.message_restore_dialog_noenc, credentialsCount, templatesCount, groupsCount);
-                firstPassword.setVisibility(View.GONE);
-                secondPassword.setVisibility(View.GONE);
-            }
+            try {
+                final boolean passwordCheckEnabled = jsonContent.get(BackupRestoreService.JSON_ENC).getAsBoolean();
+                final int credentialsCount = jsonContent.get(BackupRestoreService.JSON_CREDENTIALS_COUNT).getAsInt();
+                final int templatesCount = jsonContent.get(BackupRestoreService.JSON_TEMPLATES_COUNT).getAsInt();
+                final int groupsCount = jsonContent.get(BackupRestoreService.JSON_GROUPS_COUNT).getAsInt();
+                final String fromDate = jsonContent.get(BackupRestoreService.JSON_DATE).getAsString();
 
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-
-            final AlertDialog dialog = builder.setTitle(activity.getString(R.string.title_restore_dialog, fromDate))
-                    .setMessage(message)
-                    .setView(passwordView)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                @Override
-                public void onShow(DialogInterface dialogInterface) {
-
-                    Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    buttonPositive.setOnClickListener(new View.OnClickListener() {
-
-                        @Override
-                        public void onClick(View view) {
-                            byte[] transferKey = null;
-
-                            if (passwordCheckEnabled) {
-                                char[] pwd = EncryptUtil.getCharArray(firstPassword.getText());
-                                char[] pwd2 = null;
-                                try {
-                                    if (pwd == null || pwd.length == 0) {
-                                        firstPassword.setError(activity.getString(R.string.password_required));
-                                        firstPassword.requestFocus();
-                                        return;
-                                    }
-
-                                    pwd2 = EncryptUtil.getCharArray(secondPassword.getText());
-                                    if (pwd2 == null || pwd2.length == 0) {
-                                        secondPassword.setError(activity.getString(R.string.password_confirmation_required));
-                                        secondPassword.requestFocus();
-                                        return;
-                                    }
-
-                                    if (!Arrays.equals(pwd, pwd2)) {
-                                        secondPassword.setError(activity.getString(R.string.password_not_equal));
-                                        secondPassword.requestFocus();
-                                        return;
-                                    }
-
-
-                                    String saltBase64 = fjsonContent.get(BackupRestoreService.JSON_SALT).getAsString();
-                                    if (saltBase64 != null) {
-                                        byte[] transferSalt = Base64.decode(saltBase64, Base64.NO_WRAP);
-                                        transferKey = EncryptUtil.generateKey(pwd, transferSalt);
-                                    }
-
-                                } finally {
-                                    EncryptUtil.clearPwd(pwd);
-                                    EncryptUtil.clearPwd(pwd2);
-                                }
-                            }
-                            // import it
-                            BackupRestoreService.startRestoreAll(
-                                    activity,
-                                    fcontent,
-                                    transferKey,
-                                    key,
-                                    SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
-
-
-                            dialog.dismiss();
-                        }
-                    });
-
-                    Button buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                    buttonNegative.setOnClickListener(new View.OnClickListener() {
-
-                        @Override
-                        public void onClick(View view) {
-
-                            dialog.dismiss();
-                        }
-                    });
+                if (credentialsCount == 0 && templatesCount == 0 && groupsCount == 0) {
+                    Toast.makeText(activity, R.string.toast_restore_nodata, Toast.LENGTH_LONG).show();
+                    return;
                 }
-            });
-            dialog.show();
+
+                String message;
+                if (passwordCheckEnabled) {
+                    message = activity.getString(R.string.message_restore_dialog_encrypted, credentialsCount, templatesCount, groupsCount);
+                }
+                else {
+                    message = activity.getString(R.string.message_restore_dialog_noenc, credentialsCount, templatesCount, groupsCount);
+                    firstPassword.setVisibility(View.GONE);
+                    secondPassword.setVisibility(View.GONE);
+                }
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+
+                final AlertDialog dialog = builder.setTitle(activity.getString(R.string.title_restore_dialog, fromDate))
+                        .setMessage(message)
+                        .setView(passwordView)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .create();
+
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                    @Override
+                    public void onShow(DialogInterface dialogInterface) {
+
+                        Button buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        buttonPositive.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                byte[] transferKey = null;
+
+                                if (passwordCheckEnabled) {
+                                    char[] pwd = EncryptUtil.getCharArray(firstPassword.getText());
+                                    char[] pwd2 = null;
+                                    try {
+                                        if (pwd == null || pwd.length == 0) {
+                                            firstPassword.setError(activity.getString(R.string.password_required));
+                                            firstPassword.requestFocus();
+                                            return;
+                                        }
+
+                                        pwd2 = EncryptUtil.getCharArray(secondPassword.getText());
+                                        if (pwd2 == null || pwd2.length == 0) {
+                                            secondPassword.setError(activity.getString(R.string.password_confirmation_required));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+
+                                        if (!Arrays.equals(pwd, pwd2)) {
+                                            secondPassword.setError(activity.getString(R.string.password_not_equal));
+                                            secondPassword.requestFocus();
+                                            return;
+                                        }
+
+
+                                        String saltBase64 = fjsonContent.get(BackupRestoreService.JSON_SALT).getAsString();
+                                        if (saltBase64 != null) {
+                                            byte[] transferSalt = Base64.decode(saltBase64, Base64.NO_WRAP);
+                                            transferKey = EncryptUtil.generateKey(pwd, transferSalt);
+                                        }
+
+                                    } finally {
+                                        EncryptUtil.clearPwd(pwd);
+                                        EncryptUtil.clearPwd(pwd2);
+                                    }
+                                }
+                                // import it
+                                BackupRestoreService.startRestoreAll(
+                                        activity,
+                                        fcontent,
+                                        transferKey,
+                                        key,
+                                        SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
+
+
+                                dialog.dismiss();
+                            }
+                        });
+
+                        Button buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                        buttonNegative.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                });
+                dialog.show();
+            } catch (Exception e) {
+                Log.e("RESTORE", "cannot read metadata for " + selectedFile, e);
+                Toast.makeText(activity, activity.getString(R.string.toast_restore_failure), Toast.LENGTH_LONG).show();
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -166,8 +167,8 @@ public class BackupRestoreService extends IntentService {
         List<Template> templates = templateRepo.getAllTemplatesSync();
         for (Template template : templates) {
             if (encryptKey != null) {
-                template.encrypt(encryptKey, encWithUuid);
-                template.decrypt(transferKey, encWithUuid);
+                template.decrypt(encryptKey, encWithUuid);
+                template.encrypt(transferKey, encWithUuid);
             }
         }
         root.add(JSON_TEMPLATES, gson.toJsonTree(templates, TEMPLATES_TYPE));
@@ -196,6 +197,8 @@ public class BackupRestoreService extends IntentService {
                 }
 
                 Log.i("BACKUP", "to file " + backupFile);
+                MediaScannerConnection.scanFile(this, new String[] {backupFile.toString()}, new String[] {"text/json"}, null);
+
 
                 Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
                 PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -311,6 +314,7 @@ public class BackupRestoreService extends IntentService {
                 otherTemplate.setGroupId(group.getId());
             }
             otherTemplate.unsetId();
+            otherTemplate.encrypt(encryptKey, withUuid);
             templateRepo.insert(otherTemplate);
         }
 
@@ -343,6 +347,7 @@ public class BackupRestoreService extends IntentService {
                 otherCredential.setGroupId(group.getId());
             }
             otherCredential.unsetId();
+            otherCredential.encrypt(encryptKey, withUuid);
             credentialRepo.insert(otherCredential);
         }
 

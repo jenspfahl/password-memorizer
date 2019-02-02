@@ -1,17 +1,17 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="de.jepfa.obfusser.ui.settings.fragments.GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$SecurityPreferenceFragment"
+        android:fragment="de.jepfa.obfusser.ui.settings.fragments.SecurityPreferenceFragment"
         android:icon="@drawable/ic_security_black_24dp"
         android:title="@string/pref_header_security" />
 
     <header
-        android:fragment="de.jepfa.obfusser.ui.settings.SettingsActivity$BackupRestorePreferenceFragment"
+        android:fragment="de.jepfa.obfusser.ui.settings.fragments.BackupRestorePreferenceFragment"
         android:icon="@drawable/ic_import_export_black_24dp"
         android:title="@string/pref_header_backuprestore" />
 

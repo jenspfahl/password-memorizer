@@ -77,12 +77,20 @@ public class EncryptUtil {
     static final Loop<HintChar> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
 
 
+    /**
+     * Does AES encryption for the given data. Uses the alias to provide a save encryption key managed by Android.
+     * Only supported for Android M and greater.
+     *
+     * @param alias
+     * @param data
+     * @return a Pair containing first the init vector and second the encrypted data or null in case off error
+     */
     @TargetApi(Build.VERSION_CODES.M)
     public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
         try {
             final Cipher cipher = Cipher.getInstance(CIPHER_AES);
-            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(alias));
+            cipher.init(Cipher.ENCRYPT_MODE, getAndroidSecretKey(alias));
 
             return new Pair<>(cipher.getIV(), cipher.doFinal(data));
         } catch (Exception e) {
@@ -92,6 +100,14 @@ public class EncryptUtil {
     }
 
 
+    /**
+     * Does AES decryption for the given init vector and data. Uses the alias to provide a save encryption key managed by Android.
+     * Only supported for Android M and greater.
+     *
+     * @param alias
+     * @param encryptedIvAndData
+     * @return the decrypted data or null in case off error
+     */
     @TargetApi(Build.VERSION_CODES.M)
     public static byte[] decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
 
@@ -114,39 +130,18 @@ public class EncryptUtil {
     }
 
 
-    /**
-     * Returns null if not target api
-     * @param alias
-     * @return
-     * @throws Exception
-     */
-    @TargetApi(Build.VERSION_CODES.M)
-    private static SecretKey getSecretKey(final String alias) throws Exception {
-
-        KeyGenerator keyGenerator;
-        if (isPasswdEncryptionSupported()) {
-            keyGenerator = KeyGenerator
-                    .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
-
-            keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
-                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .build());
-
-            return keyGenerator.generateKey();
-        }
-
-        return null;
-    }
-
     public static boolean isPasswdEncryptionSupported() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
+    /**
+     * clear passwd in memory
+     *
+     * @param pwd
+     */
     public static void clearPwd(char[] pwd) {
         if (pwd != null) {
-            Arrays.fill(pwd, (char) 0); // clear passwd in memory
+            Arrays.fill(pwd, (char) 0);
         }
     }
 
@@ -175,10 +170,16 @@ public class EncryptUtil {
         return null;
     }
 
-    public static byte[] fastHash(byte[] key, byte[] salt) {
+    /**
+     * Hashes (SHA-512) the given data with the given salt.
+     * @param data
+     * @param salt
+     * @return
+     */
+    public static byte[] fastHash(byte[] data, byte[] salt) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
-            messageDigest.update(key);
+            messageDigest.update(data);
             if (salt != null) {
                 messageDigest.update(salt);
             }
@@ -192,23 +193,19 @@ public class EncryptUtil {
         return null;
     }
 
-    public static byte[] genUUIDKey(byte[] key, String uuid) {
+    /**
+     * Generates a unique single key for the given general key and the uuid.
+     *
+     * @param key
+     * @param uuid
+     * @return
+     */
+    public static byte[] generateUuidKey(byte[] key, String uuid) {
         if (uuid == null) {
             return key;
         }
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
-            messageDigest.update(key);
-            byte[] input = uuid.getBytes();
-            messageDigest.update(input);
-            byte[] digest = messageDigest.digest();
-            //Log.d("INK", Arrays.toString(digest));
-            return digest;
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("INK", "Programming error", e);
-        }
-
-        return null;
+        byte[] salt = uuid.getBytes();
+        return fastHash(key, salt);
     }
 
 
@@ -245,6 +242,7 @@ public class EncryptUtil {
     }
 
     /**
+     * Encrypts hint data by using the given index and the key to do this as obfuscating as possible.
      *
      * @param s
      * @param index the encrypted index if possible
@@ -257,7 +255,7 @@ public class EncryptUtil {
 //            Log.e("DEC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
             for (int i = 0; i < s.length() && i < key.length; i++) {
                 char c = s.charAt(i);
-                int b = key[(index + i) % key.length];
+                int b = key[(index + i) % key.length]; // ensure legal index
 
                 EncryptedHintChar encryptedHintChar = EncryptedHintChar.ofDecrypted(c);
                 if (LOOP_ENCRYPT_CHARS.applies(encryptedHintChar)) {
@@ -276,6 +274,7 @@ public class EncryptUtil {
     }
 
     /**
+     * Decrypts encrypted hint data by using the given index and the key to do this as obfuscating as possible.
      *
      * @param s
      * @param index the encrypted index if possible
@@ -288,7 +287,7 @@ public class EncryptUtil {
 //            Log.e("ENC_CHAR", "s=" + s +" index=" + index + " key=" + Arrays.toString(key));
             for (int i = 0; i < s.length() / 2 && i < key.length; i++) {
                 String decHint = s.substring(i * 2, i * 2 + 2);
-                int b = key[(index + i) % key.length];
+                int b = key[(index + i) % key.length]; // ensure legal index
                 EncryptedHintChar decryptedHint = EncryptedHintChar.ofEncrypted(decHint);
 
                 if (LOOP_ENCRYPT_CHARS.applies(decryptedHint)) {
@@ -305,6 +304,14 @@ public class EncryptUtil {
         return s;
     }
 
+    /**
+     * Encrypts the given index by using the current pattern length and a key.
+     *
+     * @param index
+     * @param patternLength
+     * @param key
+     * @return
+     */
     public static int encryptIndex(int index, int patternLength, byte[] key) {
         if (key == null) {
             return index;
@@ -314,6 +321,14 @@ public class EncryptUtil {
         return (index + k) % patternLength;
     }
 
+    /**
+     * Decrypts the given encrypted index by using the current pattern length and a key.
+     *
+     * @param index
+     * @param patternLength
+     * @param key
+     * @return
+     */
     public static int decryptIndex(int index, int patternLength, byte[] key) {
         if (key == null) {
             return index;
@@ -352,6 +367,33 @@ public class EncryptUtil {
         double i = zeroBased / BYTE_COUNT;
 
         return left <= i && i < right;
+    }
+
+
+    /**
+     * Returns null if not target api
+     * @param alias
+     * @return
+     * @throws Exception
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    private static SecretKey getAndroidSecretKey(final String alias) throws Exception {
+
+        KeyGenerator keyGenerator;
+        if (isPasswdEncryptionSupported()) {
+            keyGenerator = KeyGenerator
+                    .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+
+            keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
+                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .build());
+
+            return keyGenerator.generateKey();
+        }
+
+        return null;
     }
 
 }

@@ -41,7 +41,7 @@ import de.jepfa.obfusser.repository.credential.CredentialRepository;
 import de.jepfa.obfusser.repository.group.GroupRepository;
 import de.jepfa.obfusser.repository.template.TemplateRepository;
 import de.jepfa.obfusser.ui.common.NotificationHelper;
-import de.jepfa.obfusser.util.encrypt.FileUtil;
+import de.jepfa.obfusser.util.FileUtil;
 
 /**
  * Service to backup and restore all {@link Credential}s, {@link Template}s anf {@link de.jepfa.obfusser.model.Group}s.

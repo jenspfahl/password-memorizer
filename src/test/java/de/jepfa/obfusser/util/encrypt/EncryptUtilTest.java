@@ -1,8 +1,6 @@
 package de.jepfa.obfusser.util.encrypt;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
-import android.text.TextUtils;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -12,11 +10,9 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import de.jepfa.obfusser.model.Credential;
@@ -182,7 +178,7 @@ public class EncryptUtilTest {
 
             byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), salt);
 
-            byte[] indexKey = EncryptUtil.genUUIDKey(key, String.valueOf(i));
+            byte[] indexKey = EncryptUtil.generateUuidKey(key, String.valueOf(i));
             System.out.println("key(" + i + ")=" + Arrays.toString(key));
             System.out.println("ink(" + i + ")=" + Arrays.toString(indexKey));
 

@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util.encrypt;
+package de.jepfa.obfusser.util;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -12,6 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
+/**
+ * Utils to work with files.
+ *
+ * @author Jens Pfahl
+ */
 public class FileUtil {
 
     /** Checks if external storage is available for read and write */

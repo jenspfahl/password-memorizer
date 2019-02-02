@@ -170,7 +170,7 @@
     <string name="notification_action_backup_done">Open download folder</string>
     <string name="toast_backup_done">Backup file ready. You\'ve got a notification.</string>
     <string name="toast_backup_failed">Cannot create backup file.</string>
-    <string name="toast_restore_done">File imported.</string>
+    <string name="toast_restore_done">Backup file successfully imported.</string>
     <string name="toast_restore_failure">The selected file cannot be imported.</string>
     <string name="toast_restore_nodata">This file doesn\'t contain any data.</string>
     <string name="chooser_select_restore_file">Select a file to restore</string>

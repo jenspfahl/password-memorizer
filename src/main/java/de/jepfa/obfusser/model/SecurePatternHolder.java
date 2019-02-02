@@ -8,9 +8,7 @@ import android.support.v4.util.Pair;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -296,7 +294,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (!doit) {
             return secret;
         }
-        return EncryptUtil.genUUIDKey(secret, getUuid());
+        return EncryptUtil.generateUuidKey(secret, getUuid());
     }
 
 

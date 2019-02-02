@@ -174,5 +174,6 @@
     <string name="toast_restore_failure">The selected file cannot be imported.</string>
     <string name="toast_restore_nodata">This file doesn\'t contain any data.</string>
     <string name="chooser_select_restore_file">Select a file to restore</string>
+    <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have input your password.</string>
 
 </resources>

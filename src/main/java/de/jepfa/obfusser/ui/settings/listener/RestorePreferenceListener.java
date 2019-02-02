@@ -21,6 +21,7 @@ import com.google.gson.JsonParser;
 import java.util.Arrays;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.BackupRestoreService;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.PermissionChecker;
@@ -41,13 +42,19 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
     @Override
     public boolean onPreferenceClick(final Preference preference) {
 
+        final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(activity);
+        if (key == Secret.INVALID_DIGEST) {
+            Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         PermissionChecker.verifyReadStoragePermissions(activity);
 
         Intent intent = new Intent()
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT);
-        activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.chooser_select_restore_file)),
-                REQUEST_CODE_RESTORE_FILE);
+        Intent chooserIntent = Intent.createChooser(intent, activity.getString(R.string.chooser_select_restore_file));
+        activity.startActivityForResult(chooserIntent, REQUEST_CODE_RESTORE_FILE);
 
         return false; // it is a pseudo preference
     }
@@ -55,6 +62,11 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
     public static void doRestoreProcess(final Activity activity, Intent data) {
 
         Uri selectedFile = data.getData();
+        final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(activity);
+        if (key == Secret.INVALID_DIGEST) {
+            Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG).show();
+            return;
+        }
 
         String content = null;
         JsonObject jsonContent = null;
@@ -109,7 +121,6 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
                 secondPassword.setVisibility(View.GONE);
             }
 
-            final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(activity);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 

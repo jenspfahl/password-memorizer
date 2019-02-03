@@ -2,6 +2,8 @@ package de.jepfa.obfusser.ui.settings.listener;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +24,8 @@ import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 public class BackupPreferenceListener implements Preference.OnPreferenceClickListener {
 
+    public static final int REQUEST_CODE_BACKUP_FILE = 1001;
+
     private final Activity activity;
 
     public BackupPreferenceListener(Activity activity) {
@@ -32,6 +36,24 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
     public boolean onPreferenceClick(final Preference preference) {
 
         PermissionChecker.verifyRWStoragePermissions(activity);
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+        // Filter to only show results that can be "opened", such as
+        // a file (as opposed to a list of contacts or timezones).
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // Create a file with the requested MIME type.
+        intent.setType("text/json");
+        intent.putExtra(Intent.EXTRA_TITLE, BackupRestoreService.getBackupFileName());
+        activity.startActivityForResult(Intent.createChooser(intent, "Save as"), REQUEST_CODE_BACKUP_FILE);
+
+        return false; // it is a pseudo preference
+    }
+
+
+    public static void doBackupProcess(final Activity activity, Intent data) {
+        final Uri uri = data.getData();
 
         LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -61,7 +83,7 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
             secondPassword.setVisibility(View.GONE);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         final AlertDialog dialog = builder.setTitle(activity.getString(R.string.title_backup_dialog))
                 .setMessage(message)
@@ -111,7 +133,7 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
                                 }
 
 
-                                byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(preference.getContext());
+                                byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(activity);
                                 key = EncryptUtil.generateKey(pwd, applicationSalt);
 
                                 if (!SecureActivity.SecretChecker.isPasswordValid(pwd, activity, applicationSalt)) {
@@ -129,8 +151,8 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
                             }
                         }
                         // export it
-                        BackupRestoreService.startBackupAll(preference.getContext(), key,
-                                transferKey, transferSalt,
+                        BackupRestoreService.startBackupAll(activity,
+                                uri, key, transferKey, transferSalt,
                                 SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
 
 
@@ -151,6 +173,5 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
         });
         dialog.show();
 
-        return false; // it is a pseudo preference
     }
 }

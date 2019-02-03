@@ -31,7 +31,7 @@ import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
 public class RestorePreferenceListener implements Preference.OnPreferenceClickListener {
 
-    public static final int REQUEST_CODE_RESTORE_FILE = 1001;
+    public static final int REQUEST_CODE_RESTORE_FILE = 1002;
 
     private final Activity activity;
 

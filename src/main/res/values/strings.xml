@@ -167,8 +167,8 @@
     <string name="notification_channel_backup_title">Password Memorizer Backup Notifications</string>
     <string name="notification_backup_title">Backup ready</string>
     <string name="notification_backup_message">Backup file %1$s created under download folder.</string>
-    <string name="notification_action_backup_done">Open download folder</string>
-    <string name="toast_backup_done">Backup file ready. You\'ve got a notification.</string>
+    <string name="notification_action_backup_done">Open folder</string>
+    <string name="toast_backup_done">Backup file ready.</string>
     <string name="toast_backup_failed">Cannot create backup file.</string>
     <string name="toast_restore_done">Backup file successfully imported.</string>
     <string name="toast_restore_failure">The selected file cannot be imported.</string>

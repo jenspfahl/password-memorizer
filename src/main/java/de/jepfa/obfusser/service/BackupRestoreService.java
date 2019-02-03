@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
@@ -55,6 +57,7 @@ public class BackupRestoreService extends IntentService {
 
     private static final String ACTION_BACKUP_ALL = "de.jepfa.obfusser.service.action.backup_all";
     private static final String ACTION_RESTORE_ALL = "de.jepfa.obfusser.service.action.restore_all";
+    private static final String PARAM_FILE_URI = "de.jepfa.obfusser.service.param.file_uri";
     private static final String PARAM_ENCRYPT_KEY = "de.jepfa.obfusser.service.param.encryptkey";
     private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
     private static final String PARAM_TRANSFER_KEY = "de.jepfa.obfusser.service.param.transferkey";
@@ -77,6 +80,7 @@ public class BackupRestoreService extends IntentService {
     public static final Type CREDENTIALS_TYPE = new TypeToken<List<Credential>>(){}.getType();
     public static final Type TEMPLATES_TYPE = new TypeToken<List<Template>>(){}.getType();
     public static final Type GROUPS_TYPE = new TypeToken<List<Group>>(){}.getType();
+    public static final String MIME_TYPE_JSON = "text/json";
 
 
     private final CredentialRepository credentialRepo;
@@ -97,9 +101,10 @@ public class BackupRestoreService extends IntentService {
     }
 
 
-    public static void startBackupAll(Context context, byte[] encryptKey, byte[] transferKey, byte[] transferSalt, boolean withUuid) {
+    public static void startBackupAll(Context context, Uri fileUri, byte[] encryptKey, byte[] transferKey, byte[] transferSalt, boolean withUuid) {
         Intent intent = new Intent(context, BackupRestoreService.class);
         intent.setAction(ACTION_BACKUP_ALL);
+        intent.putExtra(PARAM_FILE_URI, fileUri);
         intent.putExtra(PARAM_ENCRYPT_KEY, encryptKey);
         intent.putExtra(PARAM_TRANSFER_KEY, transferKey);
         intent.putExtra(PARAM_TRANSFER_SALT, transferSalt);
@@ -123,7 +128,9 @@ public class BackupRestoreService extends IntentService {
             boolean withUuid = intent.getBooleanExtra(PARAM_WITH_UUID, false);
             final String action = intent.getAction();
             if (ACTION_BACKUP_ALL.equals(action)) {
-                backupAll(intent.getByteArrayExtra(PARAM_ENCRYPT_KEY),
+                backupAll(
+                        (Uri)intent.getParcelableExtra(PARAM_FILE_URI),
+                        intent.getByteArrayExtra(PARAM_ENCRYPT_KEY),
                         intent.getByteArrayExtra(PARAM_TRANSFER_KEY),
                         intent.getByteArrayExtra(PARAM_TRANSFER_SALT),
                         withUuid);
@@ -138,7 +145,7 @@ public class BackupRestoreService extends IntentService {
         }
     }
 
-    private void backupAll(byte[] encryptKey, byte[] transferKey, byte[] transferSalt, boolean encWithUuid) {
+    private void backupAll(Uri fileUri, byte[] encryptKey, byte[] transferKey, byte[] transferSalt, boolean encWithUuid) {
         JsonObject root = new JsonObject();
         try {
             PackageInfo pInfo = getApplication().getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
@@ -185,31 +192,27 @@ public class BackupRestoreService extends IntentService {
         boolean success = false;
 
         if (FileUtil.isExternalStorageWritable()) {
-            String backupFileName = BACKUP_FILE_BASE + System.currentTimeMillis() + ".json";
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File backupFile = new File(path, backupFileName);
 
-            try {
-                backupFile.createNewFile();
+            success = FileUtil.writeFile(this, fileUri, root.toString());
 
-                try (FileWriter file = new FileWriter(backupFile)) {
-                    file.write(root.toString());
-                }
+            if (success) {
+                String fileName = FileUtil.getFileName(this, fileUri);
 
-                Log.i("BACKUP", "to file " + backupFile);
-                MediaScannerConnection.scanFile(this, new String[] {backupFile.toString()}, new String[] {"text/json"}, null);
+                Log.e("BACKUP", "to file " + fileName);
+                //MediaScannerConnection.scanFile(this, new String[] {fileUri.getPath()}, new String[] {MIME_TYPE_JSON}, null);
 
-
-                Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-                PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setData(fileUri); //TODO this doesnt work
+                PendingIntent pIntent = PendingIntent.getActivity(this, 0,
+                        Intent.createChooser(intent, getString(R.string.notification_action_backup_done)), 0);
 
 
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.CHANNEL_ID_BACKUP)
                         .setSmallIcon(android.R.drawable.stat_notify_sdcard)
                         .setContentTitle(getString(R.string.notification_backup_title))
-                        .setContentText(getString(R.string.notification_backup_message, backupFileName))
+                        .setContentText(getString(R.string.notification_backup_message, fileName))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                ;
+                /* TODO doesnt work
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     mBuilder.addAction(
                             new NotificationCompat.Action(
@@ -218,7 +221,7 @@ public class BackupRestoreService extends IntentService {
                 }
                 else {
                     mBuilder.setContentIntent(pIntent);
-                }
+                }*/
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
                 notificationManager.notify(NotificationHelper.NOTIFICATION_ID_BACKUP_SUCCESS, mBuilder.build());
 
@@ -231,9 +234,6 @@ public class BackupRestoreService extends IntentService {
                     }
                 });
 
-
-            } catch (IOException e) {
-                Log.e("BACKUP", "cannot write to file " + backupFile, e);
             }
         }
 
@@ -249,6 +249,11 @@ public class BackupRestoreService extends IntentService {
             });
 
         }
+    }
+
+    @NonNull
+    public static String getBackupFileName() {
+        return BACKUP_FILE_BASE + System.currentTimeMillis() + ".json";
     }
 
     private void restoreAll(String content, byte[] transferKey, byte[] encryptKey, boolean withUuid) {

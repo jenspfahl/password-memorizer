@@ -14,6 +14,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.ui.settings.fragments.PreferenceFragmentBase;
+import de.jepfa.obfusser.ui.settings.listener.BackupPreferenceListener;
 import de.jepfa.obfusser.ui.settings.listener.RestorePreferenceListener;
 
 /**
@@ -43,8 +44,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RestorePreferenceListener.REQUEST_CODE_RESTORE_FILE && resultCode == RESULT_OK) {
-            RestorePreferenceListener.doRestoreProcess(this, data);
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case BackupPreferenceListener.REQUEST_CODE_BACKUP_FILE:
+                    BackupPreferenceListener.doBackupProcess(this, data);
+                    break;
+                case RestorePreferenceListener.REQUEST_CODE_RESTORE_FILE:
+                    RestorePreferenceListener.doRestoreProcess(this, data);
+                    break;
+            }
         }
     }
 

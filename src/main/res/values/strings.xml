@@ -166,7 +166,7 @@
     <string name="message_restore_dialog_noenc">%1$d patterns, %2$d templates and %3$d groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
     <string name="notification_channel_backup_title">Password Memorizer Backup Notifications</string>
     <string name="notification_backup_title">Backup ready</string>
-    <string name="notification_backup_message">Backup file %1$s created under download folder.</string>
+    <string name="notification_backup_message">Backup file %1$s created.</string>
     <string name="notification_action_backup_done">Open folder</string>
     <string name="toast_backup_done">Backup file ready.</string>
     <string name="toast_backup_failed">Cannot create backup file.</string>

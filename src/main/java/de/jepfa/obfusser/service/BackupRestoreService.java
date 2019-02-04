@@ -319,6 +319,7 @@ public class BackupRestoreService extends IntentService {
                 otherTemplate.setGroupId(group.getId());
             }
             otherTemplate.unsetId();
+            otherTemplate.decrypt(transferKey, decWithUuid);
             otherTemplate.encrypt(encryptKey, withUuid);
             templateRepo.insert(otherTemplate);
         }
@@ -352,6 +353,7 @@ public class BackupRestoreService extends IntentService {
                 otherCredential.setGroupId(group.getId());
             }
             otherCredential.unsetId();
+            otherCredential.decrypt(transferKey, decWithUuid);
             otherCredential.encrypt(encryptKey, withUuid);
             credentialRepo.insert(otherCredential);
         }

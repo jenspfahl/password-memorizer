@@ -41,6 +41,13 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
                 SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
         NumberedPlaceholder numberedPlaceholder = NumberedPlaceholder.fromPlaceholderNumber(position + 1);
         holder.placeholder.setText(numberedPlaceholder.toRepresentation());
+        holder.placeholder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.hint.setSelection(0, holder.hint.getText().length());
+                holder.hint.requestFocus();
+            }
+        });
         holder.hint.setText(holder.hintData.second != null ? holder.hintData.second : "");
 
         if (holder.hint instanceof EditText) {
@@ -74,7 +81,7 @@ public class TemplateHintRecyclerViewAdapter extends RecyclerView.Adapter<Templa
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView placeholder;
-        public final TextView hint;
+        public final EditText hint;
         public Pair<Integer,String> hintData;
 
         public ViewHolder(View view) {

@@ -273,7 +273,7 @@ public class BackupRestoreService extends IntentService {
         JsonArray jsonGroups = jsonContent.get(JSON_GROUPS).getAsJsonArray();
         List<Group> otherGroups = gson.fromJson(jsonGroups, GROUPS_TYPE);
 
-        Map<Integer, Group> groupIdMap = new HashMap<>();
+        Map<Integer, Group> otherGroupToExistingMap = new HashMap<>();
 
         List<Group> existingGroups = groupRepo.getAllGroupsSync();
         outer: for (Group otherGroup : otherGroups) {
@@ -282,21 +282,22 @@ public class BackupRestoreService extends IntentService {
                     existingGroup.setInfo(otherGroup.getInfo());
                     existingGroup.setColor(otherGroup.getColor());
                     groupRepo.update(existingGroup);
-                    groupIdMap.put(otherGroup.getId(), existingGroup);
+                    otherGroupToExistingMap.put(otherGroup.getId(), existingGroup);
                     continue outer;
                 }
             }
             otherGroup.unsetId();
             groupRepo.insertSync(otherGroup);
-            groupIdMap.put(otherGroup.getId(), otherGroup);
+            otherGroupToExistingMap.put(otherGroup.getId(), otherGroup);
         }
 
         List<Template> existingTemplates = templateRepo.getAllTemplatesSync();
         outer: for (Template otherTemplate : otherTemplates) {
-            Group group = groupIdMap.get(otherTemplate.getGroupId());
+            Group existingGroup = otherGroupToExistingMap.get(otherTemplate.getGroupId());
             for (Template existingTemplate : existingTemplates) {
                 if (existingTemplate.getName().equals(otherTemplate.getName())) {
                     existingTemplate.setInfo(otherTemplate.getInfo());
+                    existingTemplate.setGroupId(otherTemplate.getGroupId());
 
                     existingTemplate.setPatternFromExchangeFormat(
                             otherTemplate.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
@@ -308,15 +309,15 @@ public class BackupRestoreService extends IntentService {
                             encryptKey,
                             withUuid);
 
-                    if (group != null) {
-                        existingTemplate.setGroupId(group.getId());
+                    if (existingGroup != null) {
+                        existingTemplate.setGroupId(existingGroup.getId());
                     }
                     templateRepo.update(existingTemplate);
                     continue outer;
                 }
             }
-            if (group != null) {
-                otherTemplate.setGroupId(group.getId());
+            if (existingGroup != null) {
+                otherTemplate.setGroupId(existingGroup.getId());
             }
             otherTemplate.unsetId();
             otherTemplate.decrypt(transferKey, decWithUuid);
@@ -326,10 +327,11 @@ public class BackupRestoreService extends IntentService {
 
         List<Credential> existingCredentials = credentialRepo.getAllCredentialsSync();
         outer: for (Credential otherCredential : otherCredentials) {
-            Group group = groupIdMap.get(otherCredential.getGroupId());
+            Group existingGroup = otherGroupToExistingMap.get(otherCredential.getGroupId());
             for (Credential existingCredential : existingCredentials) {
                 if (existingCredential.getName().equals(otherCredential.getName())) {
                     existingCredential.setInfo(otherCredential.getInfo());
+                    existingCredential.setGroupId(otherCredential.getGroupId());
                     existingCredential.setTemplateId(otherCredential.getTemplateId());
 
                     existingCredential.setPatternFromExchangeFormat(
@@ -342,15 +344,15 @@ public class BackupRestoreService extends IntentService {
                             encryptKey,
                             withUuid);
 
-                    if (group != null) {
-                        existingCredential.setGroupId(group.getId());
+                    if (existingGroup != null) {
+                        existingCredential.setGroupId(existingGroup.getId());
                     }
                     credentialRepo.update(existingCredential);
                     continue outer;
                 }
             }
-            if (group != null) {
-                otherCredential.setGroupId(group.getId());
+            if (existingGroup != null) {
+                otherCredential.setGroupId(existingGroup.getId());
             }
             otherCredential.unsetId();
             otherCredential.decrypt(transferKey, decWithUuid);

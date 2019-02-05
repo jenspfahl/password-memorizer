@@ -54,4 +54,14 @@ public class Group extends IdEntity {
         this.color = color;
     }
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Group{");
+        sb.append("id=").append(getId());
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", info='").append(info).append('\'');
+        sb.append(", color=").append(color);
+        sb.append('}');
+        return sb.toString();
+    }
 }

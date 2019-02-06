@@ -1,16 +1,12 @@
 package de.jepfa.obfusser.service;
 
-import android.app.DownloadManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -25,9 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -53,7 +46,8 @@ import de.jepfa.obfusser.util.FileUtil;
  */
 public class BackupRestoreService extends IntentService {
 
-    private static final DateFormat SDF = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM);
+    private static final DateFormat SDF_INFO = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM);
+    private static final DateFormat SDF_FILE = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final String ACTION_BACKUP_ALL = "de.jepfa.obfusser.service.action.backup_all";
     private static final String ACTION_RESTORE_ALL = "de.jepfa.obfusser.service.action.restore_all";
@@ -64,9 +58,10 @@ public class BackupRestoreService extends IntentService {
     private static final String PARAM_TRANSFER_SALT = "de.jepfa.obfusser.service.param.transfersalt";
     private static final String PARAM_CONTENT = "de.jepfa.obfusser.service.param.content";
 
-    public static final String BACKUP_FILE_BASE = "password-memorizer-data-";
+    public static final String BACKUP_FILE_BASE = "password-memorizer-";
 
-    public static final String JSON_APP_VERSION = "appVersion";
+    public static final String JSON_APP_VERSIONCODE = "appVersionCode";
+    public static final String JSON_APP_VERSIONNAME = "appVersionName";
     public static final String JSON_DATE = "date";
     public static final String JSON_ENC = "enc";
     public static final String JSON_ENC_WITH_UUID = "encWithUuid";
@@ -149,12 +144,13 @@ public class BackupRestoreService extends IntentService {
         JsonObject root = new JsonObject();
         try {
             PackageInfo pInfo = getApplication().getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
-            root.addProperty(JSON_APP_VERSION, pInfo.versionCode);
+            root.addProperty(JSON_APP_VERSIONCODE, pInfo.versionCode);
+            root.addProperty(JSON_APP_VERSIONNAME, pInfo.versionName);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("BACKUPALL", "cannot get version code", e);
         }
 
-        root.addProperty(JSON_DATE, SDF.format(new Date()));
+        root.addProperty(JSON_DATE, SDF_INFO.format(new Date()));
         root.addProperty(JSON_ENC, encryptKey != null);
         root.addProperty(JSON_ENC_WITH_UUID, encWithUuid);
         root.addProperty(JSON_SALT, Base64.encodeToString(transferSalt, Base64.NO_WRAP));
@@ -208,7 +204,7 @@ public class BackupRestoreService extends IntentService {
 
 
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.CHANNEL_ID_BACKUP)
-                        .setSmallIcon(android.R.drawable.stat_notify_sdcard)
+                        .setSmallIcon(R.drawable.ic_notif_obfusser)
                         .setContentTitle(getString(R.string.notification_backup_title))
                         .setContentText(getString(R.string.notification_backup_message, fileName))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
@@ -237,8 +233,6 @@ public class BackupRestoreService extends IntentService {
             }
         }
 
-
-
         if (!success) {
 
             handler.post(new Runnable() {
@@ -253,7 +247,7 @@ public class BackupRestoreService extends IntentService {
 
     @NonNull
     public static String getBackupFileName() {
-        return BACKUP_FILE_BASE + System.currentTimeMillis() + ".json";
+        return BACKUP_FILE_BASE + SDF_FILE.format(new Date()) + ".json";
     }
 
     private void restoreAll(String content, byte[] transferKey, byte[] encryptKey, boolean withUuid) {

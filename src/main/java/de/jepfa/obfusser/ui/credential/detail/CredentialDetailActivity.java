@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
@@ -41,10 +43,24 @@ public class CredentialDetailActivity extends SecureActivity {
                 .of(this)
                 .get(GroupListViewModel.class);
 
-        Toolbar toolbar = findViewById(R.id.activity_credential_detail_toolbar);
+        final Toolbar toolbar = findViewById(R.id.activity_credential_detail_toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("");
+
+
+        final View titleLayout = findViewById(R.id.collapsing_toolbar_layout_title);
+        final TextView subText = findViewById(R.id.collapsing_toolbar_layout_title_subtext);
+        titleLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                CollapsingToolbarLayout.LayoutParams layoutParams = (CollapsingToolbarLayout.LayoutParams) toolbar.getLayoutParams();
+                layoutParams.height = titleLayout.getHeight();
+                toolbar.setLayoutParams(layoutParams);
+            }
+        });
 
         final CollapsingToolbarLayout appBarLayout = findViewById(R.id.credential_detail_toolbar_layout);
+
         if (appBarLayout != null) {
             StringBuilder sb = new StringBuilder(credential.getName());
             groupListViewModel
@@ -55,7 +71,7 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                appBarLayout.setTitle(credential.getName() + " (" + group.getName() + ")");
+                                subText.setText(group.getName());
                             }
                         }
                     });

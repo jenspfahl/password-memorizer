@@ -48,7 +48,7 @@
     <string name="title_groups">Categories</string>
     <string name="title_change_group">Change Category</string>
 
-    <string name="title_assign_group">Categorize for</string>
+    <string name="title_assign_group">Categorize </string>
 
     <string name="button_create_group">Create Category</string>
     <string name="button_change_group">Update Category</string>

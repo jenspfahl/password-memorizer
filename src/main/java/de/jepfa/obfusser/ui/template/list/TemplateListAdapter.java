@@ -16,10 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.common.ObfusTextAdjuster;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -112,22 +110,22 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
         if (templates != null || !templates.isEmpty()) {
             holder.nameView.setText(templates.get(position).getName());
 
-            boolean showPattern = PreferenceManager
+            boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(activity)
-                    .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+                    .getBoolean(SettingsActivity.PREF_HIDE_PATTERN_IN_OVERVIEW, false);
 
-            if (showPattern) {
+            if (hidePatterns) {
+                holder.patternView.setText(
+                        templates.get(position).getHiddenPatternRepresentation(
+                                activity.getPatternRepresentation()
+                        ));
+            }
+            else {
                 holder.patternView.setText(
                         templates.get(position).getPatternRepresentationWithNumberedPlaceholder(
                                 SecureActivity.SecretChecker.getOrAskForSecret(activity),
                                 activity.getPatternRepresentation(),
                                 SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity)
-                        ));
-            }
-            else {
-                holder.patternView.setText(
-                        templates.get(position).getHiddenPatternRepresentation(
-                                activity.getPatternRepresentation()
                         ));
             }
 

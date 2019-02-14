@@ -7,7 +7,7 @@ import android.preference.Preference;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.settings.listener.EnablePasswordPreferenceListener;
-import de.jepfa.obfusser.ui.settings.listener.ShowPatternsInOverviewPreferenceListener;
+import de.jepfa.obfusser.ui.settings.listener.HidePatternsInOverviewPreferenceListener;
 
 /**
  * This fragment shows general preferences only. It is used when the
@@ -28,9 +28,9 @@ public class SecurityPreferenceFragment extends PreferenceFragmentBase {
         passwordEnablePref.setOnPreferenceChangeListener(
                 new EnablePasswordPreferenceListener(getActivity()));
 
-        Preference passwordShowPattern = findPreference(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW);
-        passwordShowPattern.setOnPreferenceChangeListener(
-                new ShowPatternsInOverviewPreferenceListener(getActivity()));
+        Preference hidePatternsPref = findPreference(SettingsActivity.PREF_HIDE_PATTERN_IN_OVERVIEW);
+        hidePatternsPref.setOnPreferenceChangeListener(
+                new HidePatternsInOverviewPreferenceListener(getActivity()));
 
     }
 

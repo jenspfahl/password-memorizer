@@ -229,19 +229,19 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
 
         nameView.setText(credential.getName());
 
-        boolean showPattern = PreferenceManager
+        boolean hidePatterns = PreferenceManager
                 .getDefaultSharedPreferences(fragment.getActivity())
-                .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+                .getBoolean(SettingsActivity.PREF_HIDE_PATTERN_IN_OVERVIEW, false);
 
-        if (showPattern) {
+        if (hidePatterns) {
+            patternView.setText(credential.getHiddenPatternRepresentation(
+                    fragment.getSecureActivity().getPatternRepresentation()));
+        }
+        else {
             patternView.setText(credential.getPatternRepresentationHinted(
                     SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
                     fragment.getSecureActivity().getPatternRepresentation(),
                     SecureActivity.SecretChecker.isEncWithUUIDEnabled(fragment.getSecureActivity())));
-        }
-        else {
-            patternView.setText(credential.getHiddenPatternRepresentation(
-                    fragment.getSecureActivity().getPatternRepresentation()));
         }
 
         iconView.setTag(credential);

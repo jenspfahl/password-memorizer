@@ -114,19 +114,19 @@ implements Filterable {
 
             holder.nameView.setText(credential.getName());
 
-            boolean showPattern = PreferenceManager
+            boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(fragment.getActivity())
-                    .getBoolean(SettingsActivity.PREF_SHOW_PATTERN_IN_OVERVIEW, true);
+                    .getBoolean(SettingsActivity.PREF_HIDE_PATTERN_IN_OVERVIEW, false);
 
-            if (showPattern) {
+            if (hidePatterns) {
+                holder.patternView.setText(credential.getHiddenPatternRepresentation(
+                        fragment.getSecureActivity().getPatternRepresentation()));
+            }
+            else {
                 holder.patternView.setText(credential.getPatternRepresentationHinted(
                         SecureActivity.SecretChecker.getOrAskForSecret(fragment.getSecureActivity()),
                         fragment.getSecureActivity().getPatternRepresentation(),
                         SecureActivity.SecretChecker.isEncWithUUIDEnabled(fragment.getActivity())));
-            }
-            else {
-                holder.patternView.setText(credential.getHiddenPatternRepresentation(
-                        fragment.getSecureActivity().getPatternRepresentation()));
             }
 
             holder.iconView.setTag(credential);

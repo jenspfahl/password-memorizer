@@ -1,8 +1,11 @@
 package de.jepfa.obfusser.ui.common;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import de.jepfa.obfusser.BuildConfig;
 import de.jepfa.obfusser.Constants;
@@ -18,6 +21,13 @@ public class Debug {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         StringBuilder sb = new StringBuilder();
+
+        try {
+            PackageInfo pInfo = activity.getApplication().getPackageManager().getPackageInfo(activity.getApplication().getPackageName(), 0);
+            addParam(sb, "VersionCode", String.valueOf(pInfo.versionCode));
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("DEBUGINFO", "cannot get version code", e);
+        }
 
         byte[] salt = SecureActivity.SecretChecker.getSalt(activity);
         addParam(sb, "AppSalt", endOfArrayToString(salt, 4) + ", l=" + arrayLength(salt));

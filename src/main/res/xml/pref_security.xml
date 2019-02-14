@@ -7,9 +7,9 @@
         android:title="@string/pref_title_enable_password" />
 
     <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_show_pattern_in_overview"
-        android:summary="@string/pref_description_show_patterns"
-        android:title="@string/pref_title_show_patterns" />
+        android:defaultValue="false"
+        android:key="pref_hide_patterns_in_overview"
+        android:summary="@string/pref_description_hide_patterns"
+        android:title="@string/pref_title_hide_patterns" />
 
 </PreferenceScreen>

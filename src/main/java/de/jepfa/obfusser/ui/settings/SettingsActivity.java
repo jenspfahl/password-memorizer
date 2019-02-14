@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ENABLE_PASSWORD = "pref_enable_password";
     public static final String PREF_EXPANDABLE_CREDENTIAL_LIST = "pref_expandable_credential_list";
     public static final String PREF_PATTERN_STYLE = "pref_pattern_style";
-    public static final String PREF_SHOW_PATTERN_IN_OVERVIEW = "pref_show_pattern_in_overview";
+    public static final String PREF_HIDE_PATTERN_IN_OVERVIEW = "pref_hide_patterns_in_overview";
     public static final String PREF_EXPANDED_GROUPS = "pref_expanded_groups";
     public static final String PREF_BACKUP = "pref_backup";
     public static final String PREF_RESTORE = "pref_restore";

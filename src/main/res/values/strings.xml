@@ -119,8 +119,8 @@
     <string name="pref_description_enable_password">It is recommended to ensure your patterns with a password to prevent reading them by unauthorized people. </string>
     <string name="pattern_style">Pattern style</string>
     <string name="pref_header_general">General</string>
-    <string name="pref_title_show_patterns">Show patterns in overview list</string>
-    <string name="pref_description_show_patterns">To prevent others seeing all your patterns in the overview lists, deactivate this option.</string>
+    <string name="pref_title_hide_patterns">Cover patterns in overview list</string>
+    <string name="pref_description_hide_patterns">To prevent others seeing all your patterns in the overview lists, activate this option.</string>
     <string name="pref_header_backuprestore">Backup / Restore</string>
 
 

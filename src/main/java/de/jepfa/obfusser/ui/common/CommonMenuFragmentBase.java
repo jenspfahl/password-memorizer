@@ -31,6 +31,8 @@ import de.jepfa.obfusser.ui.settings.SettingsActivity;
 public abstract class CommonMenuFragmentBase extends SecureFragment {
 
 
+    public static final Uri OBFUSSER_HOMEPAGE = Uri.parse("https://password-memorizer.jepfa.de");
+
     protected abstract int getMenuId();
     protected abstract Filterable getFilterable();
 
@@ -136,7 +138,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
         }
 
         if (id == R.id.menu_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://password-memorizer.jepfa.de"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, OBFUSSER_HOMEPAGE);
             startActivity(browserIntent);
 
             return true;

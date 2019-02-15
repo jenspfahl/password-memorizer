@@ -13,6 +13,7 @@ import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.common.LegendShower;
+import de.jepfa.obfusser.ui.common.PatternDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -22,6 +23,7 @@ import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 public class TemplateDetailActivity extends SecureActivity {
 
     private TemplateViewModel templateViewModel;
+    private TemplateDetailFragment templateDetailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,17 +46,29 @@ public class TemplateDetailActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
-            arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                    TemplateDetailFragment.SHOW_DETAIL);
-
-            TemplateDetailFragment fragment = new TemplateDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.template_detail_container, fragment)
-                    .commit();
+        Bundle arguments = new Bundle();
+        arguments.putInt(TemplateDetailFragment.ARG_MODE,
+                TemplateDetailFragment.SHOW_DETAIL);
+        if (savedInstanceState != null) {
+            int currentClickStep = savedInstanceState.getInt(PatternDetailFragment.CURRENT_CLICK_STEP,
+                    PatternDetailFragment.DEFAULT_CLICK_STEP);
+            arguments.putInt(PatternDetailFragment.CURRENT_CLICK_STEP, currentClickStep);
         }
+
+        templateDetailFragment = new TemplateDetailFragment();
+        templateDetailFragment.setArguments(arguments);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.template_detail_container, templateDetailFragment)
+                .commit();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int currentClickStep = templateDetailFragment.getArguments().getInt(PatternDetailFragment.CURRENT_CLICK_STEP,
+                PatternDetailFragment.DEFAULT_CLICK_STEP);
+        outState.putInt(PatternDetailFragment.CURRENT_CLICK_STEP, currentClickStep);
     }
 
     @Override

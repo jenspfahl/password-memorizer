@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.util;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,17 +38,9 @@ public class IntentUtil {
         }
 
         ArrayList<String> hintsList = intent.getStringArrayListExtra(PatternHolder.ATTRIB_HINTS);
-        if (hintsList != null) {
-            Map<Integer, String> hints = new HashMap<>(hintsList.size());
-            for (String hintElem : hintsList) {
-                Integer key = getKeyFromHintElem(hintElem);
-                String value = getValueFromHintElem(hintElem);
-                hints.put(key, value);
-            }
-            pattern.setHints(hints);
-        }
-
+        convertAndSetHintsFromTransport(pattern, hintsList);
     }
+
 
     public static Credential createCredentialFromIntent(Intent intent) {
         Credential credential = new Credential();
@@ -85,12 +78,31 @@ public class IntentUtil {
         intent.putExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL, pattern.getPatternInternal());
         intent.putExtra(SecurePatternHolder.ATTRIB_UUID, pattern.getUuid());
 
+        ArrayList<String> hints = convertHintsForTransport(pattern);
+        intent.putStringArrayListExtra(Credential.ATTRIB_HINTS, hints);
+
+    }
+
+
+    public static void convertAndSetHintsFromTransport(SecurePatternHolder pattern, ArrayList<String> hintsList) {
+        if (hintsList != null) {
+            Map<Integer, String> hints = new HashMap<>(hintsList.size());
+            for (String hintElem : hintsList) {
+                Integer key = getKeyFromHintElem(hintElem);
+                String value = getValueFromHintElem(hintElem);
+                hints.put(key, value);
+            }
+            pattern.setHints(hints);
+        }
+    }
+
+    @NonNull
+    public static ArrayList<String> convertHintsForTransport(SecurePatternHolder pattern) {
         ArrayList<String> hints = new ArrayList<>(pattern.getHintsCount());
         for (Map.Entry<Integer, String> hintsEntry : pattern.getHints().entrySet()) {
             hints.add(createHintElem(hintsEntry.getKey(), hintsEntry.getValue()));
         }
-        intent.putStringArrayListExtra(Credential.ATTRIB_HINTS, hints);
-
+        return hints;
     }
 
     public static void setCredentialExtra(Intent intent, Credential credential) {

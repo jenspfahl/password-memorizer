@@ -8,7 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
+
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.PatternHolder;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.LegendShower;
@@ -35,29 +38,32 @@ public class TemplateInputHintsActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
-            arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                    TemplateDetailFragment.SELECT_HINTS);
+        Bundle arguments = new Bundle();
+        arguments.putInt(TemplateDetailFragment.ARG_MODE,
+                TemplateDetailFragment.SELECT_HINTS);
 
-            TemplateDetailFragment detailFragment = new TemplateDetailFragment();
-            detailFragment.setArguments(arguments);
+        TemplateDetailFragment detailFragment = new TemplateDetailFragment();
+        detailFragment.setArguments(arguments);
 
-            final TemplateHintFragment hintsFragment = new TemplateHintFragment();
-            hintsFragment.setArguments(arguments);
+        final TemplateHintFragment hintsFragment = new TemplateHintFragment();
+        hintsFragment.setArguments(arguments);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.template_detail_container_for_input, detailFragment)
-                    .add(R.id.template_hints_list, hintsFragment)
-                    .commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.template_detail_container_for_input, detailFragment)
+                .replace(R.id.template_hints_list, hintsFragment)
+                .commit();
 
-            detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
-                @Override
-                public void onHintUpdated(int index) {
-                    hintsFragment.refresh();
-                }
+        detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
+            @Override
+            public void onHintUpdated(int index) {
+                hintsFragment.refresh();
+            }
 
-            });
+        });
+
+        if (savedInstanceState != null) {
+            ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
+            IntentUtil.convertAndSetHintsFromTransport(template, hintsList);
         }
 
 
@@ -90,6 +96,16 @@ public class TemplateInputHintsActivity extends SecureActivity {
             button.setText(R.string.button_change_template);
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Template template = templateViewModel.getTemplate().getValue();
+        ArrayList<String> hintsForTransport = IntentUtil.convertHintsForTransport(template);
+        outState.putStringArrayList(Template.ATTRIB_HINTS, hintsForTransport);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

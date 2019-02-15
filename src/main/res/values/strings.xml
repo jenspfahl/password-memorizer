@@ -14,8 +14,8 @@
     <string name="message_delete_credential">Do you really want to delete this pattern with name \'%1$s\'?</string>
 
     <string name="credential_input_hints_explanation">Select the characters to be revealed by touching them and input the real characters. This will help you to remember your password. The more characters you reveal the less do you need to keep in mind. But remember, you shouldn\'t reveal too much.</string>
-    <string name="credential_input_name_explanation">Here you need to give your pattern a short name. Optionally you can type an additional info text.</string>
-    <string name="credential_input_pattern_explanation">You can input your password and it will be transformed instantly to a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
+    <string name="credential_input_name_explanation">Here you need to give your pattern a short name. Optionally you can enter an additional info text.</string>
+    <string name="credential_input_pattern_explanation">You can input your password and it will be transformed instantly to a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character types.</string>
     <string name="credential_select_group_explanation">Optionally categorize your pattern.</string>
     <string name="credential_select_template_explanation">Select a template to be used for your pattern.</string>
 
@@ -37,8 +37,8 @@
     <string name="use_a_template_instead">Use a template instead</string>
 
     <string name="template_input_hints_explanation">Select the characters to be placeholders by touching them. You can predefine revealed characters. This will help you to remember your password. The more characters you reveal the less do you need to keep in mind. But remember, you shouldn\'t reveal too much.</string>
-    <string name="template_input_name_explanation">Here you need to give your template a short name. Optionally you can type an additional info text.</string>
-    <string name="template_input_pattern_explanation">You can input your password and it will be transformed instantly into a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character classes.</string>
+    <string name="template_input_name_explanation">Here you need to give your template a short name. Optionally you can enter an additional info text.</string>
+    <string name="template_input_pattern_explanation">You can input your password and it will be transformed instantly into a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character types.</string>
 
 
 

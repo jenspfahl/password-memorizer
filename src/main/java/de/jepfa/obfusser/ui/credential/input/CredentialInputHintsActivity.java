@@ -9,8 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.PatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.common.PatternDetailFragment;
@@ -36,28 +40,31 @@ public class CredentialInputHintsActivity extends SecureActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
-            arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                    CredentialDetailFragment.SELECT_HINTS);
+        Bundle arguments = new Bundle();
+        arguments.putInt(CredentialDetailFragment.ARG_MODE,
+                CredentialDetailFragment.SELECT_HINTS);
 
-            CredentialDetailFragment detailFragment = new CredentialDetailFragment();
-            detailFragment.setArguments(arguments);
+        CredentialDetailFragment detailFragment = new CredentialDetailFragment();
+        detailFragment.setArguments(arguments);
 
-            final CredentialHintFragment hintsFragment = new CredentialHintFragment();
-            hintsFragment.setArguments(arguments);
+        final CredentialHintFragment hintsFragment = new CredentialHintFragment();
+        hintsFragment.setArguments(arguments);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.credential_detail_container_for_input, detailFragment)
-                    .add(R.id.credential_hints_list, hintsFragment)
-                    .commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.credential_detail_container_for_input, detailFragment)
+                .replace(R.id.credential_hints_list, hintsFragment)
+                .commit();
 
-            detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
-                @Override
-                public void onHintUpdated(int index) {
-                    hintsFragment.refresh();
-                }
-            });
+        detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
+            @Override
+            public void onHintUpdated(int index) {
+                hintsFragment.refresh();
+            }
+        });
+
+        if (savedInstanceState != null) {
+            ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
+            IntentUtil.convertAndSetHintsFromTransport(credential, hintsList);
         }
 
 
@@ -103,6 +110,15 @@ public class CredentialInputHintsActivity extends SecureActivity {
             setTitle(R.string.title_change_credential);
             button.setText(R.string.button_change_credential);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Credential credential = credentialViewModel.getCredential().getValue();
+        ArrayList<String> hintsForTransport = IntentUtil.convertHintsForTransport(credential);
+        outState.putStringArrayList(Credential.ATTRIB_HINTS, hintsForTransport);
     }
 
     @Override

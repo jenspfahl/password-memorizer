@@ -48,12 +48,4 @@ public class TemplateDetailFragment extends PatternDetailFragment {
         return counter % 2 == 1;
     }
 
-    @Override
-    protected String getPatternRepresentationForDetails(SecurePatternHolder pattern) {
-        return pattern.getPatternRepresentationWithNumberedPlaceholder(
-                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                getSecureActivity().getPatternRepresentation(),
-                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
-    }
-
 }

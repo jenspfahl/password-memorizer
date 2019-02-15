@@ -32,6 +32,9 @@ import de.jepfa.obfusser.ui.SecureFragment;
 
 public abstract class PatternDetailFragment extends SecureFragment {
 
+    public static final String CURRENT_CLICK_STEP = "current_click_step";
+    public static final int DEFAULT_CLICK_STEP = 0;
+
     private TextView hintsTextView;
     private TextView infoTextView;
 
@@ -87,8 +90,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     protected abstract boolean showHints(int counter);
 
-    protected abstract String getPatternRepresentationForDetails(SecurePatternHolder pattern);
-
     public void setHintUpdateListener(HintUpdateListener hintUpdateListener) {
         this.hintUpdateListener = hintUpdateListener;
     }
@@ -98,18 +99,26 @@ public abstract class PatternDetailFragment extends SecureFragment {
             infoTextView.setText(pattern.getInfo());
         }
 
-        String patternString = getPatternRepresentationForDetails(pattern);
+        int initClickStep = getArguments().getInt(CURRENT_CLICK_STEP, DEFAULT_CLICK_STEP);
+
+        String patternString = getFinalPatternForDetails(pattern, initClickStep);
+
+        if (showHints(initClickStep)) {
+            hintsTextView.setText(buildHintsString(pattern));
+        }
+
         SpannableString span = getSpannableString(pattern, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
         ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
 
-        final AtomicInteger clickCounter = new AtomicInteger(1);
+        final AtomicInteger clickCounter = new AtomicInteger(initClickStep);
         obfusTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                int counter = clickCounter.getAndIncrement();
+                int counter = clickCounter.incrementAndGet();
+                getArguments().putInt(CURRENT_CLICK_STEP, clickCounter.get());
 
                 String finalPatternString = getFinalPatternForDetails(pattern, counter);
                 if (showHints(counter)) {

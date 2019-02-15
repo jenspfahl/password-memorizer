@@ -56,13 +56,4 @@ public class CredentialDetailFragment extends PatternDetailFragment {
         return counter % 3 == 1;
     }
 
-    @Override
-    protected String getPatternRepresentationForDetails(SecurePatternHolder pattern) {
-        return pattern.getPatternRepresentationHinted(
-                SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity()),
-                getSecureActivity().getPatternRepresentation(),
-                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getSecureActivity()));
-    }
-
-
 }

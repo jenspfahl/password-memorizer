@@ -236,7 +236,7 @@ public class EncryptUtilTest {
     private List<String> getPatterns(List<Credential> credentials, byte[] k) {
         List<String> p = new ArrayList<>(credentials.size());
         for (Credential credential : credentials) {
-            p.add(credential.getPatternAsExchangeFormatHinted(k, true));
+            p.add(credential.getPatternAsExchangeFormat(true, k, true));
         }
         return p;
     }

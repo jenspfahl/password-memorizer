@@ -294,7 +294,7 @@ public class BackupRestoreService extends IntentService {
                     existingTemplate.setGroupId(otherTemplate.getGroupId());
 
                     existingTemplate.setPatternFromExchangeFormat(
-                            otherTemplate.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
+                            otherTemplate.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
                             encryptKey,
                             withUuid);
 
@@ -329,7 +329,7 @@ public class BackupRestoreService extends IntentService {
                     existingCredential.setTemplateId(otherCredential.getTemplateId());
 
                     existingCredential.setPatternFromExchangeFormat(
-                            otherCredential.getPatternAsExchangeFormatHinted(transferKey, decWithUuid),
+                            otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
                             encryptKey,
                             withUuid);
 

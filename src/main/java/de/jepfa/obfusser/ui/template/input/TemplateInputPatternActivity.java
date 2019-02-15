@@ -56,7 +56,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
         });
 
         byte[] secret = SecretChecker.getOrAskForSecret(this);
-        String pattern = template.getPatternAsExchangeFormatHinted(secret,
+        String pattern = template.getPatternAsExchangeFormat(false, secret,
                 SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
         obfusEditText = new ObfusEditText(editText,
                 getPatternRepresentation(), pattern, savedInstanceState != null);

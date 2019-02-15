@@ -41,7 +41,11 @@ public abstract class SecurePatternHolder extends PatternHolder {
         this.uuid = uuid;
     }
 
-    public String getPatternAsExchangeFormatHinted(byte[] key, boolean encWithUuid) {
+    /**
+     *
+     * @param hinted if true use the obfuscated char from the hint if there is any
+     */
+    public String getPatternAsExchangeFormat(boolean hinted, byte[] key, boolean encWithUuid) {
         StringBuilder sb = new StringBuilder();
         int index = 0;
         ObfusString pattern = getPattern(key, encWithUuid);
@@ -49,13 +53,13 @@ public abstract class SecurePatternHolder extends PatternHolder {
             for (ObfusChar obfusChar : pattern.getObfusChars()) {
                 String s = obfusChar.toExchangeFormat();
                 String hint = getHint(index, key, encWithUuid);
-                if (hint != null) {
+                if (hinted && hint != null) {
                     if (hint.equals(Constants.EMPTY)) {
                         //TODO not set hints as special char for representation
                         //TODO nothing, use char from pattern // s = ObfusChar.SPECIAL_CHAR.toExchangeFormat();
                     }
                     else {
-                        s = ObfusString.obfuscate(hint).toExchangeFormat();
+                       s = ObfusString.obfuscate(hint).toExchangeFormat();
                     }
                 }
                 sb.append(s);

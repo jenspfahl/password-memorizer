@@ -56,7 +56,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
         });
 
         byte[] secret = SecretChecker.getOrAskForSecret(this);
-        String pattern = credential.getPatternAsExchangeFormatHinted(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
+        String pattern = credential.getPatternAsExchangeFormat(true, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
         obfusEditText = new ObfusEditText(editText,
                 getPatternRepresentation(), pattern, savedInstanceState != null);
 

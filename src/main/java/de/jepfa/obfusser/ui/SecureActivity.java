@@ -11,10 +11,13 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -191,6 +194,15 @@ public abstract class SecureActivity extends BaseActivity {
                     .setPositiveButton(android.R.string.ok, null)
                     .setCancelable(false)
                     .create();
+
+            input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                    return true;
+                }
+            });
 
             dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 

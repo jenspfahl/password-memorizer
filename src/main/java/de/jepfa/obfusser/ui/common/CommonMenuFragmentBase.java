@@ -20,7 +20,6 @@ import android.widget.Filterable;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
-import de.jepfa.obfusser.ui.common.Debug;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
@@ -32,6 +31,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
 
 
     public static final Uri OBFUSSER_HOMEPAGE = Uri.parse("https://password-memorizer.jepfa.de");
+    private MenuItem menuLockItems;
 
     protected abstract int getMenuId();
     protected abstract Filterable getFilterable();
@@ -81,11 +81,15 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
 
-        SharedPreferences defaultSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getActivity());
+        menuLockItems = menu.findItem(R.id.menu_lock_items);
+        refreshMenuLockItem();
 
-        MenuItem menuLockItems = menu.findItem(R.id.menu_lock_items);
+    }
+
+    protected void refreshMenuLockItem() {
         if (menuLockItems != null) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity());
             boolean passwordCheckEnabled = defaultSharedPreferences
                     .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
 
@@ -101,7 +105,6 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
                 menuLockItems.setVisible(false);
             }
         }
-
     }
 
     @Override

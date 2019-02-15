@@ -10,8 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +19,6 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
-import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
@@ -126,6 +123,7 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
 
     @Override
     public void refresh() {
+        refreshMenuLockItem();
         view.post(new Runnable()
         {
             @Override

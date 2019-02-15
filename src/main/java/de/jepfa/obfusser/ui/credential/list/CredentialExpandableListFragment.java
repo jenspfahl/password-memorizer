@@ -118,6 +118,7 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
 
     @Override
     public void refresh() {
+        refreshMenuLockItem();
         listView.post(new Runnable()
         {
             @Override

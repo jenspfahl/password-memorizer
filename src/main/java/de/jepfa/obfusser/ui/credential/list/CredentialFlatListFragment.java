@@ -57,6 +57,7 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
 
     @Override
     public void refresh() {
+        refreshMenuLockItem();
         recyclerView.post(new Runnable()
         {
             @Override

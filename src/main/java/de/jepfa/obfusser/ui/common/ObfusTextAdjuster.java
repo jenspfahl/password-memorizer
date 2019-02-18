@@ -36,30 +36,9 @@ public class ObfusTextAdjuster {
             textView.setLetterSpacing(letterSpacing);
         }
     }
+    
 
-    public static void fitTextSizeToScreen(Activity activity, TextView textView, int margin) {
-        Display display = activity.getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int displayWidth = size.x - (margin * 2); // margin left and right
-
-        Paint paint = textView.getPaint();
-
-        String text = textView.getText().toString();
-        float nowWidth = paint.measureText(text);
-        float newSize = displayWidth / nowWidth * paint.getTextSize();
-
-        int dp = pxToDp(newSize);
-        if (dp < Constants.MAX_PATTERN_DETAIL_DIP) {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
-        }
-        else {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Constants.MAX_PATTERN_DETAIL_DIP);
-        }
-    }
-
-
-    public static float calcTextSizeToScreenInterpolized(Activity activity, TextView textView, String string, int margin) {
+    public static float calcTextSizeToScreen(Activity activity, TextView textView, String string, int margin) {
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -71,7 +50,10 @@ public class ObfusTextAdjuster {
         float newSize = displayWidth / nowWidth * paint.getTextSize();
 
         int dp = pxToDp(newSize);
-        if (dp < Constants.MAX_PATTERN_DETAIL_DIP) {
+        if (dp < Constants.MIN_PATTERN_DETAIL_DIP) {
+            return Constants.MIN_PATTERN_DETAIL_DIP;
+        }
+        else if (dp < Constants.MAX_PATTERN_DETAIL_DIP) {
             return dp;
         }
         else {

@@ -48,6 +48,10 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
                 secret,
                 activity.getPatternRepresentation(),
                 encWithUuid);
+        final String patternStringNumbered = pattern.getPatternRepresentationWithNumberedPlaceholder(
+                secret,
+                activity.getPatternRepresentation(),
+                encWithUuid);
 
         final boolean hasHint = pattern.hasHint(position, secret, encWithUuid);
 
@@ -137,7 +141,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
         });
 
         if (estimatedSize == null) {
-           estimatedSize = ObfusTextAdjuster.calcTextSizeToScreenInterpolized(activity, holder.selectHintTextView, patternString,
+           estimatedSize = ObfusTextAdjuster.calcTextSizeToScreen(activity, holder.selectHintTextView, patternStringNumbered,
                    ObfusTextAdjuster.DEFAULT_MARGIN);
         }
         holder.selectHintTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, estimatedSize);

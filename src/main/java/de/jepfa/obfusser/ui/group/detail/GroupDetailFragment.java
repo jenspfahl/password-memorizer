@@ -58,7 +58,7 @@ public class GroupDetailFragment extends Fragment {
             rootView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
-                    if (Debug.isDebug()) {
+                    if (Debug.INSTANCE.isDebug()) {
                         return longPressGestureDetector.onTouchEvent(motionEvent);
                     }
                     return false;

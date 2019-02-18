@@ -131,7 +131,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 if (secret != null) {
                     message = message + Constants.NL
                             + "uuidkey="
-                            + Debug.endOfArrayToString(
+                            + Debug.INSTANCE.endOfArrayToString(
                                     pattern.getUUIDKey(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity())), 4);
                 }
                 new AlertDialog.Builder(getActivity())
@@ -149,7 +149,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
                     return scaleGestureDetector.onTouchEvent(motionEvent);
                 }
                 else {
-                    if (Debug.isDebug()) {
+                    if (Debug.INSTANCE.isDebug()) {
                         return longPressGestureDetector.onTouchEvent(motionEvent);
                     }
                     return false;//obfusTextView.performClick();

@@ -46,7 +46,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(getMenuId(), menu);
-        if (Debug.isDebug()) {
+        if (Debug.INSTANCE.isDebug()) {
             menu.add("Debug info");
         }
 
@@ -114,8 +114,8 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this.getActivity());
 
-        if (id == 0 && Debug.isDebug()) {
-            Debug.showDebugDialog(getActivity());
+        if (id == 0 && Debug.INSTANCE.isDebug()) {
+            Debug.INSTANCE.showDebugDialog(getActivity());
         }
 
         if (id == R.id.menu_lock_items) {

@@ -42,8 +42,8 @@ public class CredentialInputNameActivity extends SecureActivity {
         explanationView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Debug.toggleDebug();
-                Toast.makeText(CredentialInputNameActivity.this, "Debug mode " + (Debug.isDebug() ? "ON" : "OFF"), Toast.LENGTH_LONG).show();
+                Debug.INSTANCE.toggleDebug();
+                Toast.makeText(CredentialInputNameActivity.this, "Debug mode " + (Debug.INSTANCE.isDebug() ? "ON" : "OFF"), Toast.LENGTH_LONG).show();
                 return true;
             }
         });

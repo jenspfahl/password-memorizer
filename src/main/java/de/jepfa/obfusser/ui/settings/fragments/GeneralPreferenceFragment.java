@@ -32,12 +32,14 @@ public class GeneralPreferenceFragment extends PreferenceFragmentBase {
             }
         }
 
-        String currRepresentation = patternStylePref.getPreferenceManager().getDefaultSharedPreferences(this.getActivity()).getString(
+        String currRepresentationValue = patternStylePref.getPreferenceManager().getDefaultSharedPreferences(this.getActivity()).getString(
                 SettingsActivity.PREF_PATTERN_STYLE, Representation.DEFAULT_BLOCKS.name());
+
+        Representation currRepresentation = Representation.valueOfWithDefault(currRepresentationValue);
 
         patternStylePref.setEntries(entries.toArray(new String[entries.size()]));
         patternStylePref.setEntryValues(entryValues.toArray(new String[entryValues.size()]));
-        patternStylePref.setDefaultValue(currRepresentation);
+        patternStylePref.setDefaultValue(currRepresentation.name());
 
         PatternStylePreferenceListener onPreferenceChangeListener = new PatternStylePreferenceListener(getActivity());
         patternStylePref.setOnPreferenceChangeListener(onPreferenceChangeListener);

@@ -155,6 +155,7 @@ public enum Representation {
         this.textSize = textSize;
     }
 
+
     public String getName() {
         return name;
     }
@@ -213,5 +214,13 @@ public enum Representation {
             case PLACEHOLDER: return getSpecialChar(); //TODO migration code
         }
         throw new IllegalStateException("Unknown ObfusChar: " + obfusChar);
+    }
+
+    public static Representation valueOfWithDefault(String representationValue) {
+        try {
+            return Representation.valueOf(representationValue);
+        } catch (Exception e) {
+            return Representation.DEFAULT_BLOCKS;
+        }
     }
 }

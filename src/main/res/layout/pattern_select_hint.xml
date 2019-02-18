@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/select_hint_textview"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:layout_margin="2dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textStyle="normal"
+        android:focusable="true" />
+</LinearLayout>

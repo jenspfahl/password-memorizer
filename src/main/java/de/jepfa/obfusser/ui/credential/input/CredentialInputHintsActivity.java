@@ -10,15 +10,13 @@ import android.view.View;
 import android.widget.Button;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.PatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.input.HintUpdateListener;
 import de.jepfa.obfusser.ui.common.LegendShower;
-import de.jepfa.obfusser.ui.common.PatternDetailFragment;
-import de.jepfa.obfusser.ui.credential.detail.CredentialDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
@@ -41,26 +39,24 @@ public class CredentialInputHintsActivity extends SecureActivity {
         }
 
         Bundle arguments = new Bundle();
-        arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                CredentialDetailFragment.SELECT_HINTS);
+        CredentialSelectHintsFragment selectHintsFragment = new CredentialSelectHintsFragment();
+        selectHintsFragment.setArguments(arguments);
 
-        CredentialDetailFragment detailFragment = new CredentialDetailFragment();
-        detailFragment.setArguments(arguments);
+        final CredentialEditHintFragment editHintsFragment = new CredentialEditHintFragment();
+        editHintsFragment.setArguments(arguments);
 
-        final CredentialHintFragment hintsFragment = new CredentialHintFragment();
-        hintsFragment.setArguments(arguments);
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.credential_detail_container_for_input, detailFragment)
-                .replace(R.id.credential_hints_list, hintsFragment)
-                .commit();
-
-        detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
+        selectHintsFragment.setHintUpdateListener(new HintUpdateListener() {
             @Override
             public void onHintUpdated(int index) {
-                hintsFragment.refresh();
+                editHintsFragment.refresh();
             }
         });
+
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.credential_detail_container_for_input, selectHintsFragment)
+                .replace(R.id.credential_hints_list, editHintsFragment)
+                .commit();
 
         if (savedInstanceState != null) {
             ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
@@ -73,7 +69,7 @@ public class CredentialInputHintsActivity extends SecureActivity {
             @Override
             public void onClick(View view) {
 
-                CredentialHintFragment hintsFragment = (CredentialHintFragment) getSupportFragmentManager().findFragmentById(R.id.credential_hints_list);
+                CredentialEditHintFragment hintsFragment = (CredentialEditHintFragment) getSupportFragmentManager().findFragmentById(R.id.credential_hints_list);
                 Credential credential = credentialViewModel.getCredential().getValue();
 
                 boolean check = hintsFragment.checkMandatoryFields();

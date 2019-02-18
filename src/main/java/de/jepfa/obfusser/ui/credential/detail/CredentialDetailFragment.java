@@ -2,10 +2,9 @@ package de.jepfa.obfusser.ui.credential.detail;
 
 import android.os.Bundle;
 
-import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.common.PatternDetailFragment;
+import de.jepfa.obfusser.ui.common.detail.PatternDetailFragment;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 

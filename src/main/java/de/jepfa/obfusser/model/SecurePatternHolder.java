@@ -70,6 +70,22 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     @Ignore
+    public String getPatternRepresentation(byte[] key, Representation representation, boolean encWithUuid) {
+        if (key == Secret.INVALID_DIGEST) {
+            return getHiddenPatternRepresentation(representation);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (getPattern(key, encWithUuid) != null && getPattern(key, encWithUuid).getObfusChars() != null) {
+            for (ObfusChar obfusChar : getPattern(key, encWithUuid).getObfusChars()) {
+                String s = obfusChar.toRepresentation(representation);
+                sb.append(s);
+            }
+        }
+        return sb.toString();
+    }
+
+    @Ignore
     public String getPatternRepresentationWithNumberedPlaceholder(byte[] key, Representation representation, boolean encWithUuid) {
         if (key == Secret.INVALID_DIGEST) {
             return getHiddenPatternRepresentation(representation);

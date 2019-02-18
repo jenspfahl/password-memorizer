@@ -13,7 +13,7 @@ import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.common.LegendShower;
-import de.jepfa.obfusser.ui.common.PatternDetailFragment;
+import de.jepfa.obfusser.ui.common.detail.PatternDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -47,8 +47,6 @@ public class TemplateDetailActivity extends SecureActivity {
         }
 
         Bundle arguments = new Bundle();
-        arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                TemplateDetailFragment.SHOW_DETAIL);
         if (savedInstanceState != null) {
             int currentClickStep = savedInstanceState.getInt(PatternDetailFragment.CURRENT_CLICK_STEP,
                     PatternDetailFragment.DEFAULT_CLICK_STEP);

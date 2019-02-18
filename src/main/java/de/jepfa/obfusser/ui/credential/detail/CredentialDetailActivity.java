@@ -19,7 +19,7 @@ import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.common.LegendShower;
-import de.jepfa.obfusser.ui.common.PatternDetailFragment;
+import de.jepfa.obfusser.ui.common.detail.PatternDetailFragment;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -87,8 +87,6 @@ public class CredentialDetailActivity extends SecureActivity {
         }
 
         Bundle arguments = new Bundle();
-        arguments.putInt(CredentialDetailFragment.ARG_MODE,
-                CredentialDetailFragment.SHOW_DETAIL);
         if (savedInstanceState != null) {
             int currentClickStep = savedInstanceState.getInt(PatternDetailFragment.CURRENT_CLICK_STEP,
                     PatternDetailFragment.DEFAULT_CLICK_STEP);

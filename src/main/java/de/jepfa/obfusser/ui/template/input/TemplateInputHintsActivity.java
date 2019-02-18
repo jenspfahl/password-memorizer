@@ -14,10 +14,9 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.PatternHolder;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.input.HintUpdateListener;
 import de.jepfa.obfusser.ui.common.LegendShower;
-import de.jepfa.obfusser.ui.common.PatternDetailFragment;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
-import de.jepfa.obfusser.ui.template.detail.TemplateDetailFragment;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
 
@@ -39,27 +38,26 @@ public class TemplateInputHintsActivity extends SecureActivity {
         }
 
         Bundle arguments = new Bundle();
-        arguments.putInt(TemplateDetailFragment.ARG_MODE,
-                TemplateDetailFragment.SELECT_HINTS);
+        TemplateSelectHintsFragment selectHintsFragment = new TemplateSelectHintsFragment();
+        selectHintsFragment.setArguments(arguments);
 
-        TemplateDetailFragment detailFragment = new TemplateDetailFragment();
-        detailFragment.setArguments(arguments);
+        final TemplateEditHintFragment editHintsFragment = new TemplateEditHintFragment();
+        editHintsFragment.setArguments(arguments);
 
-        final TemplateHintFragment hintsFragment = new TemplateHintFragment();
-        hintsFragment.setArguments(arguments);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.template_detail_container_for_input, detailFragment)
-                .replace(R.id.template_hints_list, hintsFragment)
-                .commit();
-
-        detailFragment.setHintUpdateListener(new PatternDetailFragment.HintUpdateListener() {
+        selectHintsFragment.setHintUpdateListener(new HintUpdateListener() {
             @Override
             public void onHintUpdated(int index) {
-                hintsFragment.refresh();
+                editHintsFragment.refresh();
             }
 
         });
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.template_detail_container_for_input, selectHintsFragment)
+                .replace(R.id.template_hints_list, editHintsFragment)
+                .commit();
+
 
         if (savedInstanceState != null) {
             ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
@@ -72,7 +70,7 @@ public class TemplateInputHintsActivity extends SecureActivity {
             @Override
             public void onClick(View view) {
 
-                TemplateHintFragment hintsFragment = (TemplateHintFragment) getSupportFragmentManager().findFragmentById(R.id.template_hints_list);
+                TemplateEditHintFragment hintsFragment = (TemplateEditHintFragment) getSupportFragmentManager().findFragmentById(R.id.template_hints_list);
                 Template template = templateViewModel.getTemplate().getValue();
 
                 if (template.isPersisted()) {

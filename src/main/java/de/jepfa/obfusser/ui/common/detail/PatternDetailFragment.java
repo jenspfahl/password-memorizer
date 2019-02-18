@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.ui.common;
+package de.jepfa.obfusser.ui.common.detail;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -14,13 +14,18 @@ import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.jepfa.obfusser.Constants;
@@ -29,6 +34,8 @@ import de.jepfa.obfusser.model.NumberedPlaceholder;
 import de.jepfa.obfusser.model.SecurePatternHolder;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.SecureFragment;
+import de.jepfa.obfusser.ui.common.Debug;
+import de.jepfa.obfusser.ui.common.ObfusTextAdjuster;
 
 public abstract class PatternDetailFragment extends SecureFragment {
 
@@ -38,24 +45,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
     private TextView hintsTextView;
     private TextView infoTextView;
 
-    public interface HintUpdateListener {
-        void onHintUpdated(int index);
-    }
-
-    public static final String ARG_MODE = "mode";
-    public static final int SHOW_DETAIL = 1;
-    public static final int SELECT_HINTS = 2;
-
-    protected int mode;
-
-    private HintUpdateListener hintUpdateListener;
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mode = getArguments().getInt(ARG_MODE);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,15 +59,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
             infoTextView = rootView.findViewById(R.id.pattern_info_textview);
             hintsTextView = rootView.findViewById(R.id.pattern_hints_textview);
 
+            onCreateForShowPatternDetails(pattern, obfusTextView);
 
-            switch (mode) {
-                case SELECT_HINTS:
-                    onCreateForNewPatternSelectHints(pattern, obfusTextView);
-                    break;
-                case SHOW_DETAIL:
-                    onCreateForShowPatternDetails(pattern, obfusTextView);
-                    break;
-            }
         }
 
         return rootView;
@@ -90,9 +72,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     protected abstract boolean showHints(int counter);
 
-    public void setHintUpdateListener(HintUpdateListener hintUpdateListener) {
-        this.hintUpdateListener = hintUpdateListener;
-    }
 
     private void onCreateForShowPatternDetails(final SecurePatternHolder pattern, final TextView obfusTextView) {
         if (pattern.getInfo() != null) {
@@ -110,7 +89,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
         SpannableString span = getSpannableString(pattern, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
-        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
+        ObfusTextAdjuster.fitTextSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
 
         final AtomicInteger clickCounter = new AtomicInteger(initClickStep);
         obfusTextView.setOnClickListener(new View.OnClickListener() {
@@ -177,110 +156,6 @@ public abstract class PatternDetailFragment extends SecureFragment {
         });
     }
 
-    private void onCreateForNewPatternSelectHints(final SecurePatternHolder pattern, final TextView obfusTextView) {
-        infoTextView.setVisibility(TextView.GONE);
-        hintsTextView.setVisibility(TextView.GONE);
-
-        byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
-        String patternString = pattern.getPatternRepresentationWithNumberedPlaceholder(
-                secret,
-                getSecureActivity().getPatternRepresentation(),
-                SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
-        final SpannableStringBuilder span = new SpannableStringBuilder(patternString);
-
-        for (int i = 0; i < patternString.length(); i++) {
-
-            final boolean fenabled = pattern.hasHint(i, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
-
-            final int fi = i;
-            ClickableSpan clickSpan = new ClickableSpan() {
-
-                private boolean enabled = fenabled;
-                private int index = fi;
-
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    int color;
-                    if (enabled) {
-                        color = getResources().getColor(R.color.colorAccent);
-
-                    }
-                    else {
-                        color = Color.BLACK;
-                    }
-                    ds.setColor(color);
-                    ds.setUnderlineText(false); // overwrite super underline setting
-                }
-
-                @Override
-                public void onClick(View yourTextView) {
-
-                    if (!enabled && pattern.getHintsCount() == NumberedPlaceholder.count()) {
-                        new AlertDialog.Builder(getContext())
-                                .setTitle(R.string.title_set_revealed)
-                                .setMessage(R.string.message_set_revealed)
-                                .setIcon(android.R.drawable.ic_dialog_info)
-                                .show();
-                        return;
-                    }
-
-                    final byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
-                    final boolean withUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity());
-
-                    enabled = !enabled;
-                    if (enabled) {
-                        pattern.addHint(index, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity()));
-
-                        if (hintUpdateListener != null) {
-                            hintUpdateListener.onHintUpdated(index);
-                        }
-                    }
-                    else {
-
-                        if (pattern.isFilledHint(index, secret, withUuid)) {
-                            new AlertDialog.Builder(getContext())
-                                    .setTitle(R.string.title_delete_revealed_character)
-                                    .setMessage(getString(R.string.message_delete_revealed_character,
-                                            pattern.getNumberedPlaceholder(index, secret, withUuid).toRepresentation()))
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-
-                                            pattern.removeHint(index, secret, withUuid);
-
-                                            if (hintUpdateListener != null) {
-                                                hintUpdateListener.onHintUpdated(index);
-                                            }
-                                            onCreateForNewPatternSelectHints(pattern, obfusTextView);
-
-                                        }})
-                                    .setNegativeButton(android.R.string.no, null)
-                                    .show();
-                        }
-                        else {
-                            pattern.removeHint(index, secret, withUuid);
-
-                            if (hintUpdateListener != null) {
-                                hintUpdateListener.onHintUpdated(index);
-                            }
-                        }
-
-                    }
-
-                    onCreateForNewPatternSelectHints(pattern, obfusTextView);
-                }
-            };
-            span.setSpan(clickSpan, i, i + 1, 0);
-
-        }
-
-        obfusTextView.setText(span);
-        obfusTextView.setMovementMethod(LinkMovementMethod.getInstance());
-
-        ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
-        ObfusTextAdjuster.fitSizeToScreen(getActivity(), obfusTextView, ObfusTextAdjuster.DEFAULT_MARGIN);
-    }
 
     protected String buildHintsString(SecurePatternHolder pattern) {
         StringBuilder sb = new StringBuilder();
@@ -335,8 +210,5 @@ public abstract class PatternDetailFragment extends SecureFragment {
     public void refresh() {
         getActivity().recreate(); //TODO
     }
-
-
-
 
 }

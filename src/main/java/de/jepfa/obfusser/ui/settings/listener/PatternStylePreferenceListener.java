@@ -18,12 +18,7 @@ public class PatternStylePreferenceListener implements Preference.OnPreferenceCh
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
-        String representationValue = value == null ? null : value.toString();
-        try {
-            Representation.valueOf(representationValue);
-        } catch (Exception e) {
-            representationValue = Representation.DEFAULT_BLOCKS.name();
-        }
+        String representationValue = Representation.valueOfWithDefault(value == null ? null : value.toString()).name();
 
         ListPreference listPreference = (ListPreference) preference;
         int index = listPreference.findIndexOfValue(representationValue);

@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.ui.template.input;
+package de.jepfa.obfusser.ui.credential.input;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -11,39 +11,43 @@ import android.view.ViewGroup;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.ui.SecureFragment;
-import de.jepfa.obfusser.viewmodel.template.TemplateViewModel;
+import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 
 
-public class TemplateHintFragment extends SecureFragment {
+public class CredentialEditHintFragment extends SecureFragment {
 
-    private TemplateViewModel templateViewModel;
-    private TemplateHintRecyclerViewAdapter adapter;
+    private CredentialViewModel credentialViewModel;
+    private CredentialHintRecyclerViewAdapter adapter;
     private View view;
 
-    public TemplateHintFragment() {
+    public CredentialEditHintFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        templateViewModel = ViewModelProviders
+        credentialViewModel = ViewModelProviders
                 .of(this.getActivity())
-                .get(TemplateViewModel.class);
+                .get(CredentialViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.template_hint_list, container, false);
+        view = inflater.inflate(R.layout.credential_hint_list, container, false);
 
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            adapter = new TemplateHintRecyclerViewAdapter(
-                    templateViewModel.getTemplate().getValue(), getSecureActivity());
-            recyclerView.setAdapter(adapter);
+
+            adapter = new CredentialHintRecyclerViewAdapter(
+                    credentialViewModel.getCredential().getValue(),
+                    getSecureActivity());
+
+            recyclerView.setAdapter(
+                    adapter);
         }
         return view;
     }

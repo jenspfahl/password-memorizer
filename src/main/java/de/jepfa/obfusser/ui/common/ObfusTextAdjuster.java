@@ -20,6 +20,7 @@ import de.jepfa.obfusser.model.Representation;
 public class ObfusTextAdjuster {
 
     public static final int DEFAULT_MARGIN = 100;
+    public static final int EXTRA_MARGIN = 200;
 
     public static void adjustTextForRepresentation(Representation representation, TextView textView) {
         if (representation.getLetterSpacing() != null) {
@@ -58,7 +59,7 @@ public class ObfusTextAdjuster {
     }
 
 
-    public static float calcTextSizeToScreenInterpolized(Activity activity, TextView textView, int count, int margin) {
+    public static float calcTextSizeToScreenInterpolized(Activity activity, TextView textView, String string, int margin) {
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -66,8 +67,7 @@ public class ObfusTextAdjuster {
 
         Paint paint = textView.getPaint();
 
-        String text = textView.getText().toString();
-        float nowWidth = paint.measureText(text) * count;
+        float nowWidth = paint.measureText(string);
         float newSize = displayWidth / nowWidth * paint.getTextSize();
 
         int dp = pxToDp(newSize);

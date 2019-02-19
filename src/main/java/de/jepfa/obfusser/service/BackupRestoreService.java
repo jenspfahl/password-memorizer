@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -187,12 +188,12 @@ public class BackupRestoreService extends IntentService {
 
         boolean success = false;
 
-        if (FileUtil.isExternalStorageWritable()) {
+        if (FileUtil.INSTANCE.isExternalStorageWritable()) {
 
-            success = FileUtil.writeFile(this, fileUri, root.toString());
+            success = FileUtil.INSTANCE.writeFile(this, fileUri, root.toString());
 
             if (success) {
-                String fileName = FileUtil.getFileName(this, fileUri);
+                String fileName = FileUtil.INSTANCE.getFileName(this, fileUri);
 
                 Log.e("BACKUP", "to file " + fileName);
                 //MediaScannerConnection.scanFile(this, new String[] {fileUri.getPath()}, new String[] {MIME_TYPE_JSON}, null);
@@ -251,116 +252,125 @@ public class BackupRestoreService extends IntentService {
     }
 
     private void restoreAll(String content, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
-        JsonParser parser = new JsonParser();
-        JsonObject jsonContent = parser.parse(content).getAsJsonObject();
+        try {
+            JsonParser parser = new JsonParser();
+            JsonObject jsonContent = parser.parse(content).getAsJsonObject();
 
-        boolean decWithUuid = jsonContent.get(JSON_ENC_WITH_UUID).getAsBoolean();
+            boolean decWithUuid = jsonContent.get(JSON_ENC_WITH_UUID).getAsBoolean();
 
-        Gson gson = new Gson();
+            Gson gson = new Gson();
 
-        JsonArray jsonCredentials = jsonContent.get(JSON_CREDENTIALS).getAsJsonArray();
-        List<Credential> otherCredentials = gson.fromJson(jsonCredentials, CREDENTIALS_TYPE);
+            JsonArray jsonCredentials = jsonContent.get(JSON_CREDENTIALS).getAsJsonArray();
+            List<Credential> otherCredentials = gson.fromJson(jsonCredentials, CREDENTIALS_TYPE);
 
-        JsonArray jsonTemplates = jsonContent.get(JSON_TEMPLATES).getAsJsonArray();
-        List<Template> otherTemplates = gson.fromJson(jsonTemplates, TEMPLATES_TYPE);
+            JsonArray jsonTemplates = jsonContent.get(JSON_TEMPLATES).getAsJsonArray();
+            List<Template> otherTemplates = gson.fromJson(jsonTemplates, TEMPLATES_TYPE);
 
-        JsonArray jsonGroups = jsonContent.get(JSON_GROUPS).getAsJsonArray();
-        List<Group> otherGroups = gson.fromJson(jsonGroups, GROUPS_TYPE);
+            JsonArray jsonGroups = jsonContent.get(JSON_GROUPS).getAsJsonArray();
+            List<Group> otherGroups = gson.fromJson(jsonGroups, GROUPS_TYPE);
 
-        Map<Integer, Group> otherGroupToExistingMap = new HashMap<>();
+            Map<Integer, Group> otherGroupToExistingMap = new HashMap<>();
 
-        List<Group> existingGroups = groupRepo.getAllGroupsSync();
-        outer: for (Group otherGroup : otherGroups) {
-            for (Group existingGroup : existingGroups) {
-                if (existingGroup.getName().equals(otherGroup.getName())) {
-                    existingGroup.setInfo(otherGroup.getInfo());
-                    existingGroup.setColor(otherGroup.getColor());
-                    groupRepo.update(existingGroup);
-                    otherGroupToExistingMap.put(otherGroup.getId(), existingGroup);
-                    continue outer;
-                }
-            }
-            otherGroup.unsetId();
-            groupRepo.insertSync(otherGroup);
-            otherGroupToExistingMap.put(otherGroup.getId(), otherGroup);
-        }
-
-        List<Template> existingTemplates = templateRepo.getAllTemplatesSync();
-        outer: for (Template otherTemplate : otherTemplates) {
-            Group existingGroup = otherGroupToExistingMap.get(otherTemplate.getGroupId());
-            for (Template existingTemplate : existingTemplates) {
-                if (existingTemplate.getName().equals(otherTemplate.getName())) {
-                    existingTemplate.setInfo(otherTemplate.getInfo());
-                    existingTemplate.setGroupId(otherTemplate.getGroupId());
-
-                    existingTemplate.setPatternFromExchangeFormat(
-                            otherTemplate.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
-                            encryptKey,
-                            withUuid);
-
-                    existingTemplate.setHints(
-                            otherTemplate.getHints(transferKey, decWithUuid),
-                            encryptKey,
-                            withUuid);
-
-                    if (existingGroup != null) {
-                        existingTemplate.setGroupId(existingGroup.getId());
+            List<Group> existingGroups = groupRepo.getAllGroupsSync();
+            outer: for (Group otherGroup : otherGroups) {
+                for (Group existingGroup : existingGroups) {
+                    if (existingGroup.getName().equals(otherGroup.getName())) {
+                        existingGroup.setInfo(otherGroup.getInfo());
+                        existingGroup.setColor(otherGroup.getColor());
+                        groupRepo.updateSync(existingGroup);
+                        otherGroupToExistingMap.put(otherGroup.getId(), existingGroup);
+                        continue outer;
                     }
-                    templateRepo.update(existingTemplate);
-                    continue outer;
                 }
+                int oldId = otherGroup.getId();
+                long newId = groupRepo.insertSync(otherGroup);
+                otherGroup.setId((int) newId);
+                otherGroupToExistingMap.put(oldId, otherGroup);
             }
-            if (existingGroup != null) {
-                otherTemplate.setGroupId(existingGroup.getId());
-            }
-            otherTemplate.unsetId();
-            otherTemplate.decrypt(transferKey, decWithUuid);
-            otherTemplate.encrypt(encryptKey, withUuid);
-            templateRepo.insert(otherTemplate);
-        }
 
-        List<Credential> existingCredentials = credentialRepo.getAllCredentialsSync();
-        outer: for (Credential otherCredential : otherCredentials) {
-            Group existingGroup = otherGroupToExistingMap.get(otherCredential.getGroupId());
-            for (Credential existingCredential : existingCredentials) {
-                if (existingCredential.getName().equals(otherCredential.getName())) {
-                    existingCredential.setInfo(otherCredential.getInfo());
-                    existingCredential.setGroupId(otherCredential.getGroupId());
-                    existingCredential.setTemplateId(otherCredential.getTemplateId());
+            List<Template> existingTemplates = templateRepo.getAllTemplatesSync();
+            outer: for (Template otherTemplate : otherTemplates) {
+                Group existingGroup = otherGroupToExistingMap.get(otherTemplate.getGroupId());
+                for (Template existingTemplate : existingTemplates) {
+                    if (existingTemplate.getName().equals(otherTemplate.getName())) {
+                        existingTemplate.setInfo(otherTemplate.getInfo());
+                        existingTemplate.setGroupId(otherTemplate.getGroupId());
 
-                    existingCredential.setPatternFromExchangeFormat(
-                            otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
-                            encryptKey,
-                            withUuid);
+                        existingTemplate.setPatternFromExchangeFormat(
+                                otherTemplate.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
+                                encryptKey,
+                                withUuid);
 
-                    existingCredential.setHints(
-                            otherCredential.getHints(transferKey, decWithUuid),
-                            encryptKey,
-                            withUuid);
+                        existingTemplate.setHints(
+                                otherTemplate.getHints(transferKey, decWithUuid),
+                                encryptKey,
+                                withUuid);
 
-                    if (existingGroup != null) {
-                        existingCredential.setGroupId(existingGroup.getId());
+                        if (existingGroup != null) {
+                            existingTemplate.setGroupId(existingGroup.getId());
+                        }
+                        templateRepo.updateSync(existingTemplate);
+                        continue outer;
                     }
-                    credentialRepo.update(existingCredential);
-                    continue outer;
                 }
+                if (existingGroup != null) {
+                    otherTemplate.setGroupId(existingGroup.getId());
+                }
+                otherTemplate.decrypt(transferKey, decWithUuid);
+                otherTemplate.encrypt(encryptKey, withUuid);
+                templateRepo.insertSync(otherTemplate);
             }
-            if (existingGroup != null) {
-                otherCredential.setGroupId(existingGroup.getId());
+
+            List<Credential> existingCredentials = credentialRepo.getAllCredentialsSync();
+            outer: for (Credential otherCredential : otherCredentials) {
+                Group existingGroup = otherGroupToExistingMap.get(otherCredential.getGroupId());
+                for (Credential existingCredential : existingCredentials) {
+                    if (existingCredential.getName().equals(otherCredential.getName())) {
+                        existingCredential.setInfo(otherCredential.getInfo());
+                        existingCredential.setGroupId(otherCredential.getGroupId());
+                        existingCredential.setTemplateId(otherCredential.getTemplateId());
+
+                        existingCredential.setPatternFromExchangeFormat(
+                                otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
+                                encryptKey,
+                                withUuid);
+
+                        existingCredential.setHints(
+                                otherCredential.getHints(transferKey, decWithUuid),
+                                encryptKey,
+                                withUuid);
+
+                        if (existingGroup != null) {
+                            existingCredential.setGroupId(existingGroup.getId());
+                        }
+                        credentialRepo.updateSync(existingCredential);
+                        continue outer;
+                    }
+                }
+                if (existingGroup != null) {
+                    otherCredential.setGroupId(existingGroup.getId());
+                }
+                otherCredential.decrypt(transferKey, decWithUuid);
+                otherCredential.encrypt(encryptKey, withUuid);
+                credentialRepo.insertSync(otherCredential);
             }
-            otherCredential.unsetId();
-            otherCredential.decrypt(transferKey, decWithUuid);
-            otherCredential.encrypt(encryptKey, withUuid);
-            credentialRepo.insert(otherCredential);
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), R.string.toast_restore_done, Toast.LENGTH_LONG).show();
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e("RESTORE", "Import error!", e);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), R.string.toast_restore_aborted, Toast.LENGTH_LONG).show();
+                }
+            });
         }
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getBaseContext(), R.string.toast_restore_done, Toast.LENGTH_LONG).show();
-            }
-        });
-
 
     }
 

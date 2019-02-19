@@ -71,9 +71,9 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
         String content = null;
         JsonObject jsonContent = null;
 
-        if (FileUtil.isExternalStorageReadable()) {
+        if (FileUtil.INSTANCE.isExternalStorageReadable()) {
             try {
-                content = FileUtil.readFile(activity, selectedFile);
+                content = FileUtil.INSTANCE.readFile(activity, selectedFile);
                 if (content != null) {
                     JsonParser parser = new JsonParser();
                     jsonContent = parser.parse(content).getAsJsonObject();

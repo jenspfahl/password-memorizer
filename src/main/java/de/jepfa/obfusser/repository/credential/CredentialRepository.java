@@ -36,8 +36,16 @@ public class CredentialRepository {
         new InsertAsyncTask(credentialDao).execute(credential);
     }
 
+    public long insertSync(Credential credential) {
+        return credentialDao.insert(credential);
+    }
+
     public void update(Credential credential) {
         new UpdateAsyncTask(credentialDao).execute(credential);
+    }
+
+    public void updateSync(Credential credential) {
+        credentialDao.update(credential);
     }
 
     public void delete(int credentialId) {

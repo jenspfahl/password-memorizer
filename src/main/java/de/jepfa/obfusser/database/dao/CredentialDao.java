@@ -15,7 +15,7 @@ import de.jepfa.obfusser.model.Credential;
 public interface CredentialDao {
 
     @Insert
-    void insert(Credential credential);
+    long insert(Credential credential);
 
     @Update
     void update(Credential credential);

@@ -31,9 +31,6 @@ public abstract class IdEntity {
         return getId() != 0;
     }
 
-    public void unsetId() {
-        id = 0;
-    }
 
     @Override
     public boolean equals(Object o) {

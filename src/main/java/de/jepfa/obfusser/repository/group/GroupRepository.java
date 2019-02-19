@@ -53,6 +53,10 @@ public class GroupRepository {
         new UpdateAsyncTask(groupDao).execute(group);
     }
 
+    public void updateSync(Group group) {
+        groupDao.update(group);
+    }
+
     public void delete(int groupId) {
         Group group = new Group();
         group.setId(groupId);

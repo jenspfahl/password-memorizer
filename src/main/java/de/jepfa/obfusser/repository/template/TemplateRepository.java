@@ -40,8 +40,16 @@ public class TemplateRepository {
         new InsertAsyncTask(templateDao).execute(template);
     }
 
+    public long insertSync(Template template) {
+        return templateDao.insert(template);
+    }
+
     public void update(Template template) {
         new UpdateAsyncTask(templateDao).execute(template);
+    }
+
+    public void updateSync(Template template) {
+        templateDao.update(template);
     }
 
     public void delete(int templateId) {

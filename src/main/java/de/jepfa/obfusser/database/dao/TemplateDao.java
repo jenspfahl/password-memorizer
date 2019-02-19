@@ -15,7 +15,7 @@ import de.jepfa.obfusser.model.Template;
 public interface TemplateDao {
 
     @Insert
-    void insert(Template template);
+    long insert(Template template);
 
     @Update
     void update(Template template);

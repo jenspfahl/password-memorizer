@@ -60,7 +60,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
             holder.selectHintTextView.setTextColor(activity.getResources().getColor(R.color.colorAccent));
         }
         else {
-            holder.selectHintTextView.setText(patternString.charAt(position) + "");
+            holder.selectHintTextView.setText(String.valueOf(patternString.charAt(position)));
             holder.selectHintTextView.setTextColor(activity.getResources().getColor(R.color.colorPrimary));
         }
 
@@ -112,7 +112,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
                                         pattern.removeHint(index, secret, withUuid);
 
                                         holder.selectHintTextView.setTextColor(Color.BLACK);
-                                        holder.selectHintTextView.setText(patternString.charAt(position)+"");
+                                        holder.selectHintTextView.setText(String.valueOf(patternString.charAt(position)));
 
                                         if (hintUpdateListener != null) {
                                             hintUpdateListener.onHintUpdated(index);
@@ -128,7 +128,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
                         pattern.removeHint(index, secret, withUuid);
 
                         holder.selectHintTextView.setTextColor(Color.BLACK);
-                        holder.selectHintTextView.setText(patternString.charAt(position)+"");
+                        holder.selectHintTextView.setText(String.valueOf(patternString.charAt(position)));
 
                         if (hintUpdateListener != null) {
                             hintUpdateListener.onHintUpdated(index);
@@ -167,7 +167,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            this.selectHintTextView = view.findViewById(R.id.select_hint_textview);;
+            this.selectHintTextView = view.findViewById(R.id.select_hint_textview);
         }
     }
 }

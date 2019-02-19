@@ -1,9 +1,6 @@
 package de.jepfa.obfusser.ui.common
 
 import android.app.Activity
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.v7.app.AlertDialog
 import android.util.Log
@@ -19,7 +16,7 @@ object Debug {
     private var debug = BuildConfig.DEBUG
 
     val isDebug: Boolean
-        get() = debug == true
+        get() = debug
 
     fun showDebugDialog(activity: Activity) {
         val builder = AlertDialog.Builder(activity)
@@ -39,7 +36,7 @@ object Debug {
             Log.e("DEBUGINFO", "cannot get version code", e)
         }
 
-        addParam(sb, "SdkVersion", Build.VERSION.SDK_INT.toString());
+        addParam(sb, "SdkVersion", Build.VERSION.SDK_INT.toString())
 
         val salt = SecureActivity.SecretChecker.getSalt(activity)
         addParam(sb, "AppSalt", endOfArrayToString(salt, 4) + ", len=" + arrayLength(salt))
@@ -93,7 +90,7 @@ object Debug {
         }
     }
 
-    fun arrayLength(a: ByteArray?): String {
+    private fun arrayLength(a: ByteArray?): String {
         return a?.size?.toString() ?: "n/a"
     }
 }

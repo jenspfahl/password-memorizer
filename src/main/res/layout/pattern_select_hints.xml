@@ -8,9 +8,8 @@
     android:layout_gravity="center_horizontal"
     android:layout_margin="4dp"
     android:padding="1dp"
-    tools:context=".ui.common.PatternSelectHintsFragment"
+    tools:context=".ui.common.input.PatternSelectHintsFragment"
     tools:listitem="@layout/pattern_select_hint">
-
 
 
 </android.support.v7.widget.RecyclerView>

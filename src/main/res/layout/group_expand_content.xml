@@ -7,7 +7,8 @@
         android:id="@+id/group_expand_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:paddingEnd="?android:attr/expandableListPreferredItemPaddingLeft"
         android:textColor="@android:color/black"
         android:paddingTop="10dp"
         android:paddingBottom="10dp" />

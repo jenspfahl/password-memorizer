@@ -186,7 +186,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
     @NonNull
     private SpannableString getSpannableString(SecurePatternHolder pattern, String patternString) {
-        SpannableString span = new SpannableString(patternString);;
+        SpannableString span = new SpannableString(patternString);
         byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
         boolean withUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity());
 

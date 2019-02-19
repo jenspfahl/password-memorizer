@@ -95,8 +95,8 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
             final View passwordView = inflater.inflate(R.layout.dialog_setup_password, null);
             final EditText firstPassword = passwordView.findViewById(R.id.first_password);
             final EditText secondPassword = passwordView.findViewById(R.id.second_password);
-            final Switch storePasswdSwitch = passwordView.findViewById(R.id.switch_store_password);
-            storePasswdSwitch.setVisibility(View.GONE);
+            final Switch overwriteExistingSwitch = passwordView.findViewById(R.id.switch_store_password);
+            overwriteExistingSwitch.setText(activity.getString(R.string.message_restore_dialog_overwrite_existing));
             final Switch disturbPatternsSwitch = passwordView.findViewById(R.id.disturb_equal_patterns);
             disturbPatternsSwitch.setVisibility(View.GONE);
 
@@ -185,6 +185,7 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
                                 BackupRestoreService.startRestoreAll(
                                         activity,
                                         fcontent,
+                                        overwriteExistingSwitch.isChecked(),
                                         transferKey,
                                         key,
                                         SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));

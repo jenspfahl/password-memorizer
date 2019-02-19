@@ -58,6 +58,7 @@ public class BackupRestoreService extends IntentService {
     private static final String PARAM_TRANSFER_KEY = "de.jepfa.obfusser.service.param.transferkey";
     private static final String PARAM_TRANSFER_SALT = "de.jepfa.obfusser.service.param.transfersalt";
     private static final String PARAM_CONTENT = "de.jepfa.obfusser.service.param.content";
+    private static final String PARAM_OVERWRITE_EXISTING = "de.jepfa.obfusser.service.param.overwrite_existing";
 
     public static final String BACKUP_FILE_BASE = "password-memorizer-";
 
@@ -108,12 +109,14 @@ public class BackupRestoreService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startRestoreAll(Context context, String jsonContent, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
+    public static void startRestoreAll(Context context, String jsonContent, boolean overwriteExisting,
+                                       byte[] transferKey, byte[] encryptKey, boolean withUuid) {
         Intent intent = new Intent(context, BackupRestoreService.class);
         intent.setAction(ACTION_RESTORE_ALL);
         intent.putExtra(PARAM_ENCRYPT_KEY, encryptKey);
         intent.putExtra(PARAM_WITH_UUID, withUuid);
         intent.putExtra(PARAM_CONTENT, jsonContent);
+        intent.putExtra(PARAM_OVERWRITE_EXISTING, overwriteExisting);
         intent.putExtra(PARAM_TRANSFER_KEY, transferKey);
         context.startService(intent);
     }
@@ -134,6 +137,7 @@ public class BackupRestoreService extends IntentService {
             if (ACTION_RESTORE_ALL.equals(action)) {
                 restoreAll(
                         intent.getStringExtra(PARAM_CONTENT),
+                        intent.getBooleanExtra(PARAM_OVERWRITE_EXISTING, false),
                         intent.getByteArrayExtra(PARAM_TRANSFER_KEY),
                         intent.getByteArrayExtra(PARAM_ENCRYPT_KEY),
                         withUuid);
@@ -251,7 +255,7 @@ public class BackupRestoreService extends IntentService {
         return BACKUP_FILE_BASE + SDF_FILE.format(new Date()) + ".json";
     }
 
-    private void restoreAll(String content, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
+    private void restoreAll(String content, boolean overwriteExisting, byte[] transferKey, byte[] encryptKey, boolean withUuid) {
         try {
             JsonParser parser = new JsonParser();
             JsonObject jsonContent = parser.parse(content).getAsJsonObject();
@@ -275,14 +279,17 @@ public class BackupRestoreService extends IntentService {
             outer: for (Group otherGroup : otherGroups) {
                 for (Group existingGroup : existingGroups) {
                     if (existingGroup.getName().equals(otherGroup.getName())) {
-                        existingGroup.setInfo(otherGroup.getInfo());
-                        existingGroup.setColor(otherGroup.getColor());
-                        groupRepo.updateSync(existingGroup);
+                        if (overwriteExisting) {
+                            existingGroup.setInfo(otherGroup.getInfo());
+                            existingGroup.setColor(otherGroup.getColor());
+                            groupRepo.updateSync(existingGroup);
+                        }
                         otherGroupToExistingMap.put(otherGroup.getId(), existingGroup);
                         continue outer;
                     }
                 }
                 int oldId = otherGroup.getId();
+                otherGroup.unsetId();
                 long newId = groupRepo.insertSync(otherGroup);
                 otherGroup.setId((int) newId);
                 otherGroupToExistingMap.put(oldId, otherGroup);
@@ -291,31 +298,38 @@ public class BackupRestoreService extends IntentService {
             List<Template> existingTemplates = templateRepo.getAllTemplatesSync();
             outer: for (Template otherTemplate : otherTemplates) {
                 Group existingGroup = otherGroupToExistingMap.get(otherTemplate.getGroupId());
+
                 for (Template existingTemplate : existingTemplates) {
                     if (existingTemplate.getName().equals(otherTemplate.getName())) {
-                        existingTemplate.setInfo(otherTemplate.getInfo());
-                        existingTemplate.setGroupId(otherTemplate.getGroupId());
 
-                        existingTemplate.setPatternFromExchangeFormat(
-                                otherTemplate.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
-                                encryptKey,
-                                withUuid);
+                        if (overwriteExisting) {
+                            existingTemplate.setInfo(otherTemplate.getInfo());
+                            existingTemplate.setGroupId(otherTemplate.getGroupId());
 
-                        existingTemplate.setHints(
-                                otherTemplate.getHints(transferKey, decWithUuid),
-                                encryptKey,
-                                withUuid);
+                            existingTemplate.setPatternFromExchangeFormat(
+                                    otherTemplate.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
+                                    encryptKey,
+                                    withUuid);
 
-                        if (existingGroup != null) {
-                            existingTemplate.setGroupId(existingGroup.getId());
+                            existingTemplate.setHints(
+                                    otherTemplate.getHints(transferKey, decWithUuid),
+                                    encryptKey,
+                                    withUuid);
+
+                            if (existingGroup != null) {
+                                existingTemplate.setGroupId(existingGroup.getId());
+                            }
+                            templateRepo.updateSync(existingTemplate);
                         }
-                        templateRepo.updateSync(existingTemplate);
+
                         continue outer;
                     }
                 }
+
                 if (existingGroup != null) {
                     otherTemplate.setGroupId(existingGroup.getId());
                 }
+                otherTemplate.unsetId();
                 otherTemplate.decrypt(transferKey, decWithUuid);
                 otherTemplate.encrypt(encryptKey, withUuid);
                 templateRepo.insertSync(otherTemplate);
@@ -324,32 +338,39 @@ public class BackupRestoreService extends IntentService {
             List<Credential> existingCredentials = credentialRepo.getAllCredentialsSync();
             outer: for (Credential otherCredential : otherCredentials) {
                 Group existingGroup = otherGroupToExistingMap.get(otherCredential.getGroupId());
+
                 for (Credential existingCredential : existingCredentials) {
                     if (existingCredential.getName().equals(otherCredential.getName())) {
-                        existingCredential.setInfo(otherCredential.getInfo());
-                        existingCredential.setGroupId(otherCredential.getGroupId());
-                        existingCredential.setTemplateId(otherCredential.getTemplateId());
 
-                        existingCredential.setPatternFromExchangeFormat(
-                                otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
-                                encryptKey,
-                                withUuid);
+                        if (overwriteExisting) {
+                            existingCredential.setInfo(otherCredential.getInfo());
+                            existingCredential.setGroupId(otherCredential.getGroupId());
+                            existingCredential.setTemplateId(otherCredential.getTemplateId());
 
-                        existingCredential.setHints(
-                                otherCredential.getHints(transferKey, decWithUuid),
-                                encryptKey,
-                                withUuid);
+                            existingCredential.setPatternFromExchangeFormat(
+                                    otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
+                                    encryptKey,
+                                    withUuid);
 
-                        if (existingGroup != null) {
-                            existingCredential.setGroupId(existingGroup.getId());
+                            existingCredential.setHints(
+                                    otherCredential.getHints(transferKey, decWithUuid),
+                                    encryptKey,
+                                    withUuid);
+
+                            if (existingGroup != null) {
+                                existingCredential.setGroupId(existingGroup.getId());
+                            }
+                            credentialRepo.updateSync(existingCredential);
                         }
-                        credentialRepo.updateSync(existingCredential);
+
                         continue outer;
                     }
                 }
+
                 if (existingGroup != null) {
                     otherCredential.setGroupId(existingGroup.getId());
                 }
+                otherCredential.unsetId();
                 otherCredential.decrypt(transferKey, decWithUuid);
                 otherCredential.encrypt(encryptKey, withUuid);
                 credentialRepo.insertSync(otherCredential);

@@ -45,4 +45,8 @@ public abstract class IdEntity {
 
         return Objects.hash(id);
     }
+
+    public void unsetId() {
+        id = 0;
+    }
 }

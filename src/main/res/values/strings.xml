@@ -162,8 +162,9 @@
     <string name="message_backup_dialog_noenc">Your data is not encrypted, so the backup data will also not be encrypted. Be careful with the backup file.</string>
 
     <string name="title_restore_dialog">Restore backup file from %1$s</string>
-    <string name="message_restore_dialog_encrypted">Enter the password of the backup file to restore your data. It is important to type it correctly, otherwise the patterns will be restored in a different way. %1$d patterns, %2$d templates and %3$d groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
-    <string name="message_restore_dialog_noenc">%1$d patterns, %2$d templates and %3$d groups are going to be imported. Elements with the same name are going to be overwritten, if they already exist.</string>
+    <string name="message_restore_dialog_encrypted">Enter the password of the backup file to restore your data. It is important to type it correctly, otherwise the patterns will be restored in a different way. %1$d patterns, %2$d templates and %3$d groups are going to be imported.</string>
+    <string name="message_restore_dialog_noenc">%1$d patterns, %2$d templates and %3$d groups are going to be imported.</string>
+    <string name="message_restore_dialog_overwrite_existing">Overwrite already existing elements.</string>
     <string name="notification_channel_backup_title">Password Memorizer Backup Notifications</string>
     <string name="notification_backup_title">Backup ready</string>
     <string name="notification_backup_message">Backup file %1$s created.</string>

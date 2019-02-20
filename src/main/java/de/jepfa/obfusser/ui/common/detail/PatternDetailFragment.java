@@ -1,31 +1,20 @@
 package de.jepfa.obfusser.ui.common.detail;
 
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.jepfa.obfusser.Constants;
@@ -131,8 +120,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
                 if (secret != null) {
                     message = message + Constants.NL
                             + "uuidkey="
-                            + Debug.INSTANCE.endOfArrayToString(
-                                    pattern.getUUIDKey(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity())), 4);
+                            + Debug.INSTANCE.byteArrayChecksum(
+                                    pattern.getUUIDKey(secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(getActivity())));
                 }
                 new AlertDialog.Builder(getActivity())
                             .setTitle("Debug pattern")

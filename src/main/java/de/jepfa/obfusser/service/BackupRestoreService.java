@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
@@ -46,9 +47,6 @@ import de.jepfa.obfusser.util.FileUtil;
  * @author Jens Pfahl
  */
 public class BackupRestoreService extends IntentService {
-
-    private static final DateFormat SDF_INFO = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM);
-    private static final DateFormat SDF_FILE = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final String ACTION_BACKUP_ALL = "de.jepfa.obfusser.service.action.backup_all";
     private static final String ACTION_RESTORE_ALL = "de.jepfa.obfusser.service.action.restore_all";
@@ -155,7 +153,7 @@ public class BackupRestoreService extends IntentService {
             Log.e("BACKUPALL", "cannot get version code", e);
         }
 
-        root.addProperty(JSON_DATE, SDF_INFO.format(new Date()));
+        root.addProperty(JSON_DATE, Constants.SDF_DT_MEDIUM.format(new Date()));
         root.addProperty(JSON_ENC, encryptKey != null);
         root.addProperty(JSON_ENC_WITH_UUID, encWithUuid);
         root.addProperty(JSON_SALT, Base64.encodeToString(transferSalt, Base64.NO_WRAP));
@@ -252,7 +250,7 @@ public class BackupRestoreService extends IntentService {
 
     @NonNull
     public static String getBackupFileName() {
-        return BACKUP_FILE_BASE + SDF_FILE.format(new Date()) + ".json";
+        return BACKUP_FILE_BASE + Constants.SDF_D_INTERNATIONAL.format(new Date()) + ".json";
     }
 
     private void restoreAll(String content, boolean overwriteExisting, byte[] transferKey, byte[] encryptKey, boolean withUuid) {

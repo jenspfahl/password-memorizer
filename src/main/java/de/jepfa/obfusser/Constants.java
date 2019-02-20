@@ -1,8 +1,13 @@
 package de.jepfa.obfusser;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public interface Constants {
 
     String NL = System.getProperty("line.separator");
+    DateFormat SDF_DT_MEDIUM = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM);
+    DateFormat SDF_D_INTERNATIONAL = new SimpleDateFormat("yyyy-MM-dd");
 
     int NO_ID = Integer.MIN_VALUE;
     String EMPTY = "";

@@ -36,13 +36,15 @@ object Debug {
             Log.e("DEBUGINFO", "cannot get version code", e)
         }
 
+        addParam(sb, "BuildTimestamp", Constants.SDF_DT_MEDIUM.format(BuildConfig.BUILD_TIME))
+        addParam(sb, "BuildType", BuildConfig.BUILD_TYPE)
         addParam(sb, "SdkVersion", Build.VERSION.SDK_INT.toString())
 
         val salt = SecureActivity.SecretChecker.getSalt(activity)
-        addParam(sb, "AppSalt", endOfArrayToString(salt, 4) + ", len=" + arrayLength(salt))
+        addParam(sb, "AppSalt", byteArrayChecksum(salt).toString() + ", len=" + arrayLength(salt))
 
         val key = Secret.getOrCreate().digest
-        addParam(sb, "Key", endOfArrayToString(key, 4) + ", len=" + arrayLength(key))
+        addParam(sb, "Key", byteArrayChecksum(key).toString() + ", len=" + arrayLength(key))
 
         addParam(sb, "Key outdated", Secret.getOrCreate().isOutdated.toString())
 
@@ -70,24 +72,15 @@ object Debug {
         sb.append(Constants.NL)
     }
 
-    fun endOfArrayToString(a: ByteArray?, count: Int): String {
-        if (a == null)
-            return "null"
-        val iMin = Math.max(a.size - count, 0)
-        val iMax = a.size - 1
-        if (iMax == -1)
-            return "..]"
+    fun byteArrayChecksum(bytes: ByteArray?): Int {
+        if (bytes == null)
+            return 0
 
-        val b = StringBuilder()
-        b.append(".., ")
-        var i = iMin
-        while (true) {
-            b.append(a[i].toInt())
-            if (i == iMax)
-                return b.append(']').toString()
-            b.append(", ")
-            i++
+        var checkSum = 0
+        for (b in bytes) {
+            checkSum += b
         }
+        return checkSum
     }
 
     private fun arrayLength(a: ByteArray?): String {

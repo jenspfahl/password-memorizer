@@ -73,7 +73,11 @@ object FileUtil {
     fun writeFile(context: Context, uri: Uri, content: String): Boolean {
 
         try {
-            context.contentResolver.openOutputStream(uri)!!.use { os -> OutputStreamWriter(os).use { osw -> BufferedWriter(osw).use { bw -> bw.write(content) } } }
+            context.contentResolver.openOutputStream(uri)!!.use { os ->
+                OutputStreamWriter(os).use { osw ->
+                    BufferedWriter(osw).use { bw -> bw.write(content) }
+                }
+            }
         } catch (e: IOException) {
             Log.e("READFILE", "Cannot read $uri", e)
             return false

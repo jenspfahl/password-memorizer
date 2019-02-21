@@ -9,10 +9,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -192,7 +195,16 @@ public class BackupRestoreService extends IntentService {
 
         if (FileUtil.INSTANCE.isExternalStorageWritable()) {
 
-            success = FileUtil.INSTANCE.writeFile(this, fileUri, root.toString());
+            try {
+                success = FileUtil.INSTANCE.writeFile(this, fileUri, root.toString());
+                String content = FileUtil.INSTANCE.readFile(this, fileUri);
+                if (TextUtils.isEmpty(content)) {
+                    Log.e("BACKUP", "Empty file created: " + fileUri);
+                    success = false;
+                }
+            } catch (Exception e) {
+                Log.e("BACKUP", "Cannot write file " + fileUri, e);
+            }
 
             if (success) {
                 String fileName = FileUtil.INSTANCE.getFileName(this, fileUri);
@@ -241,7 +253,9 @@ public class BackupRestoreService extends IntentService {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getBaseContext(), R.string.toast_backup_failed, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(getBaseContext(), R.string.toast_backup_failed, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
             });
 
@@ -343,7 +357,7 @@ public class BackupRestoreService extends IntentService {
                         if (overwriteExisting) {
                             existingCredential.setInfo(otherCredential.getInfo());
                             existingCredential.setGroupId(otherCredential.getGroupId());
-                            existingCredential.setTemplateId(otherCredential.getTemplateId());
+                            //no template assoc existingCredential.setTemplateId(otherCredential.getTemplateId());
 
                             existingCredential.setPatternFromExchangeFormat(
                                     otherCredential.getPatternAsExchangeFormat(false, transferKey, decWithUuid),
@@ -371,6 +385,8 @@ public class BackupRestoreService extends IntentService {
                 otherCredential.unsetId();
                 otherCredential.decrypt(transferKey, decWithUuid);
                 otherCredential.encrypt(encryptKey, withUuid);
+                otherCredential.setTemplateId(null); //no template assoc
+
                 credentialRepo.insertSync(otherCredential);
             }
 
@@ -386,7 +402,9 @@ public class BackupRestoreService extends IntentService {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getBaseContext(), R.string.toast_restore_aborted, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(getBaseContext(), R.string.toast_restore_aborted, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
             });
         }

@@ -8,6 +8,7 @@ import android.preference.Preference;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -44,7 +45,10 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
 
         final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(activity);
         if (key == Secret.INVALID_DIGEST) {
-            Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+
             return false;
         }
 
@@ -64,7 +68,9 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
         Uri selectedFile = data.getData();
         final byte[] key = SecureActivity.SecretChecker.getOrAskForSecret(activity);
         if (key == Secret.INVALID_DIGEST) {
-            Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(activity, R.string.secret_disappeared, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
             return;
         }
 
@@ -87,7 +93,9 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
 
 
         if (jsonContent == null) {
-            Toast.makeText(activity, activity.getString(R.string.toast_restore_failure), Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(activity, activity.getString(R.string.toast_restore_failure), Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
         }
         else {
             LayoutInflater inflater = activity.getLayoutInflater();
@@ -109,7 +117,9 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
 
 
                 if (credentialsCount == 0 && templatesCount == 0 && groupsCount == 0) {
-                    Toast.makeText(activity, R.string.toast_restore_nodata, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, R.string.toast_restore_nodata, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                     return;
                 }
 
@@ -209,7 +219,9 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
                 dialog.show();
             } catch (Exception e) {
                 Log.e("RESTORE", "cannot read metadata for " + selectedFile, e);
-                Toast.makeText(activity, activity.getString(R.string.toast_restore_failure), Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(activity, activity.getString(R.string.toast_restore_failure), Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         }
     }

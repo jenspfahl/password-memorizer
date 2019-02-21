@@ -132,7 +132,7 @@
     <string name="title_delete_revealed_character">Delete revealed character</string>
     <string name="message_delete_revealed_character">Sure delete not empty revealed character with number \'%1$s\'?</string>
     <string name="hint_tbd">t.b.d.</string>
-    <string name="fill_hints">Please fill all placeholders.</string>
+    <string name="fill_hints">Please fill all revealed characters.</string>
     <string name="title_about_the_app">About the app</string>
 
     <string name="message_password_to_encrypt">Your password is used to encrypt all patterns. It is important to remember this password, there is no recovery. Wrong entered passwords will decrypt the patterns in a different way and only you should know how your patterns usually look like.</string>
@@ -170,12 +170,12 @@
     <string name="notification_backup_message">Backup file %1$s created.</string>
     <string name="notification_action_backup_done">Open folder</string>
     <string name="toast_backup_done">Backup file ready.</string>
-    <string name="toast_backup_failed">Cannot create backup file.</string>
+    <string name="toast_backup_failed">Sorry, cannot create backup file!</string>
     <string name="toast_restore_done">Backup file successfully imported.</string>
-    <string name="toast_restore_failure">The selected file cannot be imported.</string>
-    <string name="toast_restore_aborted">Selected file import aborted due to an error.</string>
-    <string name="toast_restore_nodata">This file doesn\'t contain any data.</string>
+    <string name="toast_restore_failure">The selected file cannot be imported!</string>
+    <string name="toast_restore_aborted">Selected file import aborted due to an error!</string>
+    <string name="toast_restore_nodata">This file doesn\'t contain any data!</string>
     <string name="chooser_select_restore_file">Select a file to restore</string>
-    <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have entered your password again.</string>
+    <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have entered your password again!</string>
 
 </resources>

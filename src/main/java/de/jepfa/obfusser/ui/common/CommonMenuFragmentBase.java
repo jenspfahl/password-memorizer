@@ -152,7 +152,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
 
             Drawable icon = getActivity().getApplicationInfo().loadIcon(getActivity().getPackageManager());
             String message = getString(R.string.app_name) + ", Version " + getVersionName(getActivity()) +
-                    Constants.NL + " (c) Jens Pfahl 2018,2019";
+                    Constants.NL + " \u00A9 Jens Pfahl 2018,2019";
             builder.setTitle(R.string.title_about_the_app)
                     .setMessage(message)
                     .setIcon(icon)

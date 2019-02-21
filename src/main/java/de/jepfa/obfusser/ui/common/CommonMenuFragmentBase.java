@@ -51,39 +51,40 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
         }
 
         final MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        if (searchItem != null) {
+            SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 
-        final SearchView searchView = (SearchView) searchItem.getActionView();
+            final SearchView searchView = (SearchView) searchItem.getActionView();
 
-        if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        }
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchItem.collapseActionView();
-
-                return false;
+            if (searchView != null) {
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             }
-            @Override
-            public boolean onQueryTextChange(String s) {
-                Filterable filterable = getFilterable();
-                if (filterable != null) {
-                    filterable.getFilter().filter(s);
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    searchItem.collapseActionView();
+
+                    return false;
                 }
-                return false;
-            }
-        });
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    Filterable filterable = getFilterable();
+                    if (filterable != null) {
+                        filterable.getFilter().filter(s);
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-
         menuLockItems = menu.findItem(R.id.menu_lock_items);
         refreshMenuLockItem();
-
     }
 
     protected void refreshMenuLockItem() {

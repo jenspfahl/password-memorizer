@@ -31,4 +31,7 @@ public interface GroupDao {
 
     @Query("SELECT * FROM Groups WHERE id=:id")
     LiveData<Group> getGroupById(int id);
+
+    @Query("SELECT count(*) FROM Groups")
+    int getGroupCountSync();
 }

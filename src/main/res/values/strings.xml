@@ -20,7 +20,6 @@
     <string name="credential_select_template_explanation">Select a template to be used for your pattern.</string>
 
 
-
     <!-- Strings related to template -->
     <string name="title_template_detail">Template Detail</string>
     <string name="title_activity_template_input">New Template</string>
@@ -41,7 +40,6 @@
     <string name="template_input_pattern_explanation">You can enter your password and it will be transformed instantly into a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character types.</string>
 
 
-
     <!-- Strings related to group -->
     <string name="title_group_detail">Category Detail</string>
     <string name="title_activity_group_input">New Category</string>
@@ -58,7 +56,6 @@
 
     <string name="no_group">-not categorized-</string>
     <string name="assign_to_group">Categorize</string>
-
 
 
     <!-- common strings -->
@@ -78,11 +75,6 @@
     <string name="hint">Reveal</string>
 
 
-
-
-
-
-
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -90,7 +82,7 @@
     <string name="group_items">Group by categories</string>
     <string name="lock_items">Lock patterns</string>
     <string name="legend">Show legend</string>
-    <string name="help">Help</string>
+    <string name="help">Online Help</string>
     <string name="about">About</string>
     <string name="save">Save</string>
 
@@ -109,7 +101,6 @@
     <string name="title_legend">Legend</string>
 
 
-
     <!-- Strings related to Settings -->
     <string name="title_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
@@ -122,7 +113,6 @@
     <string name="pref_title_hide_patterns">Cover patterns in overview list</string>
     <string name="pref_description_hide_patterns">To prevent others seeing all your patterns in the overview lists, activate this option.</string>
     <string name="pref_header_backuprestore">Backup / Restore</string>
-
 
 
     <string name="title_encryption_password_required">Password required</string>
@@ -177,5 +167,9 @@
     <string name="toast_restore_nodata">This file doesn\'t contain any data!</string>
     <string name="chooser_select_restore_file">Select a file to restore</string>
     <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have entered your password again!</string>
+
+    <string name="credential_intro_text1">Memorize your passwords with help of a unique pattern. Each character of your password is stored like this:</string>
+    <string name="credential_intro_text2">Example:</string>
+    <string name="credential_intro_text3">Click on the Plus-Button to create your first password pattern.</string>
 
 </resources>

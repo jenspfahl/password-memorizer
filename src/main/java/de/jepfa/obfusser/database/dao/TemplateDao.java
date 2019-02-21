@@ -32,6 +32,9 @@ public interface TemplateDao {
     @Query("SELECT * FROM Template")
     List<Template> getAllTemplatesSync();
 
+    @Query("SELECT count(*) FROM Template")
+    int getTemplateCountSync();
+
     @Query("SELECT * FROM Template WHERE id=:id")
     LiveData<Template> getTemplateById(int id);
 }

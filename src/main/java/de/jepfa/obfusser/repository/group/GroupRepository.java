@@ -30,6 +30,10 @@ public class GroupRepository {
         return groupDao.getAllGroupsSync();
     }
 
+    public int getGroupCountSync() {
+        return groupDao.getGroupCountSync();
+    }
+
     public LiveData<Group> getGroupById(int id) {
         return groupDao.getGroupById(id);
     }

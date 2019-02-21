@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.common;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import de.jepfa.obfusser.Constants;
@@ -13,17 +14,23 @@ public class LegendShower {
     public static void showLegend(Activity activity, Representation representation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
+        String legend = buildLegend(activity, representation);
+
+        Drawable icon = activity.getApplicationInfo().loadIcon(activity.getPackageManager());
+        builder.setTitle(R.string.title_legend)
+                .setMessage(legend)
+                .setIcon(icon)
+                .show();
+    }
+
+    @NonNull
+    public static String buildLegend(Activity activity, Representation representation) {
         StringBuilder sb = new StringBuilder();
         buildObfusChar(activity, representation, sb, ObfusChar.LOWER_CASE_CHAR, R.string.lower_char, R.string.lower_char_explanation);
         buildObfusChar(activity, representation, sb, ObfusChar.UPPER_CASE_CHAR, R.string.upper_char, R.string.upper_char_explanation);
         buildObfusChar(activity, representation, sb, ObfusChar.DIGIT, R.string.digit, R.string.digit_explanation);
         buildObfusChar(activity, representation, sb, ObfusChar.SPECIAL_CHAR, R.string.special_char, R.string.special_char_explanation);
-
-        Drawable icon = activity.getApplicationInfo().loadIcon(activity.getPackageManager());
-        builder.setTitle(R.string.title_legend)
-                .setMessage(sb.toString())
-                .setIcon(icon)
-                .show();
+        return sb.toString();
     }
 
 

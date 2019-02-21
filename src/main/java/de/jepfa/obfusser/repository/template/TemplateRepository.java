@@ -32,6 +32,10 @@ public class TemplateRepository {
         return templateDao.getAllTemplatesSortByGroupAndName();
     }
 
+    public int getTemplateCountSync() {
+        return templateDao.getTemplateCountSync();
+    }
+
     public LiveData<Template> getTemplateById(int id) {
         return templateDao.getTemplateById(id);
     }

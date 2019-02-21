@@ -14,24 +14,36 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 
 import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.group.input.GroupInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
 
-public class GroupListFragment extends Fragment implements View.OnClickListener{
+public class GroupListFragment extends CommonMenuFragmentBase implements View.OnClickListener{
 
     private GroupListViewModel groupListViewModel;
 
 
     public GroupListFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    protected int getMenuId() {
+        return R.menu.toolbar_menu_group;
+    }
+
+    @Override
+    protected Filterable getFilterable() {
+        return null;
     }
 
     @Override
@@ -42,6 +54,11 @@ public class GroupListFragment extends Fragment implements View.OnClickListener{
                 .of(this.getActivity())
                 .get(GroupListViewModel.class);
 
+    }
+
+    @Override
+    public void refresh() {
+        refreshMenuLockItem();
     }
 
     @Override

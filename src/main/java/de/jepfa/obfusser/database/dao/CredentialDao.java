@@ -32,4 +32,7 @@ public interface CredentialDao {
     @Query("SELECT * FROM Credential")
     List<Credential> getAllCredentialsSync();
 
+    @Query("SELECT count(*) FROM Credential")
+    int getCredentialCountSync();
+
 }

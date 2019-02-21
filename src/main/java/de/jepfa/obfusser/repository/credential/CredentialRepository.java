@@ -32,6 +32,10 @@ public class CredentialRepository {
         return credentialDao.getAllCredentialsSync();
     }
 
+    public int getCredentialCountSync() {
+        return credentialDao.getCredentialCountSync();
+    }
+
     public void insert(Credential credential) {
         new InsertAsyncTask(credentialDao).execute(credential);
     }

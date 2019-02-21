@@ -24,8 +24,10 @@ import de.jepfa.obfusser.ui.credential.list.CredentialFlatListFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialIntroFragment;
 import de.jepfa.obfusser.ui.credential.list.CredentialListFragmentBase;
 import de.jepfa.obfusser.ui.group.list.GroupListFragment;
+import de.jepfa.obfusser.ui.group.list.GroupsIntroFragment;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.list.TemplateListFragment;
+import de.jepfa.obfusser.ui.template.list.TemplatesIntroFragment;
 import de.jepfa.obfusser.viewmodel.credential.CredentialListViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
@@ -148,13 +150,21 @@ public class NavigationActivity extends SecureActivity {
 
     @NonNull
     private CommonMenuFragmentBase getTemplateListFragmentImpl() {
-        return new TemplateListFragment();
+        if (isTemplatesEmpty()) {
+            return new TemplatesIntroFragment();
+        } else {
+            return new TemplateListFragment();
+        }
     }
 
 
     @NonNull
     private CommonMenuFragmentBase getGroupListFragmentImpl() {
-        return new GroupListFragment();
+        if (isGroupsEmpty()) {
+            return new GroupsIntroFragment();
+        } else {
+            return new GroupListFragment();
+        }
     }
 
     private boolean isCredentialsEmpty() {

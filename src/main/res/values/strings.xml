@@ -19,6 +19,10 @@
     <string name="credential_select_group_explanation">Optionally categorize your pattern.</string>
     <string name="credential_select_template_explanation">Select a template to be used for your pattern.</string>
 
+    <string name="credential_intro_text1">Memorize your passwords with help of a unique pattern. Each character of your password is stored like this:</string>
+    <string name="credential_intro_text2">Example:</string>
+    <string name="credential_intro_text3">Click on the Plus-Button to create your first password pattern.</string>
+
 
     <!-- Strings related to template -->
     <string name="title_template_detail">Template Detail</string>
@@ -39,6 +43,9 @@
     <string name="template_input_name_explanation">Here you need to give your template a short name. Optionally you can enter an additional info text.</string>
     <string name="template_input_pattern_explanation">You can enter your password and it will be transformed instantly into a pattern. If you don\'t want to type your password, you can also build the pattern by clicking the buttons for the character types.</string>
 
+    <string name="template_intro_text1">Templates are used to create new password patterns. If you have a base password which is adapted for each real password, you can use a template for that.</string>
+    <string name="template_intro_text2">Click on the Plus-Button to create your first pattern template.</string>
+
 
     <!-- Strings related to group -->
     <string name="title_group_detail">Category Detail</string>
@@ -56,6 +63,9 @@
 
     <string name="no_group">-not categorized-</string>
     <string name="assign_to_group">Categorize</string>
+
+    <string name="group_intro_text1">If you have a lot of password patterns, it can be become confusing. Here you can create and manage several categories. Go to the Patterns overview to associate your patterns with categories. You can also group your patterns by these categories.</string>
+    <string name="group_intro_text2">Click on the Plus-Button to create your first pattern category.</string>
 
 
     <!-- common strings -->
@@ -167,9 +177,5 @@
     <string name="toast_restore_nodata">This file doesn\'t contain any data!</string>
     <string name="chooser_select_restore_file">Select a file to restore</string>
     <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have entered your password again!</string>
-
-    <string name="credential_intro_text1">Memorize your passwords with help of a unique pattern. Each character of your password is stored like this:</string>
-    <string name="credential_intro_text2">Example:</string>
-    <string name="credential_intro_text3">Click on the Plus-Button to create your first password pattern.</string>
 
 </resources>

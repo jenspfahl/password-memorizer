@@ -51,7 +51,7 @@ class CredentialIntroFragment : CommonMenuFragmentBase() {
             val intent = Intent(context, CredentialInputNameActivity::class.java)
             startActivity(intent)
         })
-        // Inflate the layout for this fragment
+
         return view
     }
 

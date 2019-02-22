@@ -64,7 +64,6 @@ public class CredentialDetailActivity extends SecureActivity {
         final CollapsingToolbarLayout appBarLayout = findViewById(R.id.credential_detail_toolbar_layout);
 
         if (appBarLayout != null) {
-            StringBuilder sb = new StringBuilder(credential.getName());
             groupListViewModel
                     .getRepo()
                     .getGroupFromPattern(credential)
@@ -78,7 +77,7 @@ public class CredentialDetailActivity extends SecureActivity {
                         }
                     });
 
-            appBarLayout.setTitle(sb.toString());
+            appBarLayout.setTitle(credential.getName());
         }
 
         ActionBar actionBar = getSupportActionBar();

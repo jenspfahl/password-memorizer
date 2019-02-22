@@ -2,7 +2,10 @@ package de.jepfa.obfusser.ui.credential.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +20,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.IntentUtil;
@@ -103,7 +108,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         this.listView = listView;
     }
 
-    void setCredentials(List<Group> allGroups, List<Credential> credentials) {
+    void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials) {
         groups = new ArrayList<>(allGroups.size());
         groupIdCredentials = new HashMap<>();
         originGroups = groups;
@@ -211,7 +216,8 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
                     parent, false);
         }
         TextView nameView = convertView.findViewById(R.id.group_expand_title);
-        nameView.setText(group.getName());
+        nameView.setText(GroupColorizer.getColorizedText(group, group.getName()));
+
         return convertView;
     }
 
@@ -227,7 +233,8 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         TextView patternView = convertView.findViewById(R.id.credential_list_pattern);
         ImageView iconView = convertView.findViewById(R.id.credential_list_menu_popup);
 
-        nameView.setText(credential.getName());
+        Group group = (Group) getGroup(groupPosition);
+        nameView.setText(GroupColorizer.getColorizedText(group, credential.getName()));
 
         boolean hidePatterns = PreferenceManager
                 .getDefaultSharedPreferences(fragment.getActivity())

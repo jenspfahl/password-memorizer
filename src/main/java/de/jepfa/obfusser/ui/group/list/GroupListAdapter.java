@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.group.detail.GroupDetailActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 
@@ -61,11 +62,12 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (groups != null || !groups.isEmpty()) {
-            holder.nameView.setText(groups.get(position).getName());
+            Group group = groups.get(position);
+            holder.nameView.setText(GroupColorizer.getColorizedText(group, group.getName()));
 
-            holder.iconView.setTag(groups.get(position));
+            holder.iconView.setTag(group);
             holder.nameView.setOnClickListener(onClickShowDetailListener);
-            holder.nameView.setTag(groups.get(position));
+            holder.nameView.setTag(group);
         }
     }
 

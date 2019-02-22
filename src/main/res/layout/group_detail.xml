@@ -1,16 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/group_detail_textview"
     style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clickable="true"
-    android:letterSpacing="0.1"
-    android:padding="16dp"
-    android:textAlignment="center"
-    android:textIsSelectable="false"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="1dp"
+    tools:context=".ui.group.detail.GroupDetailFragment">
 
-    android:textStyle="normal"
-    tools:context=".ui.group.detail.GroupDetailFragment"
-    android:focusable="true" />
+    <TextView
+        android:id="@+id/group_detail_textview"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:letterSpacing="0.1"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textStyle="normal"
+        android:focusable="true" />
+
+
+    <TextView
+        android:id="@+id/group_detail_color"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="56dp"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        android:textStyle="normal"
+        android:clickable="true"
+        android:focusable="true" />
+</LinearLayout>
+
+

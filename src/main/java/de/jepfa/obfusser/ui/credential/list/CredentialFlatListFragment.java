@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.Group;
 
 
 public class CredentialFlatListFragment extends CredentialListFragmentBase {
@@ -48,7 +49,15 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {
-                        listAdapter.setCredentials(credentials);
+                        groupListViewModel
+                                .getRepo()
+                                .getAllGroupsSortByName()
+                                .observe(CredentialFlatListFragment.this, new Observer<List<Group>>() {
+                                    @Override
+                                    public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call
+                                        listAdapter.setGroupsAndCredentials(groups, credentials);
+                                    }
+                                });
                     }
                 });
 

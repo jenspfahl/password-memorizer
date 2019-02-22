@@ -62,7 +62,7 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
                                 .observe(CredentialExpandableListFragment.this, new Observer<List<Group>>() {
                                     @Override
                                     public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call
-                                        expandableAdapter.setCredentials(groups, credentials);
+                                        expandableAdapter.setGroupsAndCredentials(groups, credentials);
                                         expandStoredGroups(listView, defaultSharedPreferences);
                                     }
                                 });

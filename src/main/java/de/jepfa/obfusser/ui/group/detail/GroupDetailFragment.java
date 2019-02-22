@@ -15,6 +15,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.Debug;
+import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 public class GroupDetailFragment extends Fragment {
@@ -39,10 +40,31 @@ public class GroupDetailFragment extends Fragment {
 
         if (groupViewModel.getGroup() != null) {
             final Group group = groupViewModel.getGroup().getValue();
-            TextView textView = rootView.findViewById(R.id.group_detail_textview);
+            TextView infoTextView = rootView.findViewById(R.id.group_detail_textview);
             if (group.getInfo() != null) {
-                textView.setText(group.getInfo());
+                infoTextView.setText(group.getInfo());
             }
+            else {
+                infoTextView.setText("         "); // be clickable for debugging
+            }
+
+            final TextView colorTextView = rootView.findViewById(R.id.group_detail_color);
+            colorTextView.setText(GroupColorizer.getColorizedButton(group));
+
+            colorTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (group.getColor() == 0) {
+                        int color = Integer.parseInt("#9210d5".replaceFirst("#", ""), 16);
+                        group.setColor(color);
+                    }
+                    else {
+                        group.setColor(0);
+                    }
+                    groupViewModel.getRepo().update(group);
+                    colorTextView.setText(GroupColorizer.getColorizedButton(group));
+                }
+            });
 
             final GestureDetector longPressGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
                 public void onLongPress(MotionEvent event) {
@@ -55,7 +77,7 @@ public class GroupDetailFragment extends Fragment {
             });
 
 
-            rootView.setOnTouchListener(new View.OnTouchListener() {
+            infoTextView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (Debug.INSTANCE.isDebug()) {

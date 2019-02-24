@@ -1,5 +1,7 @@
 package de.jepfa.obfusser.ui.group.detail;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -10,12 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
-import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.model.GroupColor;
 import de.jepfa.obfusser.ui.common.Debug;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
+import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.group.GroupViewModel;
 
 public class GroupDetailFragment extends Fragment {
@@ -49,20 +51,24 @@ public class GroupDetailFragment extends Fragment {
             }
 
             final TextView colorTextView = rootView.findViewById(R.id.group_detail_color);
-            colorTextView.setText(GroupColorizer.getColorizedButton(group));
+            char indicator;
+            if (group.getColor() == 0) {
+                indicator = GroupColorizer.COLOR_INDICATION_EMPTY;
+                colorTextView.setTextColor(Color.GRAY);
+            }
+            else {
+                indicator = GroupColorizer.COLOR_INDICATION_FULL;
+                colorTextView.setTextColor(GroupColor.getAndroidColor(group.getColor()));
+            }
+            colorTextView.setText(String.valueOf(indicator));
 
             colorTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (group.getColor() == 0) {
-                        int color = Integer.parseInt("#9210d5".replaceFirst("#", ""), 16);
-                        group.setColor(color);
-                    }
-                    else {
-                        group.setColor(0);
-                    }
-                    groupViewModel.getRepo().update(group);
-                    colorTextView.setText(GroupColorizer.getColorizedButton(group));
+
+                    Intent intent = new Intent(v.getContext(), SelectGroupColorActivity.class);
+                    IntentUtil.setGroupExtra(intent, group);
+                    startActivity(intent);
                 }
             });
 

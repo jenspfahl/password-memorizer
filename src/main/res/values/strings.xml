@@ -55,6 +55,8 @@
 
     <string name="title_assign_group">Categorize </string>
 
+    <string name="title_group_color">Set color for </string>
+
     <string name="button_create_group">Create Category</string>
     <string name="button_change_group">Update Category</string>
 
@@ -67,6 +69,9 @@
     <string name="group_intro_text1">If you have a lot of password patterns, it can be become confusing. Here you can create and manage several categories. Go to the Patterns overview to associate your patterns with categories. You can also group your patterns by these categories.</string>
     <string name="group_intro_text2">Click on the Plus-Button to create your first pattern category.</string>
 
+    <string name="group_colorize">Define a color for your category.</string>
+    <string name="group_colorize_no_color">- no color -</string>
+    <string name="change_color">Set color</string>
 
     <!-- common strings -->
     <string name="prompt_name">Name</string>

@@ -15,19 +15,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:letterSpacing="0.1"
-        android:padding="16dp"
+        android:paddingTop="16dp"
         android:textAlignment="center"
         android:textIsSelectable="false"
         android:textStyle="normal"
         android:focusable="true" />
 
-
     <TextView
         android:id="@+id/group_detail_color"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="56dp"
+        android:textSize="250dp"
         android:textAlignment="center"
         android:textIsSelectable="false"
         android:textStyle="normal"

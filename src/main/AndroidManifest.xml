@@ -98,6 +98,13 @@
             android:name=".ui.group.input.GroupInputNameActivity"
             android:label="@string/title_activity_group_input" />
         <activity
+            android:name=".ui.group.detail.SelectGroupColorActivity"
+            android:parentActivityName=".ui.group.detail.GroupDetailActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.jepfa.obfusser.ui.group.detail.GroupDetailActivity" />
+        </activity>
+        <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
 

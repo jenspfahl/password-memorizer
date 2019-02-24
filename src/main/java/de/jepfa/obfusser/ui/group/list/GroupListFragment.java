@@ -22,6 +22,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.group.detail.SelectGroupColorActivity;
 import de.jepfa.obfusser.ui.group.input.GroupInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
@@ -108,6 +109,11 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
                 switch (item.getItemId()) {
                     case R.id.menu_change_group:
                         Intent intent = new Intent(v.getContext(), GroupInputNameActivity.class);
+                        IntentUtil.setGroupExtra(intent, group);
+                        startActivity(intent);
+                        return true;
+                    case R.id.menu_change_color:
+                        intent = new Intent(v.getContext(), SelectGroupColorActivity.class);
                         IntentUtil.setGroupExtra(intent, group);
                         startActivity(intent);
                         return true;

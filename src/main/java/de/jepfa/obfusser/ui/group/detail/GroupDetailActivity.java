@@ -79,6 +79,12 @@ public class GroupDetailActivity extends BaseActivity {
                 startActivity(intent);
                 return true;
 
+            case R.id.menu_change_color:
+                intent = new Intent(this, SelectGroupColorActivity.class);
+                IntentUtil.setGroupExtra(intent, group);
+                startActivity(intent);
+                return true;
+
             case R.id.menu_delete_group:
                 DeletionHelper.askAndDelete(groupViewModel.getRepo(), group, this, new Runnable() {
                     @Override
@@ -88,7 +94,6 @@ public class GroupDetailActivity extends BaseActivity {
                         navigateUpTo(upIntent);
                     }
                 });
-
 
                 return true;
         }

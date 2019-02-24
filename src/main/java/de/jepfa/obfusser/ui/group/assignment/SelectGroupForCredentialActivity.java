@@ -19,6 +19,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
@@ -77,7 +78,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                         for (Group group : groups) {
                             RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
                             groupRadioButton.setId(group.getId());
-                            groupRadioButton.setText(group.getName());
+                            groupRadioButton.setText(GroupColorizer.getColorizedText(group, group.getName()));
                             if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
                                 groupRadioButton.setChecked(true);
                             }

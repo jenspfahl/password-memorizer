@@ -20,6 +20,7 @@ import java.util.List;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
+import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
 import de.jepfa.obfusser.ui.group.detail.SelectGroupColorActivity;
@@ -66,6 +67,9 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.navtab_group_list, container, false);
+
+        // get secret also here to avoid unexpected user timeouts
+        SecureActivity.SecretChecker.getOrAskForSecret(getSecureActivity());
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

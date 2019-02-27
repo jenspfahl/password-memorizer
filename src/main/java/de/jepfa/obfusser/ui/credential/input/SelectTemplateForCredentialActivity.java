@@ -62,7 +62,9 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
             public void onClick(View view) {
                 Credential credential = credentialViewModel.getCredential().getValue();
                 if (selectedTemplate != null) {
-                    credential.copyFrom(selectedTemplate);
+                    credential.copyFrom(selectedTemplate,
+                            SecureActivity.SecretChecker.getOrAskForSecret(SelectTemplateForCredentialActivity.this),
+                            SecureActivity.SecretChecker.isEncWithUUIDEnabled(SelectTemplateForCredentialActivity.this));
                 }
                 Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
                 IntentUtil.setCredentialExtra(intent, credential);

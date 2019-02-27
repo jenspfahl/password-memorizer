@@ -399,6 +399,11 @@ public abstract class SecurePatternHolder extends PatternHolder {
                 })).toRepresentation(representation);
     }
 
+    public void copyFrom(SecurePatternHolder other, byte[] key, boolean encWithUuid) {
+        setPattern(other.getPattern(key, encWithUuid), key, encWithUuid, false);
+        setHints(new TreeMap<>(other.getHints(key, encWithUuid)), key, encWithUuid);
+        //setGroupId(other.getGroupId()); TODO activate if group is part of the cretion/change process
+    }
 
 
     private void recryptAllHints(int oldPatternLength, int newPatternLength, byte[] key, boolean encWithUuid) {

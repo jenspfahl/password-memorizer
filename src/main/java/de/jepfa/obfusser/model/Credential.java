@@ -40,8 +40,8 @@ public class Credential extends SecurePatternHolder {
         this.templateId = templateId;
     }
 
-    public void copyFrom(Template template) {
-        super.copyFrom(template);
+    public void copyFrom(Template template, byte[] key, boolean encWithUuid) {
+        super.copyFrom(template, key, encWithUuid);
         //setTemplateId(template.getId()); Don't do this, this may reveal pattern belonging
     }
 

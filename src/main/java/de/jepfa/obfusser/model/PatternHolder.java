@@ -115,12 +115,6 @@ public abstract class PatternHolder extends IdEntity {
     }
 
 
-    public void copyFrom(PatternHolder other) {
-        setPatternInternal(other.getPatternInternal());
-        setHints(new TreeMap<>(other.getHints()));
-        //setGroupId(other.getGroupId()); TODO activate if group is part of the cretion/change process
-    }
-
     public String toString() {
         return "id=" + id +
                 ", name='" + name + '\'' +

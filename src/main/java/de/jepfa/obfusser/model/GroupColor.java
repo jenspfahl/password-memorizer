@@ -8,7 +8,7 @@ public enum GroupColor {
     GREEN("#59cd00"),
     GOLD("#e09300"),
     LIGHT_BLUE("#0097f9"),
-    DARK_BLUE("#1e384c"),
+    GREY("#3e586c"),
     ;
 
     private String colorRGBHex;

@@ -18,6 +18,7 @@ import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.common.LegendShower;
 import de.jepfa.obfusser.ui.common.detail.PatternDetailFragment;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
@@ -72,7 +73,7 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                subText.setText(group.getName());
+                                subText.setText(GroupColorizer.getColorizedText(group, group.getName()));
                             }
                         }
                     });

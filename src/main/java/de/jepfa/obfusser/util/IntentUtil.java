@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.model.PatternHolder;
@@ -26,9 +27,9 @@ public class IntentUtil {
     private static void fillPatternFromIntent(SecurePatternHolder pattern, Intent intent) {
 
         pattern.setId(intent.getIntExtra(SecurePatternHolder.ATTRIB_ID, 0));
-        pattern.setName(intent.getStringExtra(SecurePatternHolder.ATTRIB_NAME));
-        pattern.setInfo(intent.getStringExtra(SecurePatternHolder.ATTRIB_INFO));
-        pattern.setPatternInternal(intent.getStringExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL));
+        pattern.setName(CryptString.of(intent.getStringExtra(SecurePatternHolder.ATTRIB_NAME)));
+        pattern.setInfo(CryptString.of(intent.getStringExtra(SecurePatternHolder.ATTRIB_INFO)));
+        pattern.setPatternInternal(CryptString.of(intent.getStringExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL)));
         pattern.setUuid(intent.getStringExtra(SecurePatternHolder.ATTRIB_UUID));
 
 
@@ -73,10 +74,10 @@ public class IntentUtil {
 
     private static void setPatternExtra(Intent intent, SecurePatternHolder pattern) {
         intent.putExtra(SecurePatternHolder.ATTRIB_ID, pattern.getId());
-        intent.putExtra(SecurePatternHolder.ATTRIB_NAME, pattern.getName());
-        intent.putExtra(SecurePatternHolder.ATTRIB_INFO, pattern.getInfo());
+        intent.putExtra(SecurePatternHolder.ATTRIB_NAME, CryptString.from(pattern.getName()));
+        intent.putExtra(SecurePatternHolder.ATTRIB_INFO, CryptString.from(pattern.getInfo()));
         intent.putExtra(SecurePatternHolder.ATTRIB_GROUP_ID, pattern.getGroupId());
-        intent.putExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL, pattern.getPatternInternal());
+        intent.putExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL, CryptString.from(pattern.getPatternInternal()));
         intent.putExtra(SecurePatternHolder.ATTRIB_UUID, pattern.getUuid());
 
         ArrayList<String> hints = convertHintsForTransport(pattern);

@@ -139,6 +139,10 @@ public abstract class SecureActivity extends BaseActivity {
                         byte[] encSalt = Base64.decode(saltBase64, 0);
                         Pair<byte[], byte[]> encrypted = new Pair<>(iv, encSalt);
                         salt = EncryptUtil.decryptData(SecretChecker.KEY_ALIAS_SALT, encrypted);
+                        if (salt == null) {
+                            Log.e("GET_SALT", "Cannot get stored salt cause it could not be decrypted");
+                            return null;
+                        }
                     }
                 }
                 else {
@@ -155,6 +159,10 @@ public abstract class SecureActivity extends BaseActivity {
         private static void encryptAndStoreSalt(byte[] salt, SharedPreferences.Editor editor) {
 
             Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecretChecker.KEY_ALIAS_SALT, salt);
+            if (encrypted == null) {
+                Log.e("STORE_SALT", "Cannot store salt cause it could not be encrypted");
+                return;
+            }
 
             String encSaltBase64 = Base64.encodeToString(encrypted.second, 0);
             String ivBase64 = Base64.encodeToString(encrypted.first, 0);
@@ -275,6 +283,10 @@ public abstract class SecureActivity extends BaseActivity {
 
                     byte[] key = EncryptUtil.generateKey(pwd, salt);
                     byte[] hashedStoredKey = EncryptUtil.decryptData(KEY_ALIAS_PASSWD, new Pair<>(iv, encPasswd));
+                    if (hashedStoredKey == null) {
+                        Log.e("CHECK_PWD", "Cannot get stored salt cause it could not be decrypted");
+                        return false;
+                    }
                     byte[] hashedPwd = EncryptUtil.fastHash(key, salt);
 
                     return Arrays.equals(hashedPwd, hashedStoredKey);

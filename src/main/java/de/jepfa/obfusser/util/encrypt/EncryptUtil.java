@@ -16,12 +16,15 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 
 import de.jepfa.obfusser.Constants;
@@ -38,8 +41,10 @@ import de.jepfa.obfusser.util.encrypt.hints.HintChar;
 public class EncryptUtil {
 
     private static final int BYTE_COUNT = 1 << Byte.SIZE;
-    private static final String CIPHER_AES = "AES/GCM/NoPadding";
+    private static final String CIPHER_AES_GCM = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
+
+    private static final Map<String, SecretKey> secretKeys = new ConcurrentHashMap<>();
 
     /*
      * To encypt special chars, we need to define which chars are common in credentials.
@@ -88,16 +93,26 @@ public class EncryptUtil {
     @TargetApi(Build.VERSION_CODES.M)
     public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
-        try {
-            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
-            cipher.init(Cipher.ENCRYPT_MODE, getAndroidSecretKey(alias));
+        synchronized (alias) {
+            try {
+                final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
+                SecretKey androidSecretKey = getAndroidSecretKey(alias);
+                if (androidSecretKey == null) {
+                    Log.e("ENCDATA", "Key is null: " + alias);
+                    return null;
+                }
 
-            return new Pair<>(cipher.getIV(), cipher.doFinal(data));
-        } catch (Exception e) {
-            Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
+                cipher.init(Cipher.ENCRYPT_MODE, androidSecretKey);
+
+              return new Pair<>(cipher.getIV(), cipher.doFinal(data));
+            } catch (Exception e) {
+                Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
+            }
         }
         return null;
     }
+
+
 
 
     /**
@@ -110,25 +125,29 @@ public class EncryptUtil {
      */
     @TargetApi(Build.VERSION_CODES.M)
     public static byte[] decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
+        synchronized (alias) {
+            try {
+                byte[] encryptionIv = encryptedIvAndData.first;
+                byte[] encryptedData = encryptedIvAndData.second;
 
-        try {
-            byte[] encryptionIv = encryptedIvAndData.first;
-            byte[] encryptedData = encryptedIvAndData.second;
-            KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
-            keyStore.load(null);
+                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+                keyStore.load(null);
 
-            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
-            final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
-            SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+                final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
+                final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
 
-            return cipher.doFinal(encryptedData);
-        } catch (Exception e) {
-            Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
+                SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
+
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+                return cipher.doFinal(encryptedData);
+
+            } catch (Exception e) {
+                Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
+            }
         }
         return null;
     }
-
 
     public static boolean isPasswdEncryptionSupported() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
@@ -379,21 +398,28 @@ public class EncryptUtil {
     @TargetApi(Build.VERSION_CODES.M)
     private static SecretKey getAndroidSecretKey(final String alias) throws Exception {
 
-        KeyGenerator keyGenerator;
-        if (isPasswdEncryptionSupported()) {
-            keyGenerator = KeyGenerator
-                    .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+        synchronized (alias) {
+            if (isPasswdEncryptionSupported()) {
+                SecretKey secretKey = secretKeys.get(alias);
+                if (secretKey == null) {
+                    KeyGenerator keyGenerator = KeyGenerator
+                            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
 
-            keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
-                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .build());
+                    keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
+                            KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                            .build());
 
-            return keyGenerator.generateKey();
+                    secretKey = keyGenerator.generateKey();
+                    secretKeys.put(alias, secretKey);
+                }
+                return secretKey;
+            }
         }
 
         return null;
     }
+
 
 }

@@ -4,15 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Ignore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-
-import de.jepfa.obfusser.Constants;
 
 /**
  * Base class for {@link Credential} and {@link Template}.
@@ -29,13 +23,13 @@ public abstract class PatternHolder extends IdEntity {
 
 
     @NonNull
-    private String name;
+    private CryptString name;
 
     @Nullable
-    private String info;
+    private CryptString info;
 
     @NonNull
-    private String patternInternal;
+    private CryptString patternInternal;
 
     @NonNull
     private Map<Integer, String> hints;
@@ -45,20 +39,20 @@ public abstract class PatternHolder extends IdEntity {
     private Integer groupId;
 
     @NonNull
-    public String getName() {
+    public CryptString getName() {
         return name;
     }
 
-    public void setName(@NonNull String name) {
+    public void setName(@NonNull CryptString name) {
         this.name = name;
     }
 
     @Nullable
-    public String getInfo() {
+    public CryptString getInfo() {
         return info;
     }
 
-    public void setInfo(@NonNull String info) {
+    public void setInfo(@NonNull CryptString info) {
         this.info = info;
     }
 
@@ -72,11 +66,11 @@ public abstract class PatternHolder extends IdEntity {
     }
 
     @NonNull
-    public String getPatternInternal() {
+    public CryptString getPatternInternal() {
         return patternInternal;
     }
 
-    public void setPatternInternal(@NonNull String patternInternal) {
+    public void setPatternInternal(@NonNull CryptString patternInternal) {
         this.patternInternal = patternInternal;
     }
 
@@ -111,7 +105,7 @@ public abstract class PatternHolder extends IdEntity {
         if (patternInternal == null) {
             return 0;
         }
-        return patternInternal.length();
+        return getPatternInternal().length();
     }
 
 

@@ -10,6 +10,7 @@ import android.preference.SwitchPreference;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -193,6 +194,11 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
 
         byte[] hashedKey = EncryptUtil.fastHash(key, salt);
         Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecureActivity.SecretChecker.KEY_ALIAS_PASSWD, hashedKey);
+        if (encrypted == null) {
+            Log.e("STORE_KEY", "Cannot store key cause it could not be encrypted");
+            return;
+        }
+
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(activity);
 

@@ -361,7 +361,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     private ObfusString getPattern(byte[] key, boolean encWithUuid) {
-        ObfusString pattern = ObfusString.fromExchangeFormat(getPatternInternal());
+        ObfusString pattern = ObfusString.fromExchangeFormat(CryptString.from(getPatternInternal()));
 
         if (pattern != null && key != null) {
             pattern.decrypt(getUUIDKey(key, encWithUuid));
@@ -380,7 +380,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
         if (key != null) {
             tbs.encrypt(getUUIDKey(key, encWithUuid));
         }
-        setPatternInternal(tbs.toExchangeFormat());
+        setPatternInternal(CryptString.of(tbs.toExchangeFormat()));
     }
 
     public String getHiddenPatternRepresentation(Representation representation) {

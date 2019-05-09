@@ -2,10 +2,7 @@ package de.jepfa.obfusser.ui.credential.list;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
@@ -234,7 +231,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         ImageView iconView = convertView.findViewById(R.id.credential_list_menu_popup);
 
         Group group = (Group) getGroup(groupPosition);
-        nameView.setText(GroupColorizer.getColorizedText(group, credential.getName()));
+        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.from(credential.getName())));
 
         boolean hidePatterns = PreferenceManager
                 .getDefaultSharedPreferences(fragment.getActivity())

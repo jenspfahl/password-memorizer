@@ -9,6 +9,8 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import de.jepfa.obfusser.database.converter.CryptStringConverter;
+import de.jepfa.obfusser.database.converter.IntegerStringMapConverter;
 import de.jepfa.obfusser.database.dao.CredentialDao;
 import de.jepfa.obfusser.database.dao.GroupDao;
 import de.jepfa.obfusser.database.dao.TemplateDao;
@@ -17,7 +19,7 @@ import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.model.Template;
 
 @Database(entities = {Credential.class, Template.class, Group.class}, version = 5, exportSchema = false)
-@TypeConverters(IntegerStringMapConverter.class)
+@TypeConverters({IntegerStringMapConverter.class, CryptStringConverter.class})
 public abstract class ObfusDatabase extends RoomDatabase {
 
     public abstract CredentialDao credentialDao();

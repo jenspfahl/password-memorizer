@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.ui.common.Debug;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
@@ -49,13 +50,13 @@ public class CredentialInputNameActivity extends SecureActivity {
         });
 
         nameView = findViewById(R.id.credential_name);
-        String name = credential.getName();
+        CryptString name = credential.getName();
         if (name != null) {
             nameView.setText(name);
         }
 
         infoView = findViewById(R.id.credential_info);
-        String info = credential.getInfo();
+        CryptString info = credential.getInfo();
         if (info != null) {
             infoView.setText(info);
         }
@@ -123,8 +124,8 @@ public class CredentialInputNameActivity extends SecureActivity {
             focusView.requestFocus();
         } else {
             Credential credential = credentialViewModel.getCredential().getValue();
-            credential.setName(nameView.getText().toString());
-            credential.setInfo(infoView.getText().toString());
+            credential.setName(CryptString.of(nameView.getText().toString()));
+            credential.setInfo(CryptString.of(infoView.getText().toString()));
 
             Intent intent = new Intent(getBaseContext(), CredentialInputPatternActivity.class);
             IntentUtil.setCredentialExtra(intent, credential);

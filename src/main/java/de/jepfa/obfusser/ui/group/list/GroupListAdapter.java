@@ -15,6 +15,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.group.detail.GroupDetailActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
@@ -72,7 +73,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     void setGroups(List<Group> groups){
-        this.groups = groups;
+        this.groups = DataSorter.sortGroupsByName(groups);
         notifyDataSetChanged();
     }
 

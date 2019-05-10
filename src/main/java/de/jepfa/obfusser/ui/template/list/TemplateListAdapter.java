@@ -20,6 +20,7 @@ import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.ui.template.detail.TemplateDetailActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapter.ViewHolder> implements Filterable {
@@ -138,8 +139,8 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
     }
 
     void setTemplates(List<Template> templates){
-        this.templates = templates;
-        originTemplates = templates;
+        this.templates = DataSorter.sortPatternsByName(templates);
+        originTemplates = this.templates;
         notifyDataSetChanged();
     }
 

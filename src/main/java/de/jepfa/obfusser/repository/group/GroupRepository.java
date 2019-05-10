@@ -22,8 +22,8 @@ public class GroupRepository {
         groupDao = db.groupDao();
     }
 
-    public LiveData<List<Group>> getAllGroupsSortByName() {
-        return groupDao.getAllGroupsSortByName();
+    public LiveData<List<Group>> getAllGroups() {
+        return groupDao.getAllGroups();
     }
 
     public List<Group> getAllGroupsSync() {

@@ -20,6 +20,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
@@ -123,12 +124,12 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
     private void createRadioButtons() {
         templateListViewModel
                 .getRepo()
-                .getAllTemplatesSortByName()
+                .getAllTemplates()
                 .observe(this, new Observer<List<Template>>() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onChanged(@Nullable final List<Template> templates) {
-
+                        DataSorter.sortPatternsByName(templates);
                         for (Template template : templates) {
                             RadioButton groupRadioButton = new RadioButton(SelectTemplateForCredentialActivity.this);
                             groupRadioButton.setId(template.getId());

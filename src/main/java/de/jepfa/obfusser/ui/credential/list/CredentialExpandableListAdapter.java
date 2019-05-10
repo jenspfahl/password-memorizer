@@ -27,6 +27,7 @@ import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialExpandableListAdapter extends BaseExpandableListAdapter implements Filterable {
@@ -106,11 +107,11 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
     }
 
     void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials) {
-        groups = new ArrayList<>(allGroups.size());
+        groups = DataSorter.sortGroupsByName(new ArrayList<Group>(allGroups.size()));
         groupIdCredentials = new HashMap<>();
         originGroups = groups;
         originGroupIdCredentials = groupIdCredentials;
-
+        credentials = DataSorter.sortPatternsByGroupsAndName(groups, credentials);
 
         for (Credential credential : credentials) {
             int groupId;

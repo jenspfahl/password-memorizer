@@ -9,10 +9,14 @@ import android.support.v4.util.Pair;
 import android.text.Editable;
 import android.util.Log;
 
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,8 +47,6 @@ public class EncryptUtil {
     private static final int BYTE_COUNT = 1 << Byte.SIZE;
     private static final String CIPHER_AES_GCM = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
-
-    private static final Map<String, SecretKey> secretKeys = new ConcurrentHashMap<>();
 
     /*
      * To encypt special chars, we need to define which chars are common in credentials.
@@ -130,13 +132,13 @@ public class EncryptUtil {
                 byte[] encryptionIv = encryptedIvAndData.first;
                 byte[] encryptedData = encryptedIvAndData.second;
 
-                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
-                keyStore.load(null);
+                SecretKey secretKey = findStoredKey(alias);
+                if (secretKey == null) {
+                    Log.e("DECDATA", "No key found for: " + alias);
+                }
 
                 final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
                 final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
-
-                SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
 
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
@@ -145,6 +147,16 @@ public class EncryptUtil {
             } catch (Exception e) {
                 Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
             }
+        }
+        return null;
+    }
+
+    private static SecretKey findStoredKey(String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableEntryException {
+        KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+        keyStore.load(null);
+        KeyStore.Entry entry = keyStore.getEntry(alias, null);
+        if (entry != null) {
+            return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
         }
         return null;
     }
@@ -400,7 +412,7 @@ public class EncryptUtil {
 
         synchronized (alias) {
             if (isPasswdEncryptionSupported()) {
-                SecretKey secretKey = secretKeys.get(alias);
+                SecretKey secretKey = findStoredKey(alias);
                 if (secretKey == null) {
                     KeyGenerator keyGenerator = KeyGenerator
                             .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
@@ -412,7 +424,6 @@ public class EncryptUtil {
                             .build());
 
                     secretKey = keyGenerator.generateKey();
-                    secretKeys.put(alias, secretKey);
                 }
                 return secretKey;
             }

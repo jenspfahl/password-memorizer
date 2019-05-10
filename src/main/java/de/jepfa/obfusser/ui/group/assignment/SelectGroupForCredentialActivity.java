@@ -21,6 +21,7 @@ import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
@@ -57,11 +58,11 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
 
         groupListViewModel
                 .getRepo()
-                .getAllGroupsSortByName()
+                .getAllGroups()
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {
-
+                        DataSorter.sortGroupsByName(groups);
                         Integer selectedGroupId = null;
                         if (credential.getGroupId() != null) {
                             selectedGroupId  = credential.getGroupId();

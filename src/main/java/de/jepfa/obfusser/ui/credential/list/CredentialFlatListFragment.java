@@ -45,13 +45,13 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
 
         credentialListViewModel
                 .getRepo()
-                .getAllCredentialsSortByName()
+                .getAllCredentials()
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {
                         groupListViewModel
                                 .getRepo()
-                                .getAllGroupsSortByName()
+                                .getAllGroups()
                                 .observe(CredentialFlatListFragment.this, new Observer<List<Group>>() {
                                     @Override
                                     public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call

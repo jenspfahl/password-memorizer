@@ -23,8 +23,8 @@ public interface GroupDao {
     @Delete
     void delete(Group group);
 
-    @Query("SELECT * FROM Groups ORDER BY UPPER(name), id")
-    LiveData<List<Group>> getAllGroupsSortByName();
+    @Query("SELECT * FROM Groups")
+    LiveData<List<Group>> getAllGroups();
 
     @Query("SELECT * FROM Groups")
     List<Group> getAllGroupsSync();

@@ -23,6 +23,7 @@ import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder>
@@ -143,9 +144,9 @@ implements Filterable {
     }
 
     void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials){
-        groups = allGroups;
-        this.credentials = credentials;
-        this.originCredentials = credentials;
+        groups = DataSorter.sortGroupsByName(allGroups);
+        this.credentials = DataSorter.sortPatternsByName(credentials);
+        this.originCredentials = this.credentials;
         notifyDataSetChanged();
     }
 

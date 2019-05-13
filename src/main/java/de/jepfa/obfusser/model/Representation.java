@@ -118,6 +118,27 @@ public enum Representation {
             '\u23EB',
             Build.VERSION_CODES.O),
 
+    BITS("Bits",
+            '\u2596',
+            '\u2598',
+            '\u259C',
+            '\u259E',
+            '\u25AA',
+            null,
+            0.1f,
+            32.0f),
+
+
+    EASY("Easy",
+            '\u24D0',
+            '\u24B6',
+            '\u24EA',
+            '\u263A',
+            '\u2639',
+            null,
+            null,
+            33.0f),
+
     ;
 
     private static final char COMMON_PLACEHOLDER_CHAR = '\u25EF'; // '◯'

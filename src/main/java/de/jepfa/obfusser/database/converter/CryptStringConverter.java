@@ -11,7 +11,7 @@ public class CryptStringConverter {
     public static CryptString restore(String string) {
         String aesString = DbCrypt.aesDecrypt(string);
         if (aesString != null) {
-            return CryptString.of(aesString);
+            return CryptString.of(aesString, string);
         }
         return null;
     }

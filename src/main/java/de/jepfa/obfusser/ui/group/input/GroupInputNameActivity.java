@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.BaseActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -35,13 +36,13 @@ public class GroupInputNameActivity extends BaseActivity {
         Group group = groupViewModel.getGroup().getValue();
 
         nameView = findViewById(R.id.group_name);
-        String name = group.getName();
+        CryptString name = group.getName();
         if (name != null) {
             nameView.setText(name);
         }
 
         infoView = findViewById(R.id.group_info);
-        String info = group.getInfo();
+        CryptString info = group.getInfo();
         if (info != null) {
             infoView.setText(info);
         }
@@ -107,8 +108,8 @@ public class GroupInputNameActivity extends BaseActivity {
             focusView.requestFocus();
         } else {
             Group group = groupViewModel.getGroup().getValue();
-            group.setName(name);
-            group.setInfo(info);
+            group.setName(CryptString.of(name));
+            group.setInfo(CryptString.of(info));
 
             if (group.isPersisted()) {
                 groupViewModel.getRepo().update(group);

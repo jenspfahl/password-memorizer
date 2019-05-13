@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
@@ -73,7 +74,8 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                subText.setText(GroupColorizer.getColorizedText(group, group.getName()));
+                                subText.setText(GroupColorizer.getColorizedText(group,
+                                        CryptString.from(group.getName())));
                             }
                         }
                     });

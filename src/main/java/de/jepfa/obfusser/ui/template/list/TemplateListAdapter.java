@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
@@ -109,7 +110,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (templates != null || !templates.isEmpty()) {
-            holder.nameView.setText(templates.get(position).getName());
+            holder.nameView.setText(CryptString.toDebugString(templates.get(position).getName()));
 
             boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(activity)

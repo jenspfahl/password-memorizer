@@ -65,8 +65,8 @@ public class IntentUtil {
     public static Group createGroupFromIntent(Intent intent) {
         Group group = new Group();
         group.setId(intent.getIntExtra(Group.ATTRIB_ID, 0));
-        group.setName(intent.getStringExtra(Group.ATTRIB_NAME));
-        group.setInfo(intent.getStringExtra(Group.ATTRIB_INFO));
+        group.setName(CryptString.of(intent.getStringExtra(Group.ATTRIB_NAME)));
+        group.setInfo(CryptString.of(intent.getStringExtra(Group.ATTRIB_INFO)));
         group.setColor(intent.getIntExtra(Group.ATTRIB_COLOR, 0));
 
         return group;

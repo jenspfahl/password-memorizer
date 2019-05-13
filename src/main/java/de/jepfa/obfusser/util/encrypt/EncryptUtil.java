@@ -95,22 +95,21 @@ public class EncryptUtil {
     @TargetApi(Build.VERSION_CODES.M)
     public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
-        synchronized (alias) {
-            try {
-                final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
-                SecretKey androidSecretKey = getAndroidSecretKey(alias);
-                if (androidSecretKey == null) {
-                    Log.e("ENCDATA", "Key is null: " + alias);
-                    return null;
-                }
-
-                cipher.init(Cipher.ENCRYPT_MODE, androidSecretKey);
-
-              return new Pair<>(cipher.getIV(), cipher.doFinal(data));
-            } catch (Exception e) {
-                Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
+        try {
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
+            SecretKey androidSecretKey = getAndroidSecretKey(alias);
+            if (androidSecretKey == null) {
+                Log.e("ENCDATA", "Key is null: " + alias);
+                return null;
             }
+
+            cipher.init(Cipher.ENCRYPT_MODE, androidSecretKey);
+
+          return new Pair<>(cipher.getIV(), cipher.doFinal(data));
+        } catch (Exception e) {
+            Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
         }
+
         return null;
     }
 
@@ -127,27 +126,27 @@ public class EncryptUtil {
      */
     @TargetApi(Build.VERSION_CODES.M)
     public static byte[] decryptData(final String alias, Pair<byte[], byte[]> encryptedIvAndData) {
-        synchronized (alias) {
-            try {
-                byte[] encryptionIv = encryptedIvAndData.first;
-                byte[] encryptedData = encryptedIvAndData.second;
 
-                SecretKey secretKey = findStoredKey(alias);
-                if (secretKey == null) {
-                    Log.e("DECDATA", "No key found for: " + alias);
-                }
+        try {
+            byte[] encryptionIv = encryptedIvAndData.first;
+            byte[] encryptedData = encryptedIvAndData.second;
 
-                final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
-                final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
-
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
-
-                return cipher.doFinal(encryptedData);
-
-            } catch (Exception e) {
-                Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
+            SecretKey secretKey = findStoredKey(alias);
+            if (secretKey == null) {
+                Log.e("DECDATA", "No key found for: " + alias);
             }
+
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
+            final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
+
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+            return cipher.doFinal(encryptedData);
+
+        } catch (Exception e) {
+            Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
         }
+
         return null;
     }
 
@@ -410,23 +409,21 @@ public class EncryptUtil {
     @TargetApi(Build.VERSION_CODES.M)
     private static SecretKey getAndroidSecretKey(final String alias) throws Exception {
 
-        synchronized (alias) {
-            if (isPasswdEncryptionSupported()) {
-                SecretKey secretKey = findStoredKey(alias);
-                if (secretKey == null) {
-                    KeyGenerator keyGenerator = KeyGenerator
-                            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+        if (isPasswdEncryptionSupported()) {
+            SecretKey secretKey = findStoredKey(alias);
+            if (secretKey == null) {
+                KeyGenerator keyGenerator = KeyGenerator
+                        .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
 
-                    keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
-                            KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                            .build());
+                keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
+                        KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                        .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .build());
 
-                    secretKey = keyGenerator.generateKey();
-                }
-                return secretKey;
+                secretKey = keyGenerator.generateKey();
             }
+            return secretKey;
         }
 
         return null;

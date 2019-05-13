@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.group.detail.GroupDetailActivity;
@@ -64,7 +65,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (groups != null || !groups.isEmpty()) {
             Group group = groups.get(position);
-            holder.nameView.setText(GroupColorizer.getColorizedText(group, group.getName()));
+            holder.nameView.setText(GroupColorizer.getColorizedText(group,
+                    CryptString.toDebugString(group.getName())));
 
             holder.iconView.setTag(group);
             holder.nameView.setOnClickListener(onClickShowDetailListener);

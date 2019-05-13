@@ -17,6 +17,7 @@ import java.util.List;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
@@ -79,7 +80,8 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                         for (Group group : groups) {
                             RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
                             groupRadioButton.setId(group.getId());
-                            groupRadioButton.setText(GroupColorizer.getColorizedText(group, group.getName()));
+                            groupRadioButton.setText(GroupColorizer.getColorizedText(group,
+                                    CryptString.from(group.getName())));
                             if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
                                 groupRadioButton.setChecked(true);
                             }

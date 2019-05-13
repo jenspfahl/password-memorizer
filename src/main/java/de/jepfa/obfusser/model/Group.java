@@ -18,30 +18,30 @@ public class Group extends IdEntity {
     public static final String ATTRIB_COLOR = "color";
 
     @NonNull
-    private String name;
+    private CryptString name;
 
     @Nullable
-    private String info;
+    private CryptString info;
 
     @Nullable
     private int color;
 
 
     @NonNull
-    public String getName() {
+    public CryptString getName() {
         return name;
     }
 
-    public void setName(@NonNull String name) {
+    public void setName(@NonNull CryptString name) {
         this.name = name;
     }
 
     @Nullable
-    public String getInfo() {
+    public CryptString getInfo() {
         return info;
     }
 
-    public void setInfo(@Nullable String info) {
+    public void setInfo(@Nullable CryptString info) {
         this.info = info;
     }
 
@@ -58,8 +58,8 @@ public class Group extends IdEntity {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Group{");
         sb.append("id=").append(getId());
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", info='").append(info).append('\'');
+        sb.append(", name='").append(CryptString.toDebugString(name)).append('\'');
+        sb.append(", info='").append(CryptString.toDebugString(info)).append('\'');
         sb.append(", color=").append(color);
         sb.append('}');
         return sb.toString();

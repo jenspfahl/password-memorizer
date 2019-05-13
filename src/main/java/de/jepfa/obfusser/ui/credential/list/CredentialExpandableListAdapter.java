@@ -130,7 +130,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
                 else {
                     Group noGroupGroup = new Group();
                     noGroupGroup.setId(Constants.NO_ID);
-                    noGroupGroup.setName(fragment.getString(R.string.no_group));
+                    noGroupGroup.setName(CryptString.of(fragment.getString(R.string.no_group)));
                     groups.add(0, noGroupGroup);
                 }
             }
@@ -214,7 +214,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
                     parent, false);
         }
         TextView nameView = convertView.findViewById(R.id.group_expand_title);
-        nameView.setText(GroupColorizer.getColorizedText(group, group.getName()));
+        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.from(group.getName())));
 
         return convertView;
     }
@@ -232,7 +232,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         ImageView iconView = convertView.findViewById(R.id.credential_list_menu_popup);
 
         Group group = (Group) getGroup(groupPosition);
-        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.from(credential.getName())));
+        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.toDebugString(credential.getName())));
 
         boolean hidePatterns = PreferenceManager
                 .getDefaultSharedPreferences(fragment.getActivity())

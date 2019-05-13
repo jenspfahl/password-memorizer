@@ -111,9 +111,9 @@ public abstract class PatternHolder extends IdEntity {
 
     public String toString() {
         return "id=" + id +
-                ", name='" + name + '\'' +
-                ", info='" + info + '\'' +
-                ", patternInternal='" + patternInternal + '\'' +
+                ", name='" + CryptString.toDebugString(name) + '\'' +
+                ", info='" + CryptString.toDebugString(info) + '\'' +
+                ", patternInternal='" + CryptString.toDebugString(patternInternal) + '\'' +
                 ", hints=" + hints +
                 ", groupId=" + groupId;
     }

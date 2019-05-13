@@ -1,5 +1,7 @@
 package de.jepfa.obfusser.model;
 
+import de.jepfa.obfusser.ui.common.Debug;
+
 public class CryptString implements CharSequence {
 
     public static CryptString of(String string) {
@@ -9,6 +11,13 @@ public class CryptString implements CharSequence {
         return new CryptString(string);
     }
 
+    public static CryptString of(String string, String encrypted) {
+        CryptString cryptString = new CryptString(string);
+        cryptString.decrypted = string != null && encrypted != null
+                && string.equals(encrypted);
+        return cryptString;
+    }
+
     public static String from(CryptString cryptString) {
         if (cryptString == null) {
             return null;
@@ -16,10 +25,26 @@ public class CryptString implements CharSequence {
         return cryptString.toString();
     }
 
+    public static String toDebugString(CryptString cryptString) {
+        if (cryptString == null) {
+            return null;
+        }
+        if (Debug.INSTANCE.isDebug()) {
+            return cryptString.toString() +
+                    (cryptString.isDecrypted() ? "*" : "");
+        }
+        return cryptString.toString();
+    }
+
     private String string;
+    private boolean decrypted;
 
     private CryptString(String string) {
         this.string = string;
+    }
+
+    public boolean isDecrypted() {
+        return decrypted;
     }
 
     @Override

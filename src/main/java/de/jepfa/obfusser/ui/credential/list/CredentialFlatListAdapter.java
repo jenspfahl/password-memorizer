@@ -118,7 +118,7 @@ implements Filterable {
             Credential credential = credentials.get(position);
 
             Group group = getGroupFromId(credential.getGroupId());
-            holder.nameView.setText(GroupColorizer.getColorizedText(group, CryptString.from(credential.getName())));
+            holder.nameView.setText(GroupColorizer.getColorizedText(group, CryptString.toDebugString(credential.getName())));
 
             boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(fragment.getActivity())

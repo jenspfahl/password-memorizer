@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
@@ -99,9 +100,11 @@ public class SelectGroupColorActivity extends SecureActivity {
             else {
                 int colorId = GroupColor.getAndroidColor(groupColor.getColorInt());
                 String usedText = "";
-                Group usedGroup = findUsedGroup(groupColor, groups);
-                if (usedGroup != null && usedGroup.getId() != group.getId()) {
-                    usedText = " (" + usedGroup.getName() + ")";
+                List<Group> usedGroups = findUsedGroups(groupColor, groups, group);
+                if (usedGroups.size() == 1) {
+                    usedText = " (" + usedGroups.get(0).getName() + ")";
+                } else if (usedGroups.size() > 1) {
+                    usedText = " (" + usedGroups.get(0).getName() + ", ...)";
                 }
                 SpannableString span = new SpannableString(nocolorText + usedText);
                 span.setSpan(new ForegroundColorSpan(colorId), 0, nocolorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -132,13 +135,14 @@ public class SelectGroupColorActivity extends SecureActivity {
     public void refresh(boolean before) {
     }
 
-    private Group findUsedGroup(GroupColor groupColor, List<Group> groups) {
-
+    private List<Group> findUsedGroups(GroupColor groupColor, List<Group> groups, Group group) {
+        List<Group> usedGroups = new ArrayList<>(groups.size());
         for (Group existingGroup : groups) {
-            if (existingGroup.getColor() == groupColor.getColorInt()) {
-                return existingGroup;
+            if (existingGroup.getColor() == groupColor.getColorInt()
+                    && existingGroup.getId() != group.getId()) {
+                usedGroups.add(existingGroup);
             }
         }
-        return null;
+        return usedGroups;
     }
 }

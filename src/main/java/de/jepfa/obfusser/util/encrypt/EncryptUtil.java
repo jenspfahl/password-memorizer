@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -82,6 +83,8 @@ public class EncryptUtil {
     }
 
     static final Loop<HintChar> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
+
+    private static final ConcurrentMap<String, KeyStore> keyStoreMap = new ConcurrentHashMap<>();
 
 
     /**
@@ -151,8 +154,17 @@ public class EncryptUtil {
     }
 
     private static SecretKey findStoredKey(String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableEntryException {
-        KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
-        keyStore.load(null);
+
+        KeyStore keyStore;
+        if (!keyStoreMap.containsKey(alias)) {
+            synchronized (alias) {
+                keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+                keyStore.load(null);
+                keyStoreMap.putIfAbsent(alias, keyStore);
+            }
+        }
+        keyStore = keyStoreMap.get(alias);
+
         KeyStore.Entry entry = keyStore.getEntry(alias, null);
         if (entry != null) {
             return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
@@ -412,16 +424,23 @@ public class EncryptUtil {
         if (isPasswdEncryptionSupported()) {
             SecretKey secretKey = findStoredKey(alias);
             if (secretKey == null) {
-                KeyGenerator keyGenerator = KeyGenerator
-                        .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+                synchronized (alias) {
+                    // check after sync block entered
+                    secretKey = findStoredKey(alias);
+                    if (secretKey != null) {
+                        return secretKey;
+                    }
+                    KeyGenerator keyGenerator = KeyGenerator
+                            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
 
-                keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
-                        KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                        .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                        .build());
+                    keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
+                            KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                            .build());
 
-                secretKey = keyGenerator.generateKey();
+                    secretKey = keyGenerator.generateKey();
+                }
             }
             return secretKey;
         }

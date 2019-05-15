@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
+import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
@@ -60,7 +61,9 @@ public abstract class SecureActivity extends BaseActivity {
 
     protected synchronized void securityCheck() {
         SecretChecker.getOrAskForSecret(this);
+        SecretChecker.migrateToCryptStrings(this);
     }
+
 
     /**
      * Helper class to check the user secret.
@@ -75,6 +78,7 @@ public abstract class SecureActivity extends BaseActivity {
 
         private static final String PREF_SALT = "application.salt";
         private static final String PREF_SALT_IV = "application.salt_iv";
+        private static final String PREF_STRINGS_CRYPTED = "pref_strings_crypted";
         private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
 
         private static volatile long secretDialogOpened;
@@ -85,23 +89,45 @@ public abstract class SecureActivity extends BaseActivity {
                     .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
 
             if (passwordCheckEnabled) {
-                Secret secret = Secret.getOrCreate();
+                synchronized (activity) {
+                    Secret secret = Secret.getOrCreate();
 
-                if (secret.isOutdated() || !secret.hasDigest()) {
-                    // make all not readable by setting key as invalid
-                    secret.invalidate();
-                    // open user secret dialoh
-                    openDialog(secret, activity);
-                } else {
-                    secret.renew();
+                    if (secret.isOutdated() || !secret.hasDigest()) {
+                        // make all not readable by setting key as invalid
+                        secret.invalidate();
+                        // open user secret dialoh
+                        openDialog(secret, activity);
+                    } else {
+                        secret.renew();
+                    }
+
+                    return secret.getDigest();
                 }
-
-                return secret.getDigest();
             }
 
             return null;
         }
 
+        public static void migrateToCryptStrings(final Activity activity) {
+            final SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+
+            if (shouldDoCryptStrings(activity)) {
+                SecurityService.startDoStringCrypt(activity.getBaseContext());
+
+                SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+                editor.putBoolean(PREF_STRINGS_CRYPTED, true);
+                editor.commit();
+            }
+        }
+
+        public static boolean shouldDoCryptStrings(Activity activity) {
+            boolean stringsEncrypted = PreferenceManager
+                    .getDefaultSharedPreferences(activity)
+                    .getBoolean(PREF_STRINGS_CRYPTED, false);
+
+            return !stringsEncrypted;
+        }
 
         public static synchronized byte[] getSalt(Context context) {
             SharedPreferences defaultSharedPreferences = PreferenceManager

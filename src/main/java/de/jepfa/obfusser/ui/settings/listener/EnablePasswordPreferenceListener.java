@@ -135,7 +135,8 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                                 passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, disturbPatternsSwitch.isChecked());
                                 passwdEditor.commit();
 
-                                SecurityService.startEncryptAll(preference.getContext(), key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
+                                SecurityService.startEncryptAll(preference.getContext(),
+                                        key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
 
                                 Secret secret = Secret.getOrCreate();
                                 secret.setDigest(key);

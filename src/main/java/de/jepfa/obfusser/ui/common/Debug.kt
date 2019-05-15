@@ -52,6 +52,7 @@ object Debug {
         addParam(sb, "Key stored", SecureActivity.SecretChecker.isPasswordStored(activity).toString())
         addParam(sb, "Salt encrypted", SecureActivity.SecretChecker.isSaltEncrypted(activity).toString())
         addParam(sb, "Enc with UUID", SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity).toString())
+        addParam(sb, "Uncrypted Strings", SecureActivity.SecretChecker.shouldDoCryptStrings(activity).toString())
 
         val icon = activity.applicationInfo.loadIcon(activity.packageManager)
         builder.setTitle("Debug info")

@@ -23,6 +23,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
@@ -127,10 +128,10 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                             byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(preference.getContext());
                             byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
 
+                            SharedPreferences defaultSharedPreferences = PreferenceManager
+                                    .getDefaultSharedPreferences(activity);
 
                             if (encrypt) {
-                                SharedPreferences defaultSharedPreferences = PreferenceManager
-                                        .getDefaultSharedPreferences(activity);
                                 SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
                                 passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, disturbPatternsSwitch.isChecked());
                                 passwdEditor.commit();
@@ -158,6 +159,8 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                                     Secret secret = Secret.getOrCreate();
                                     secret.setDigest(null);
                                     removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+
+                                    Noogler.resetPrefs(activity);
                                 }
                             }
                         } finally {

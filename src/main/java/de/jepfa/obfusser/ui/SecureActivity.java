@@ -84,28 +84,29 @@ public abstract class SecureActivity extends BaseActivity {
         private static volatile long secretDialogOpened;
 
         public static byte[] getOrAskForSecret(Activity activity) {
-            boolean passwordCheckEnabled = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-                    .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
 
-            if (passwordCheckEnabled) {
-                synchronized (activity) {
-                    Secret secret = Secret.getOrCreate();
+            if (isPasswordCheckEnabled(activity)) {
+                Secret secret = Secret.getOrCreate();
 
-                    if (secret.isOutdated() || !secret.hasDigest()) {
-                        // make all not readable by setting key as invalid
-                        secret.invalidate();
-                        // open user secret dialoh
-                        openDialog(secret, activity);
-                    } else {
-                        secret.renew();
-                    }
-
-                    return secret.getDigest();
+                if (secret.isOutdated() || !secret.hasDigest()) {
+                    // make all not readable by setting key as invalid
+                    secret.invalidate();
+                    // open user secret dialoh
+                    openDialog(secret, activity);
+                } else {
+                    secret.renew();
                 }
+
+                return secret.getDigest();
             }
 
             return null;
+        }
+
+        public static boolean isPasswordCheckEnabled(Activity activity) {
+            return PreferenceManager
+                            .getDefaultSharedPreferences(activity)
+                            .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
         }
 
         public static void migrateToCryptStrings(final Activity activity) {

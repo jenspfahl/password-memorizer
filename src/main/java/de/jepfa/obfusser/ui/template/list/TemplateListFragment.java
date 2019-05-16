@@ -21,6 +21,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
@@ -81,6 +82,8 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
                         adapter.setTemplates(templates);
                     }
                 });
+
+        Noogler.noogleEncryptData(getActivity(), view);
 
         return view;
     }

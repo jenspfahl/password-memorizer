@@ -22,6 +22,16 @@ public enum Representation {
             0.0f,
             32.0f),
 
+    ROTUND("Rotund",
+            '\u2b2c',
+            '\u2b2e',
+            '\u2b24',
+            '\u2b22',
+            '\u2b23',
+            null,
+            0.0f,
+            32.0f),
+
     CARDS("Cards",
             '\u2660',
             '\u2665',
@@ -138,6 +148,16 @@ public enum Representation {
             null,
             null,
             33.0f),
+
+    CHINESE("Chinese",
+            '\u5f0b',
+            '\u5f00',
+            '\u5fa6',
+            '\u5fc7',
+            '\u2f00',
+            null,
+            null,
+            null),
 
     ;
 

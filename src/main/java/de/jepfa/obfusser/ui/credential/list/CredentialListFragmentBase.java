@@ -1,35 +1,24 @@
 package de.jepfa.obfusser.ui.credential.list;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.model.ObfusChar;
-import de.jepfa.obfusser.model.Secret;
-import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -78,6 +67,8 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
         });
 
         getActivity().setTitle(R.string.title_credentials);
+
+        Noogler.noogleEncryptData(getActivity(), view);
 
         return view;
     }

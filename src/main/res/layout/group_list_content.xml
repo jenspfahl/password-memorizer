@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:stretchColumns="0,1"
+    android:stretchColumns="0"
+    android:shrinkColumns="0"
     tools:context=".ui.group.list.GroupListFragment"
     android:orientation="horizontal">
     <TableRow>

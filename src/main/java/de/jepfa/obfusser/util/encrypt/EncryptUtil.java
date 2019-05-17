@@ -19,17 +19,16 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 
 import de.jepfa.obfusser.Constants;
@@ -84,7 +83,7 @@ public class EncryptUtil {
 
     static final Loop<HintChar> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
 
-    private static final ConcurrentMap<String, KeyStore> keyStoreMap = new ConcurrentHashMap<>();
+    private static final Map<String, SecretKey> secretKeyCache = Collections.synchronizedMap(new HashMap<String, SecretKey>());
 
 
     /**
@@ -100,7 +99,7 @@ public class EncryptUtil {
 
         try {
             final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
-            SecretKey androidSecretKey = getAndroidSecretKey(alias);
+            SecretKey androidSecretKey = getOrCreateSecretKey(alias);
             if (androidSecretKey == null) {
                 Log.e("ENCDATA", "Key is null: " + alias);
                 return null;
@@ -155,21 +154,22 @@ public class EncryptUtil {
 
     private static SecretKey findStoredKey(String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableEntryException {
 
-        KeyStore keyStore;
-        if (!keyStoreMap.containsKey(alias)) {
-            synchronized (alias) {
-                keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+        synchronized (alias) {
+            if (!secretKeyCache.containsKey(alias)) {
+                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
                 keyStore.load(null);
-                keyStoreMap.putIfAbsent(alias, keyStore);
+
+                KeyStore.Entry entry = keyStore.getEntry(alias, null);
+                if (entry != null) {
+                    SecretKey secretKey = ((KeyStore.SecretKeyEntry) entry).getSecretKey();
+                    secretKeyCache.put(alias, secretKey);
+                }
+                else {
+                    return null;
+                }
             }
         }
-        keyStore = keyStoreMap.get(alias);
-
-        KeyStore.Entry entry = keyStore.getEntry(alias, null);
-        if (entry != null) {
-            return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
-        }
-        return null;
+        return secretKeyCache.get(alias);
     }
 
     public static boolean isPasswdEncryptionSupported() {
@@ -419,7 +419,7 @@ public class EncryptUtil {
      * @throws Exception
      */
     @TargetApi(Build.VERSION_CODES.M)
-    private static SecretKey getAndroidSecretKey(final String alias) throws Exception {
+    private static SecretKey getOrCreateSecretKey(final String alias) throws Exception {
 
         if (isPasswdEncryptionSupported()) {
             SecretKey secretKey = findStoredKey(alias);

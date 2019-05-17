@@ -22,10 +22,9 @@ public class Noogler {
     public static void noogleEncryptData(final Activity activity, View view) {
         final SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(activity);
-        boolean dontNoogle = defaultSharedPreferences
-                .getBoolean(PREF_DONT_NOOGLE_ENC_DATA, false);
-        int noogleCounter = defaultSharedPreferences
-                .getInt(PREF_NOOGLE_ENC_DATA_COUNTER, 0);
+        boolean dontNoogle = isDontNoogle(defaultSharedPreferences);
+        int noogleCounter = getNoogleCounter(defaultSharedPreferences);
+
         SharedPreferences.Editor edit = defaultSharedPreferences.edit();
         edit.putInt(PREF_NOOGLE_ENC_DATA_COUNTER, ++noogleCounter);
         edit.commit();
@@ -53,6 +52,16 @@ public class Noogler {
                     })
                     .show();
         }
+    }
+
+    public static int getNoogleCounter(SharedPreferences defaultSharedPreferences) {
+        return defaultSharedPreferences
+                .getInt(PREF_NOOGLE_ENC_DATA_COUNTER, 0);
+    }
+
+    public static boolean isDontNoogle(SharedPreferences defaultSharedPreferences) {
+        return defaultSharedPreferences
+                .getBoolean(PREF_DONT_NOOGLE_ENC_DATA, false);
     }
 
     private static boolean itIsTime(int noogleCounter) {

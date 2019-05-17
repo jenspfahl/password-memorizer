@@ -113,7 +113,7 @@ public abstract class SecureActivity extends BaseActivity {
             final SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
 
-            if (shouldDoCryptStrings(activity)) {
+            if (shouldDoCryptStrings(defaultSharedPreferences)) {
                 SecurityService.startDoStringCrypt(activity.getBaseContext());
 
                 SharedPreferences.Editor editor = defaultSharedPreferences.edit();
@@ -122,9 +122,8 @@ public abstract class SecureActivity extends BaseActivity {
             }
         }
 
-        public static boolean shouldDoCryptStrings(Activity activity) {
-            boolean stringsEncrypted = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
+        public static boolean shouldDoCryptStrings(SharedPreferences sharedPreferences) {
+            boolean stringsEncrypted = sharedPreferences
                     .getBoolean(PREF_STRINGS_CRYPTED, false);
 
             return !stringsEncrypted;

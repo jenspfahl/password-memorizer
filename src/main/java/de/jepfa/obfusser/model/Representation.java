@@ -22,13 +22,13 @@ public enum Representation {
             0.0f,
             32.0f),
 
-    ROTUND("Rotund",
+    ROTUND("Rotunde",
             '\u2b2c',
             '\u2b2e',
             '\u2b24',
             '\u2b22',
             '\u2b23',
-            null,
+            Build.VERSION_CODES.O,
             0.0f,
             32.0f),
 

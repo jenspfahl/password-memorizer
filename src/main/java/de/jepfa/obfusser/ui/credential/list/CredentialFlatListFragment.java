@@ -44,8 +44,7 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
         recyclerView.setAdapter(listAdapter);
 
         credentialListViewModel
-                .getRepo()
-                .getAllCredentials()
+                .getCredentials()
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {

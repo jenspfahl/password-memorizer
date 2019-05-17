@@ -83,7 +83,7 @@ public abstract class SecureActivity extends BaseActivity {
 
         private static volatile long secretDialogOpened;
 
-        public static byte[] getOrAskForSecret(Activity activity) {
+        public static synchronized byte[] getOrAskForSecret(Activity activity) {
 
             if (isPasswordCheckEnabled(activity)) {
                 Secret secret = Secret.getOrCreate();
@@ -198,7 +198,7 @@ public abstract class SecureActivity extends BaseActivity {
         }
 
 
-        private synchronized static void openDialog(final Secret secret, final Activity activity) {
+        private static void openDialog(final Secret secret, final Activity activity) {
 
             if (isRecentlyOpened(secretDialogOpened)) {
                 return;

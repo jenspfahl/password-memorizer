@@ -74,8 +74,7 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
 
 
         templateListViewModel
-                .getRepo()
-                .getAllTemplates()
+                .getTemplates()
                 .observe(this, new Observer<List<Template>>() {
                     @Override
                     public void onChanged(@Nullable final List<Template> templates) {

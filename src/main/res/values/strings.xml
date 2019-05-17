@@ -184,6 +184,6 @@
     <string name="secret_disappeared">Cannot continue since your patterns are locked. Try again after you have entered your password again!</string>
     <string name="noogler_open_setting">Open Settings</string>
     <string name="noogler_dismiss_forever">Dismiss Forever</string>
-    <string name="noogler_noogle_text">It is highly recommend to ensure your patterns with a password.</string>
+    <string name="noogler_noogle_text">Set a password to ensure your patterns.</string>
 
 </resources>

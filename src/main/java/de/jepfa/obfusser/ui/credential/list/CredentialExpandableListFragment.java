@@ -51,8 +51,7 @@ public class CredentialExpandableListFragment extends CredentialListFragmentBase
                 .getDefaultSharedPreferences(this.getActivity());
 
         credentialListViewModel
-                .getRepo()
-                .getAllCredentials()
+                .getCredentials()
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {

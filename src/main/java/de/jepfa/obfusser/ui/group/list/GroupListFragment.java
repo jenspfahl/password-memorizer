@@ -90,8 +90,7 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
 
 
         groupListViewModel
-                .getRepo()
-                .getAllGroups()
+                .getGroups()
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {

@@ -41,7 +41,7 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
         super.onCreate(savedInstanceState);
 
         credentialListViewModel = ViewModelProviders
-                .of(this)
+                .of(this.getActivity())
                 .get(CredentialListViewModel.class);
 
         groupListViewModel = ViewModelProviders

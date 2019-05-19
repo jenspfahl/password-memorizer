@@ -13,8 +13,15 @@ public class IntegerStringMapConverter {
 
     @TypeConverter
     public static Map<Integer, String> restoreMap(String listOfString) {
+        String string;
+        if ("{}".equals(listOfString)) {
+            string = listOfString;
+        }
+        else {
+            string = DbCrypt.aesDecrypt(listOfString);
+        }
         return new Gson().fromJson(
-                DbCrypt.aesDecrypt(listOfString),
+                string,
                 new TypeToken<Map<Integer, String>>() {
                 }.getType());
     }
@@ -22,6 +29,11 @@ public class IntegerStringMapConverter {
     @TypeConverter
     public static String saveMap(Map<Integer, String> listOfString) {
         String serialized = new Gson().toJson(listOfString);
-        return DbCrypt.aesEncrypt(serialized);
+        if ("{}".equals(serialized)) {
+            return serialized;
+        }
+        else {
+            return DbCrypt.aesEncrypt(serialized);
+        }
     }
 }

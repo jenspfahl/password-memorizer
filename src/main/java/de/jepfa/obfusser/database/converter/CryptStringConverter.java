@@ -9,6 +9,9 @@ public class CryptStringConverter {
 
     @TypeConverter
     public static CryptString restore(String string) {
+        if ("".equals(string)) {
+            return CryptString.of(string, string);
+        }
         String aesString = DbCrypt.aesDecrypt(string);
         if (aesString != null) {
             return CryptString.of(aesString, string);
@@ -19,8 +22,13 @@ public class CryptStringConverter {
     @TypeConverter
     public static String save(CryptString cryptString) {
         if (cryptString != null) {
-            String encrypted = DbCrypt.aesEncrypt(CryptString.from(cryptString));
-            return encrypted;
+            if ("".equals(cryptString.toString())) {
+                return cryptString.toString();
+            }
+            else {
+                String encrypted = DbCrypt.aesEncrypt(CryptString.from(cryptString));
+                return encrypted;
+            }
         }
         return null;
     }

@@ -60,7 +60,7 @@ public class CredentialInputHintsActivity extends SecureActivity {
 
         if (savedInstanceState != null) {
             ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
-            IntentUtil.convertAndSetHintsFromTransport(credential, hintsList);
+            IntentUtil.INSTANCE.convertAndSetHintsFromTransport(credential, hintsList);
         }
 
 
@@ -112,7 +112,7 @@ public class CredentialInputHintsActivity extends SecureActivity {
         super.onSaveInstanceState(outState);
 
         Credential credential = credentialViewModel.getCredential().getValue();
-        ArrayList<String> hintsForTransport = IntentUtil.convertHintsForTransport(credential);
+        ArrayList<String> hintsForTransport = IntentUtil.INSTANCE.convertHintsForTransport(credential);
         outState.putStringArrayList(Credential.ATTRIB_HINTS, hintsForTransport);
     }
 
@@ -126,11 +126,11 @@ public class CredentialInputHintsActivity extends SecureActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == 0) {
-            LegendShower.showLegend(this, getPatternRepresentation());
+            LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
         }
         if (id == android.R.id.home) {
             Intent upIntent = new Intent(this, CredentialInputPatternActivity.class);
-            IntentUtil.setCredentialExtra(upIntent, credentialViewModel.getCredential().getValue());
+            IntentUtil.INSTANCE.setCredentialExtra(upIntent, credentialViewModel.getCredential().getValue());
             navigateUpTo(upIntent);
             return true;
         }

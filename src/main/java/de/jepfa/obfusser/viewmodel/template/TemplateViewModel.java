@@ -30,7 +30,7 @@ public class TemplateViewModel extends TemplateViewModelBase {
     public static TemplateViewModel getFromIntent(FragmentActivity activity, Intent intent) {
         TemplateViewModel templateViewModel = get(activity);
         templateViewModel.setTemplate(
-                IntentUtil.createTemplateFromIntent(intent));
+                IntentUtil.INSTANCE.createTemplateFromIntent(intent));
 
         return templateViewModel;
     }

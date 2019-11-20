@@ -12,9 +12,11 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.group.detail.GroupDetailActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
@@ -42,7 +44,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             Group item = (Group) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, GroupDetailActivity.class);
-            IntentUtil.setGroupExtra(intent, item);
+            IntentUtil.INSTANCE.setGroupExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -63,7 +65,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (groups != null || !groups.isEmpty()) {
             Group group = groups.get(position);
-            holder.nameView.setText(GroupColorizer.getColorizedText(group, group.getName()));
+            holder.nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group,
+                    CryptString.toDebugString(group.getName())));
 
             holder.iconView.setTag(group);
             holder.nameView.setOnClickListener(onClickShowDetailListener);
@@ -72,7 +75,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     void setGroups(List<Group> groups){
-        this.groups = groups;
+        this.groups = DataSorter.INSTANCE.sortGroupsByName(groups);
         notifyDataSetChanged();
     }
 

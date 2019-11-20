@@ -20,12 +20,8 @@ public class CredentialRepository {
         credentialDao = db.credentialDao();
     }
 
-    public LiveData<List<Credential>> getAllCredentialsSortByName() {
-        return credentialDao.getAllCredentialsSortByName();
-    }
-
-    public LiveData<List<Credential>> getAllCredentialsSortByGroupAndName() {
-        return credentialDao.getAllCredentialsSortByGroupAndName();
+    public LiveData<List<Credential>> getAllCredentials() {
+        return credentialDao.getAllCredentials();
     }
 
     public List<Credential> getAllCredentialsSync() {

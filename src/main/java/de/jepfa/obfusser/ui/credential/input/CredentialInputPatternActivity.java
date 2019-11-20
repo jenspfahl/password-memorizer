@@ -67,7 +67,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
             public void onClick(View v) {
 
                 Intent intent = new Intent(getBaseContext(), SelectTemplateForCredentialActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
+                IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                 startActivity(intent);
             }
         });
@@ -122,12 +122,12 @@ public class CredentialInputPatternActivity extends SecureActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == 0) {
-            LegendShower.showLegend(this, getPatternRepresentation());
+            LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
         }
         if (id == android.R.id.home) {
             Credential credential = credentialViewModel.getCredential().getValue();
             Intent intent = new Intent(this, CredentialInputNameActivity.class);
-            IntentUtil.setCredentialExtra(intent, credential);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
             navigateUpTo(intent);
             return true;
         }
@@ -158,7 +158,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
             credential.setPatternFromUser(pattern, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
 
             Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
-            IntentUtil.setCredentialExtra(intent, credential);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
             startActivity(intent);
 
         }
@@ -166,7 +166,7 @@ public class CredentialInputPatternActivity extends SecureActivity {
 
     private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
         button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
-        ObfusTextAdjuster.adjustTextForRepresentation(getPatternRepresentation(), button);
+        ObfusTextAdjuster.INSTANCE.adjustTextForRepresentation(getPatternRepresentation(), button);
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

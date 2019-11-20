@@ -89,16 +89,16 @@ public class TemplateDetailActivity extends SecureActivity {
         Template template = templateViewModel.getTemplate().getValue();
         switch (item.getItemId()) {
             case 0:
-                LegendShower.showLegend(this, getPatternRepresentation());
+                LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
                 return true;
             case R.id.menu_change_template:
                 Intent intent = new Intent(this, TemplateInputNameActivity.class);
-                IntentUtil.setTemplateExtra(intent, template);
+                IntentUtil.INSTANCE.setTemplateExtra(intent, template);
                 startActivity(intent);
                 return true;
 
             case R.id.menu_delete_template:
-                DeletionHelper.askAndDelete(templateViewModel.getRepo(), template, this, new Runnable() {
+                DeletionHelper.INSTANCE.askAndDelete(templateViewModel.getRepo(), template, this, new Runnable() {
                     @Override
                     public void run() {
                         Intent upIntent = new Intent(TemplateDetailActivity.this, NavigationActivity.class);

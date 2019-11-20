@@ -40,7 +40,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -77,6 +76,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
     }
 
     /**

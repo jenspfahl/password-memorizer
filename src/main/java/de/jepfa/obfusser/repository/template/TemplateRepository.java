@@ -20,16 +20,12 @@ public class TemplateRepository {
         templateDao = db.templateDao();
     }
 
-    public LiveData<List<Template>> getAllTemplatesSortByName() {
-        return templateDao.getAllTemplatesSortByName();
+    public LiveData<List<Template>> getAllTemplates() {
+        return templateDao.getAllTemplates();
     }
 
     public List<Template> getAllTemplatesSync() {
         return templateDao.getAllTemplatesSync();
-    }
-
-    public LiveData<List<Template>> getAllTemplatesSortByGroupAndName() {
-        return templateDao.getAllTemplatesSortByGroupAndName();
     }
 
     public int getTemplateCountSync() {

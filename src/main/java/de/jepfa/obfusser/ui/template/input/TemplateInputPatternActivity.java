@@ -111,12 +111,12 @@ public class TemplateInputPatternActivity extends SecureActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == 0) {
-            LegendShower.showLegend(this, getPatternRepresentation());
+            LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
         }
         if (id == android.R.id.home) {
             Template template = templateViewModel.getTemplate().getValue();
             Intent intent = new Intent(this, TemplateInputNameActivity.class);
-            IntentUtil.setTemplateExtra(intent, template);
+            IntentUtil.INSTANCE.setTemplateExtra(intent, template);
             navigateUpTo(intent);
             return true;
         }
@@ -147,7 +147,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
             template.setPatternFromUser(pattern, secret, SecureActivity.SecretChecker.isEncWithUUIDEnabled(this));
 
             Intent intent = new Intent(getBaseContext(), TemplateInputHintsActivity.class);
-            IntentUtil.setTemplateExtra(intent, template);
+            IntentUtil.INSTANCE.setTemplateExtra(intent, template);
             startActivity(intent);
 
         }
@@ -155,7 +155,7 @@ public class TemplateInputPatternActivity extends SecureActivity {
 
     private void createObfusCharButton(Button button, final ObfusChar obfusChar) {
         button.setText(obfusChar.toRepresentation(getPatternRepresentation()));
-        ObfusTextAdjuster.adjustTextForRepresentation(getPatternRepresentation(), button);
+        ObfusTextAdjuster.INSTANCE.adjustTextForRepresentation(getPatternRepresentation(), button);
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -9,13 +9,20 @@ import android.support.v4.util.Pair;
 import android.text.Editable;
 import android.util.Log;
 
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -38,7 +45,7 @@ import de.jepfa.obfusser.util.encrypt.hints.HintChar;
 public class EncryptUtil {
 
     private static final int BYTE_COUNT = 1 << Byte.SIZE;
-    private static final String CIPHER_AES = "AES/GCM/NoPadding";
+    private static final String CIPHER_AES_GCM = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
 
     /*
@@ -76,6 +83,8 @@ public class EncryptUtil {
 
     static final Loop<HintChar> LOOP_ENCRYPT_CHARS = new Loop<>(CHARACTERS);
 
+    private static final Map<String, SecretKey> secretKeyCache = Collections.synchronizedMap(new HashMap<String, SecretKey>());
+
 
     /**
      * Does AES encryption for the given data. Uses the alias to provide a save encryption key managed by Android.
@@ -89,15 +98,24 @@ public class EncryptUtil {
     public static Pair<byte[],byte[]> encryptData(final String alias, final byte[] data) {
 
         try {
-            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
-            cipher.init(Cipher.ENCRYPT_MODE, getAndroidSecretKey(alias));
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
+            SecretKey androidSecretKey = getOrCreateSecretKey(alias);
+            if (androidSecretKey == null) {
+                Log.e("ENCDATA", "Key is null: " + alias);
+                return null;
+            }
 
-            return new Pair<>(cipher.getIV(), cipher.doFinal(data));
+            cipher.init(Cipher.ENCRYPT_MODE, androidSecretKey);
+
+          return new Pair<>(cipher.getIV(), cipher.doFinal(data));
         } catch (Exception e) {
             Log.e("ENCDATA", "Encryption error wth alias= " + alias, e);
         }
+
         return null;
     }
+
+
 
 
     /**
@@ -114,21 +132,45 @@ public class EncryptUtil {
         try {
             byte[] encryptionIv = encryptedIvAndData.first;
             byte[] encryptedData = encryptedIvAndData.second;
-            KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
-            keyStore.load(null);
 
-            final Cipher cipher = Cipher.getInstance(CIPHER_AES);
+            SecretKey secretKey = findStoredKey(alias);
+            if (secretKey == null) {
+                Log.e("DECDATA", "No key found for: " + alias);
+            }
+
+            final Cipher cipher = Cipher.getInstance(CIPHER_AES_GCM);
             final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
-            SecretKey secretKey = ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
+
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             return cipher.doFinal(encryptedData);
+
         } catch (Exception e) {
             Log.e("DECDATA", "Decryption error wth alias= " + alias, e);
         }
+
         return null;
     }
 
+    private static SecretKey findStoredKey(String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableEntryException {
+
+        synchronized (alias) {
+            if (!secretKeyCache.containsKey(alias)) {
+                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+                keyStore.load(null);
+
+                KeyStore.Entry entry = keyStore.getEntry(alias, null);
+                if (entry != null) {
+                    SecretKey secretKey = ((KeyStore.SecretKeyEntry) entry).getSecretKey();
+                    secretKeyCache.put(alias, secretKey);
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+        return secretKeyCache.get(alias);
+    }
 
     public static boolean isPasswdEncryptionSupported() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
@@ -257,7 +299,7 @@ public class EncryptUtil {
                 char c = s.charAt(i);
                 int b = key[(index + i) % key.length]; // ensure legal index
 
-                EncryptedHintChar encryptedHintChar = EncryptedHintChar.ofDecrypted(c);
+                EncryptedHintChar encryptedHintChar = EncryptedHintChar.Companion.ofDecrypted(c);
                 if (LOOP_ENCRYPT_CHARS.applies(encryptedHintChar)) {
 
                     do {
@@ -288,7 +330,7 @@ public class EncryptUtil {
             for (int i = 0; i < s.length() / 2 && i < key.length; i++) {
                 String decHint = s.substring(i * 2, i * 2 + 2);
                 int b = key[(index + i) % key.length]; // ensure legal index
-                EncryptedHintChar decryptedHint = EncryptedHintChar.ofEncrypted(decHint);
+                EncryptedHintChar decryptedHint = EncryptedHintChar.Companion.ofEncrypted(decHint);
 
                 if (LOOP_ENCRYPT_CHARS.applies(decryptedHint)) {
                     int br = b * decryptedHint.getRoundTrips();
@@ -377,23 +419,34 @@ public class EncryptUtil {
      * @throws Exception
      */
     @TargetApi(Build.VERSION_CODES.M)
-    private static SecretKey getAndroidSecretKey(final String alias) throws Exception {
+    private static SecretKey getOrCreateSecretKey(final String alias) throws Exception {
 
-        KeyGenerator keyGenerator;
         if (isPasswdEncryptionSupported()) {
-            keyGenerator = KeyGenerator
-                    .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+            SecretKey secretKey = findStoredKey(alias);
+            if (secretKey == null) {
+                synchronized (alias) {
+                    // check after sync block entered
+                    secretKey = findStoredKey(alias);
+                    if (secretKey != null) {
+                        return secretKey;
+                    }
+                    KeyGenerator keyGenerator = KeyGenerator
+                            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
 
-            keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
-                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .build());
+                    keyGenerator.init(new KeyGenParameterSpec.Builder(alias,
+                            KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                            .build());
 
-            return keyGenerator.generateKey();
+                    secretKey = keyGenerator.generateKey();
+                }
+            }
+            return secretKey;
         }
 
         return null;
     }
+
 
 }

@@ -44,14 +44,12 @@ public class CredentialFlatListFragment extends CredentialListFragmentBase {
         recyclerView.setAdapter(listAdapter);
 
         credentialListViewModel
-                .getRepo()
-                .getAllCredentialsSortByName()
+                .getCredentials()
                 .observe(this, new Observer<List<Credential>>() {
                     @Override
                     public void onChanged(@Nullable final List<Credential> credentials) {
                         groupListViewModel
-                                .getRepo()
-                                .getAllGroupsSortByName()
+                                .getGroups()
                                 .observe(CredentialFlatListFragment.this, new Observer<List<Group>>() {
                                     @Override
                                     public void onChanged(@Nullable final List<Group> groups) { //TODO find better way instead of nested observe call

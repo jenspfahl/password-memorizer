@@ -2,11 +2,8 @@ package de.jepfa.obfusser.ui.credential.list;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +14,16 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Credential;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.credential.detail.CredentialDetailActivity;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.util.IntentUtil;
 
 public class CredentialFlatListAdapter extends RecyclerView.Adapter<CredentialFlatListAdapter.ViewHolder>
@@ -95,7 +93,7 @@ implements Filterable {
             Credential item = (Credential) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, CredentialDetailActivity.class);
-            IntentUtil.setCredentialExtra(intent, item);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -120,7 +118,7 @@ implements Filterable {
             Credential credential = credentials.get(position);
 
             Group group = getGroupFromId(credential.getGroupId());
-            holder.nameView.setText(GroupColorizer.getColorizedText(group, credential.getName()));
+            holder.nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group, CryptString.toDebugString(credential.getName())));
 
             boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(fragment.getActivity())
@@ -146,9 +144,9 @@ implements Filterable {
     }
 
     void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials){
-        groups = allGroups;
-        this.credentials = credentials;
-        this.originCredentials = credentials;
+        groups = DataSorter.INSTANCE.sortGroupsByName(allGroups);
+        this.credentials = DataSorter.INSTANCE.sortPatternsByName(credentials);
+        this.originCredentials = this.credentials;
         notifyDataSetChanged();
     }
 

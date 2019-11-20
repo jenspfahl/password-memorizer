@@ -13,7 +13,7 @@ public class CredentialListViewModel extends CredentialViewModelBase {
 
     public CredentialListViewModel(Application application) {
         super(application);
-        credentials = getRepo().getAllCredentialsSortByName();
+        credentials = getRepo().getAllCredentials();
     }
 
     public LiveData<List<Credential>> getCredentials() {

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import de.jepfa.obfusser.R;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -36,13 +37,13 @@ public class TemplateInputNameActivity extends SecureActivity {
         Template template = templateViewModel.getTemplate().getValue();
 
         nameView = findViewById(R.id.template_name);
-        String name = template.getName();
+        CryptString name = template.getName();
         if (name != null) {
             nameView.setText(name);
         }
 
         infoView = findViewById(R.id.template_info);
-        String info = template.getInfo();
+        CryptString info = template.getInfo();
         if (info != null) {
             infoView.setText(info);
         }
@@ -110,11 +111,11 @@ public class TemplateInputNameActivity extends SecureActivity {
             focusView.requestFocus();
         } else {
             Template template = templateViewModel.getTemplate().getValue();
-            template.setName(nameView.getText().toString());
-            template.setInfo(infoView.getText().toString());
+            template.setName(CryptString.of(nameView.getText().toString()));
+            template.setInfo(CryptString.of(infoView.getText().toString()));
 
             Intent intent = new Intent(getBaseContext(), TemplateInputPatternActivity.class);
-            IntentUtil.setTemplateExtra(intent, template);
+            IntentUtil.INSTANCE.setTemplateExtra(intent, template);
             startActivity(intent);
 
         }

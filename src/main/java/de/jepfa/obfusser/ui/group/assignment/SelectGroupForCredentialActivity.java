@@ -17,10 +17,12 @@ import java.util.List;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.CryptString;
 import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.ui.SecureActivity;
 import de.jepfa.obfusser.ui.common.GroupColorizer;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
+import de.jepfa.obfusser.util.DataSorter;
 import de.jepfa.obfusser.viewmodel.credential.CredentialViewModel;
 import de.jepfa.obfusser.viewmodel.group.GroupListViewModel;
 
@@ -57,11 +59,11 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
 
         groupListViewModel
                 .getRepo()
-                .getAllGroupsSortByName()
+                .getAllGroups()
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {
-
+                        DataSorter.INSTANCE.sortGroupsByName(groups);
                         Integer selectedGroupId = null;
                         if (credential.getGroupId() != null) {
                             selectedGroupId  = credential.getGroupId();
@@ -78,7 +80,8 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                         for (Group group : groups) {
                             RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
                             groupRadioButton.setId(group.getId());
-                            groupRadioButton.setText(GroupColorizer.getColorizedText(group, group.getName()));
+                            groupRadioButton.setText(GroupColorizer.INSTANCE.getColorizedText(group,
+                                    CryptString.from(group.getName())));
                             if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
                                 groupRadioButton.setChecked(true);
                             }

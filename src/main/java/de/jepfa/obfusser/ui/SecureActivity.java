@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
+import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
@@ -60,7 +61,9 @@ public abstract class SecureActivity extends BaseActivity {
 
     protected synchronized void securityCheck() {
         SecretChecker.getOrAskForSecret(this);
+        SecretChecker.migrateToCryptStrings(this);
     }
+
 
     /**
      * Helper class to check the user secret.
@@ -75,16 +78,14 @@ public abstract class SecureActivity extends BaseActivity {
 
         private static final String PREF_SALT = "application.salt";
         private static final String PREF_SALT_IV = "application.salt_iv";
+        private static final String PREF_STRINGS_CRYPTED = "pref_strings_crypted";
         private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
 
         private static volatile long secretDialogOpened;
 
-        public static byte[] getOrAskForSecret(Activity activity) {
-            boolean passwordCheckEnabled = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-                    .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
+        public static synchronized byte[] getOrAskForSecret(Activity activity) {
 
-            if (passwordCheckEnabled) {
+            if (isPasswordCheckEnabled(activity)) {
                 Secret secret = Secret.getOrCreate();
 
                 if (secret.isOutdated() || !secret.hasDigest()) {
@@ -102,6 +103,31 @@ public abstract class SecureActivity extends BaseActivity {
             return null;
         }
 
+        public static boolean isPasswordCheckEnabled(Activity activity) {
+            return PreferenceManager
+                            .getDefaultSharedPreferences(activity)
+                            .getBoolean(SettingsActivity.PREF_ENABLE_PASSWORD, false);
+        }
+
+        public static void migrateToCryptStrings(final Activity activity) {
+            final SharedPreferences defaultSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(activity);
+
+            if (shouldDoCryptStrings(defaultSharedPreferences)) {
+                SecurityService.startDoStringCrypt(activity.getBaseContext());
+
+                SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+                editor.putBoolean(PREF_STRINGS_CRYPTED, true);
+                editor.commit();
+            }
+        }
+
+        public static boolean shouldDoCryptStrings(SharedPreferences sharedPreferences) {
+            boolean stringsEncrypted = sharedPreferences
+                    .getBoolean(PREF_STRINGS_CRYPTED, false);
+
+            return !stringsEncrypted;
+        }
 
         public static synchronized byte[] getSalt(Context context) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
@@ -139,6 +165,10 @@ public abstract class SecureActivity extends BaseActivity {
                         byte[] encSalt = Base64.decode(saltBase64, 0);
                         Pair<byte[], byte[]> encrypted = new Pair<>(iv, encSalt);
                         salt = EncryptUtil.decryptData(SecretChecker.KEY_ALIAS_SALT, encrypted);
+                        if (salt == null) {
+                            Log.e("GET_SALT", "Cannot get stored salt cause it could not be decrypted");
+                            return null;
+                        }
                     }
                 }
                 else {
@@ -155,6 +185,10 @@ public abstract class SecureActivity extends BaseActivity {
         private static void encryptAndStoreSalt(byte[] salt, SharedPreferences.Editor editor) {
 
             Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecretChecker.KEY_ALIAS_SALT, salt);
+            if (encrypted == null) {
+                Log.e("STORE_SALT", "Cannot store salt cause it could not be encrypted");
+                return;
+            }
 
             String encSaltBase64 = Base64.encodeToString(encrypted.second, 0);
             String ivBase64 = Base64.encodeToString(encrypted.first, 0);
@@ -164,7 +198,7 @@ public abstract class SecureActivity extends BaseActivity {
         }
 
 
-        private synchronized static void openDialog(final Secret secret, final Activity activity) {
+        private static void openDialog(final Secret secret, final Activity activity) {
 
             if (isRecentlyOpened(secretDialogOpened)) {
                 return;
@@ -275,6 +309,10 @@ public abstract class SecureActivity extends BaseActivity {
 
                     byte[] key = EncryptUtil.generateKey(pwd, salt);
                     byte[] hashedStoredKey = EncryptUtil.decryptData(KEY_ALIAS_PASSWD, new Pair<>(iv, encPasswd));
+                    if (hashedStoredKey == null) {
+                        Log.e("CHECK_PWD", "Cannot get stored salt cause it could not be decrypted");
+                        return false;
+                    }
                     byte[] hashedPwd = EncryptUtil.fastHash(key, salt);
 
                     return Arrays.equals(hashedPwd, hashedStoredKey);

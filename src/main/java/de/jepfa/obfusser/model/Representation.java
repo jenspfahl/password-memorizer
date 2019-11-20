@@ -22,6 +22,16 @@ public enum Representation {
             0.0f,
             32.0f),
 
+    ROTUND("Rotunde",
+            '\u2b2c',
+            '\u2b2e',
+            '\u2b24',
+            '\u2b22',
+            '\u2b23',
+            Build.VERSION_CODES.O,
+            0.0f,
+            32.0f),
+
     CARDS("Cards",
             '\u2660',
             '\u2665',
@@ -117,6 +127,37 @@ public enum Representation {
             '\u23F8',
             '\u23EB',
             Build.VERSION_CODES.O),
+
+    BITS("Bits",
+            '\u2596',
+            '\u2598',
+            '\u259C',
+            '\u259E',
+            '\u25AA',
+            null,
+            0.1f,
+            32.0f),
+
+
+    EASY("Easy",
+            '\u24D0',
+            '\u24B6',
+            '\u24EA',
+            '\u263A',
+            '\u2639',
+            null,
+            null,
+            33.0f),
+
+    CHINESE("Chinese",
+            '\u5f0b',
+            '\u5f00',
+            '\u5fa6',
+            '\u5fc7',
+            '\u2f00',
+            null,
+            null,
+            null),
 
     ;
 

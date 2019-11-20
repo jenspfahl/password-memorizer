@@ -43,7 +43,7 @@ public abstract class PatternDetailFragment extends SecureFragment {
 
         if (pattern != null) {
             final TextView obfusTextView = rootView.findViewById(R.id.pattern_detail_obfuschar);
-            ObfusTextAdjuster.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
+            ObfusTextAdjuster.INSTANCE.adjustTextForRepresentation(getSecureActivity().getPatternRepresentation(), obfusTextView);
 
             infoTextView = rootView.findViewById(R.id.pattern_info_textview);
             hintsTextView = rootView.findViewById(R.id.pattern_hints_textview);
@@ -78,8 +78,8 @@ public abstract class PatternDetailFragment extends SecureFragment {
         SpannableString span = getSpannableString(pattern, patternString);
 
         obfusTextView.setText(span, TextView.BufferType.NORMAL);
-        float estimatedSize = ObfusTextAdjuster.calcTextSizeToScreen(getActivity(), obfusTextView,
-                obfusTextView.getText().toString(), ObfusTextAdjuster.DEFAULT_MARGIN);
+        float estimatedSize = ObfusTextAdjuster.INSTANCE.calcTextSizeToScreen(getActivity(), obfusTextView,
+                obfusTextView.getText().toString(), ObfusTextAdjuster.INSTANCE.getDEFAULT_MARGIN());
         obfusTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, estimatedSize);
 
         final AtomicInteger clickCounter = new AtomicInteger(initClickStep);

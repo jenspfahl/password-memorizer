@@ -21,6 +21,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.template.input.TemplateInputNameActivity;
 import de.jepfa.obfusser.util.IntentUtil;
 import de.jepfa.obfusser.viewmodel.template.TemplateListViewModel;
@@ -73,14 +74,15 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
 
 
         templateListViewModel
-                .getRepo()
-                .getAllTemplatesSortByGroupAndName()
+                .getTemplates()
                 .observe(this, new Observer<List<Template>>() {
                     @Override
                     public void onChanged(@Nullable final List<Template> templates) {
                         adapter.setTemplates(templates);
                     }
                 });
+
+        Noogler.INSTANCE.noogleEncryptData(getActivity(), view);
 
         return view;
     }
@@ -106,11 +108,11 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
                 switch (item.getItemId()) {
                     case R.id.menu_change_template:
                         Intent intent = new Intent(v.getContext(), TemplateInputNameActivity.class);
-                        IntentUtil.setTemplateExtra(intent, template);
+                        IntentUtil.INSTANCE.setTemplateExtra(intent, template);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_template:
-                        DeletionHelper.askAndDelete(templateListViewModel.getRepo(), template, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(templateListViewModel.getRepo(), template, getActivity(), null);
                         return true;
                     default:
                         return false;

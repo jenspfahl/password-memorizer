@@ -35,7 +35,7 @@ public class BackupPreferenceListener implements Preference.OnPreferenceClickLis
     @Override
     public boolean onPreferenceClick(final Preference preference) {
 
-        PermissionChecker.verifyRWStoragePermissions(activity);
+        PermissionChecker.INSTANCE.verifyRWStoragePermissions(activity);
 
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 

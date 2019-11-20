@@ -10,6 +10,7 @@ import android.preference.SwitchPreference;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Secret;
 import de.jepfa.obfusser.service.SecurityService;
 import de.jepfa.obfusser.ui.SecureActivity;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.settings.SettingsActivity;
 import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 
@@ -126,15 +128,16 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                             byte[] applicationSalt = SecureActivity.SecretChecker.getSalt(preference.getContext());
                             byte[] key = EncryptUtil.generateKey(pwd, applicationSalt);
 
+                            SharedPreferences defaultSharedPreferences = PreferenceManager
+                                    .getDefaultSharedPreferences(activity);
 
                             if (encrypt) {
-                                SharedPreferences defaultSharedPreferences = PreferenceManager
-                                        .getDefaultSharedPreferences(activity);
                                 SharedPreferences.Editor passwdEditor = defaultSharedPreferences.edit();
                                 passwdEditor.putBoolean(SecureActivity.SecretChecker.PREF_ENC_WITH_UUID, disturbPatternsSwitch.isChecked());
                                 passwdEditor.commit();
 
-                                SecurityService.startEncryptAll(preference.getContext(), key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
+                                SecurityService.startEncryptAll(preference.getContext(),
+                                        key, SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity));
 
                                 Secret secret = Secret.getOrCreate();
                                 secret.setDigest(key);
@@ -156,6 +159,8 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                                     Secret secret = Secret.getOrCreate();
                                     secret.setDigest(null);
                                     removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
+
+                                    Noogler.INSTANCE.resetPrefs(activity);
                                 }
                             }
                         } finally {
@@ -193,6 +198,11 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
 
         byte[] hashedKey = EncryptUtil.fastHash(key, salt);
         Pair<byte[], byte[]> encrypted = EncryptUtil.encryptData(SecureActivity.SecretChecker.KEY_ALIAS_PASSWD, hashedKey);
+        if (encrypted == null) {
+            Log.e("STORE_KEY", "Cannot store key cause it could not be encrypted");
+            return;
+        }
+
         SharedPreferences defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(activity);
 

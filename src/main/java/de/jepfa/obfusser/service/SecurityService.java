@@ -7,8 +7,10 @@ import android.content.Intent;
 import java.util.List;
 
 import de.jepfa.obfusser.model.Credential;
+import de.jepfa.obfusser.model.Group;
 import de.jepfa.obfusser.model.Template;
 import de.jepfa.obfusser.repository.credential.CredentialRepository;
+import de.jepfa.obfusser.repository.group.GroupRepository;
 import de.jepfa.obfusser.repository.template.TemplateRepository;
 
 /**
@@ -19,14 +21,14 @@ import de.jepfa.obfusser.repository.template.TemplateRepository;
 public class SecurityService extends IntentService {
 
     private static final String ACTION_ENCRYPT_ALL = "de.jepfa.obfusser.service.action.encrypt_all";
-    private static final String ACTION_REENCRYPT_ALL = "de.jepfa.obfusser.service.action.reencrypt_all";
     private static final String ACTION_DECRYPT_ALL = "de.jepfa.obfusser.service.action.decrypt_all";
+    private static final String ACTION_DO_STRING_CRYPT = "de.jepfa.obfusser.service.action.do_string_crypt";
     private static final String PARAM_KEY = "de.jepfa.obfusser.service.param.key";
-    private static final String PARAM_OLD_KEY = "de.jepfa.obfusser.service.param.old_key";
     private static final String PARAM_WITH_UUID = "de.jepfa.obfusser.service.param.with_uuid";
 
     private final CredentialRepository credentialRepo;
     private final TemplateRepository templateRepo;
+    private final GroupRepository groupRepo;
 
 
     public SecurityService() {
@@ -34,6 +36,7 @@ public class SecurityService extends IntentService {
 
         credentialRepo = new CredentialRepository(getApplication());
         templateRepo = new TemplateRepository(getApplication());
+        groupRepo = new GroupRepository(getApplication());
     }
 
 
@@ -45,12 +48,9 @@ public class SecurityService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startReencryptAll(Context context, byte[] oldKey, byte[] key, boolean withUuid) {
+    public static void startDoStringCrypt(Context context) {
         Intent intent = new Intent(context, SecurityService.class);
-        intent.setAction(ACTION_REENCRYPT_ALL);
-        intent.putExtra(PARAM_OLD_KEY, oldKey);
-        intent.putExtra(PARAM_KEY, key);
-        intent.putExtra(PARAM_WITH_UUID, withUuid);
+        intent.setAction(ACTION_DO_STRING_CRYPT);
         context.startService(intent);
     }
 
@@ -73,9 +73,8 @@ public class SecurityService extends IntentService {
             if (ACTION_DECRYPT_ALL.equals(action)) {
                 decryptAll(intent.getByteArrayExtra(PARAM_KEY), withUuid);
             }
-            if (ACTION_REENCRYPT_ALL.equals(action)) {
-                decryptAll(intent.getByteArrayExtra(PARAM_OLD_KEY), withUuid);
-                encryptAll(intent.getByteArrayExtra(PARAM_KEY), withUuid);
+            if (ACTION_DO_STRING_CRYPT.equals(action)) {
+                doStringCrypt(intent.getByteArrayExtra(PARAM_KEY), withUuid);
             }
         }
     }
@@ -105,6 +104,23 @@ public class SecurityService extends IntentService {
         for (Credential credential : allCredentials) {
             credential.decrypt(key, decWithUuid);
             credentialRepo.update(credential);
+        }
+    }
+
+    private void doStringCrypt(byte[] key, boolean decWithUuid) {
+        List<Template> allTemplates = templateRepo.getAllTemplatesSync();
+        for (Template template : allTemplates) {
+            templateRepo.update(template);
+        }
+
+        List<Credential> allCredentials = credentialRepo.getAllCredentialsSync();
+        for (Credential credential : allCredentials) {
+            credentialRepo.update(credential);
+        }
+
+        List<Group> allGroups = groupRepo.getAllGroupsSync();
+        for (Group group : allGroups) {
+            groupRepo.update(group);
         }
     }
 

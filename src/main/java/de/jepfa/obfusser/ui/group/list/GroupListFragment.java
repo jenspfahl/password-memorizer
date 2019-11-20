@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -91,8 +90,7 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
 
 
         groupListViewModel
-                .getRepo()
-                .getAllGroupsSortByName()
+                .getGroups()
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {
@@ -113,16 +111,16 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
                 switch (item.getItemId()) {
                     case R.id.menu_change_group:
                         Intent intent = new Intent(v.getContext(), GroupInputNameActivity.class);
-                        IntentUtil.setGroupExtra(intent, group);
+                        IntentUtil.INSTANCE.setGroupExtra(intent, group);
                         startActivity(intent);
                         return true;
                     case R.id.menu_change_color:
                         intent = new Intent(v.getContext(), SelectGroupColorActivity.class);
-                        IntentUtil.setGroupExtra(intent, group);
+                        IntentUtil.INSTANCE.setGroupExtra(intent, group);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_group:
-                        DeletionHelper.askAndDelete(groupListViewModel.getRepo(), group, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(groupListViewModel.getRepo(), group, getActivity(), null);
                         return true;
                     default:
                         return false;

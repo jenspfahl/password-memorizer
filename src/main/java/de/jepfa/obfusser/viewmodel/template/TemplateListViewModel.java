@@ -13,7 +13,7 @@ public class TemplateListViewModel extends TemplateViewModelBase {
 
     public TemplateListViewModel(Application application) {
         super(application);
-        templates = getRepo().getAllTemplatesSortByGroupAndName();
+        templates = getRepo().getAllTemplates();
     }
 
     public LiveData<List<Template>> getTemplates() {

@@ -2,6 +2,7 @@ package de.jepfa.obfusser.ui.common
 
 import android.app.Activity
 import android.os.Build
+import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.util.Log
 
@@ -36,6 +37,9 @@ object Debug {
             Log.e("DEBUGINFO", "cannot get version code", e)
         }
 
+        val defaultSharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(activity)
+
         addParam(sb, "BuildTimestamp", Constants.SDF_DT_MEDIUM.format(BuildConfig.BUILD_TIME))
         addParam(sb, "BuildType", BuildConfig.BUILD_TYPE)
         addParam(sb, "SdkVersion", Build.VERSION.SDK_INT.toString())
@@ -52,6 +56,9 @@ object Debug {
         addParam(sb, "Key stored", SecureActivity.SecretChecker.isPasswordStored(activity).toString())
         addParam(sb, "Salt encrypted", SecureActivity.SecretChecker.isSaltEncrypted(activity).toString())
         addParam(sb, "Enc with UUID", SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity).toString())
+        addParam(sb, "Uncrypted Strings", SecureActivity.SecretChecker.shouldDoCryptStrings(defaultSharedPreferences).toString())
+        addParam(sb, "Don't noogle", Noogler.isDontNoogle(defaultSharedPreferences).toString())
+        addParam(sb, "Noogle Counter", Noogler.getNoogleCounter(defaultSharedPreferences).toString())
 
         val icon = activity.applicationInfo.loadIcon(activity.packageManager)
         builder.setTitle("Debug info")

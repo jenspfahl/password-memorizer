@@ -1,35 +1,24 @@
 package de.jepfa.obfusser.ui.credential.list;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.jepfa.obfusser.Constants;
 import de.jepfa.obfusser.R;
 import de.jepfa.obfusser.model.Credential;
-import de.jepfa.obfusser.model.ObfusChar;
-import de.jepfa.obfusser.model.Secret;
-import de.jepfa.obfusser.ui.SecureActivity;
-import de.jepfa.obfusser.ui.SecureFragment;
 import de.jepfa.obfusser.ui.common.CommonMenuFragmentBase;
 import de.jepfa.obfusser.ui.common.DeletionHelper;
+import de.jepfa.obfusser.ui.common.Noogler;
 import de.jepfa.obfusser.ui.credential.input.CredentialInputNameActivity;
 import de.jepfa.obfusser.ui.group.assignment.SelectGroupForCredentialActivity;
 import de.jepfa.obfusser.ui.navigation.NavigationActivity;
@@ -52,7 +41,7 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
         super.onCreate(savedInstanceState);
 
         credentialListViewModel = ViewModelProviders
-                .of(this)
+                .of(this.getActivity())
                 .get(CredentialListViewModel.class);
 
         groupListViewModel = ViewModelProviders
@@ -78,6 +67,8 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
         });
 
         getActivity().setTitle(R.string.title_credentials);
+
+        Noogler.INSTANCE.noogleEncryptData(getActivity(), view);
 
         return view;
     }
@@ -142,16 +133,16 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
                 switch (item.getItemId()) {
                     case R.id.menu_change_credential:
                         Intent intent = new Intent(v.getContext(), CredentialInputNameActivity.class);
-                        IntentUtil.setCredentialExtra(intent, credential);
+                        IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                         startActivity(intent);
                         return true;
                     case R.id.menu_assign_group_credential:
                         intent = new Intent(v.getContext(), SelectGroupForCredentialActivity.class);
-                        IntentUtil.setCredentialExtra(intent, credential);
+                        IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_credential:
-                        DeletionHelper.askAndDelete(credentialListViewModel.getRepo(), credential, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(credentialListViewModel.getRepo(), credential, getActivity(), null);
                         return true;
                     default:
                         return false;

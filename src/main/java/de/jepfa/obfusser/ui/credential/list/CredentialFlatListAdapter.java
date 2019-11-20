@@ -93,7 +93,7 @@ implements Filterable {
             Credential item = (Credential) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, CredentialDetailActivity.class);
-            IntentUtil.setCredentialExtra(intent, item);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -118,7 +118,7 @@ implements Filterable {
             Credential credential = credentials.get(position);
 
             Group group = getGroupFromId(credential.getGroupId());
-            holder.nameView.setText(GroupColorizer.getColorizedText(group, CryptString.toDebugString(credential.getName())));
+            holder.nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group, CryptString.toDebugString(credential.getName())));
 
             boolean hidePatterns = PreferenceManager
                     .getDefaultSharedPreferences(fragment.getActivity())
@@ -144,8 +144,8 @@ implements Filterable {
     }
 
     void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials){
-        groups = DataSorter.sortGroupsByName(allGroups);
-        this.credentials = DataSorter.sortPatternsByName(credentials);
+        groups = DataSorter.INSTANCE.sortGroupsByName(allGroups);
+        this.credentials = DataSorter.INSTANCE.sortPatternsByName(credentials);
         this.originCredentials = this.credentials;
         notifyDataSetChanged();
     }

@@ -128,7 +128,7 @@ public class CredentialInputNameActivity extends SecureActivity {
             credential.setInfo(CryptString.of(infoView.getText().toString()));
 
             Intent intent = new Intent(getBaseContext(), CredentialInputPatternActivity.class);
-            IntentUtil.setCredentialExtra(intent, credential);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
             startActivity(intent);
 
         }

@@ -136,7 +136,7 @@ public abstract class CommonMenuFragmentBase extends SecureFragment {
         }
 
         if (id == R.id.menu_legend) {
-            LegendShower.showLegend(getActivity(), getSecureActivity().getPatternRepresentation());
+            LegendShower.INSTANCE.showLegend(getActivity(), getSecureActivity().getPatternRepresentation());
 
             return true;
         }

@@ -53,11 +53,11 @@ public class GroupDetailFragment extends Fragment {
             final TextView colorTextView = rootView.findViewById(R.id.group_detail_color);
             char indicator;
             if (group.getColor() == 0) {
-                indicator = GroupColorizer.COLOR_INDICATION_EMPTY;
+                indicator = GroupColorizer.INSTANCE.getCOLOR_INDICATION_EMPTY();
                 colorTextView.setTextColor(Color.GRAY);
             }
             else {
-                indicator = GroupColorizer.COLOR_INDICATION_FULL;
+                indicator = GroupColorizer.INSTANCE.getCOLOR_INDICATION_FULL();
                 colorTextView.setTextColor(GroupColor.getAndroidColor(group.getColor()));
             }
             colorTextView.setText(String.valueOf(indicator));
@@ -67,7 +67,7 @@ public class GroupDetailFragment extends Fragment {
                 public void onClick(View v) {
 
                     Intent intent = new Intent(v.getContext(), SelectGroupColorActivity.class);
-                    IntentUtil.setGroupExtra(intent, group);
+                    IntentUtil.INSTANCE.setGroupExtra(intent, group);
                     startActivity(intent);
                 }
             });

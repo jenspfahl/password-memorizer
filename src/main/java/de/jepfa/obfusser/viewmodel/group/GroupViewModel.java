@@ -30,7 +30,7 @@ public class GroupViewModel extends GroupViewModelBase {
     public static GroupViewModel getFromIntent(FragmentActivity activity, Intent intent) {
         GroupViewModel groupViewModel = get(activity);
         groupViewModel.setGroup(
-                IntentUtil.createGroupFromIntent(intent));
+                IntentUtil.INSTANCE.createGroupFromIntent(intent));
 
         return groupViewModel;
     }

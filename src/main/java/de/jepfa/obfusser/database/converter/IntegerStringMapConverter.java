@@ -18,7 +18,7 @@ public class IntegerStringMapConverter {
             string = listOfString;
         }
         else {
-            string = DbCrypt.aesDecrypt(listOfString);
+            string = DbCrypt.INSTANCE.aesDecrypt(listOfString);
         }
         return new Gson().fromJson(
                 string,
@@ -33,7 +33,7 @@ public class IntegerStringMapConverter {
             return serialized;
         }
         else {
-            return DbCrypt.aesEncrypt(serialized);
+            return DbCrypt.INSTANCE.aesEncrypt(serialized);
         }
     }
 }

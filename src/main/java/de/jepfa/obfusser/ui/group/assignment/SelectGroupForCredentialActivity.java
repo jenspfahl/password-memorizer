@@ -63,7 +63,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                 .observe(this, new Observer<List<Group>>() {
                     @Override
                     public void onChanged(@Nullable final List<Group> groups) {
-                        DataSorter.sortGroupsByName(groups);
+                        DataSorter.INSTANCE.sortGroupsByName(groups);
                         Integer selectedGroupId = null;
                         if (credential.getGroupId() != null) {
                             selectedGroupId  = credential.getGroupId();
@@ -80,7 +80,7 @@ public class SelectGroupForCredentialActivity extends SecureActivity {
                         for (Group group : groups) {
                             RadioButton groupRadioButton = new RadioButton(SelectGroupForCredentialActivity.this);
                             groupRadioButton.setId(group.getId());
-                            groupRadioButton.setText(GroupColorizer.getColorizedText(group,
+                            groupRadioButton.setText(GroupColorizer.INSTANCE.getColorizedText(group,
                                     CryptString.from(group.getName())));
                             if (selectedGroupId != null && group.getId() == selectedGroupId.intValue()) {
                                 groupRadioButton.setChecked(true);

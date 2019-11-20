@@ -61,7 +61,7 @@ public class TemplateInputHintsActivity extends SecureActivity {
 
         if (savedInstanceState != null) {
             ArrayList<String> hintsList = savedInstanceState.getStringArrayList(PatternHolder.ATTRIB_HINTS);
-            IntentUtil.convertAndSetHintsFromTransport(template, hintsList);
+            IntentUtil.INSTANCE.convertAndSetHintsFromTransport(template, hintsList);
         }
 
 
@@ -100,7 +100,7 @@ public class TemplateInputHintsActivity extends SecureActivity {
         super.onSaveInstanceState(outState);
 
         Template template = templateViewModel.getTemplate().getValue();
-        ArrayList<String> hintsForTransport = IntentUtil.convertHintsForTransport(template);
+        ArrayList<String> hintsForTransport = IntentUtil.INSTANCE.convertHintsForTransport(template);
         outState.putStringArrayList(Template.ATTRIB_HINTS, hintsForTransport);
     }
 
@@ -115,11 +115,11 @@ public class TemplateInputHintsActivity extends SecureActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == 0) {
-            LegendShower.showLegend(this, getPatternRepresentation());
+            LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
         }
         if (id == android.R.id.home) {
             Intent upIntent = new Intent(this, TemplateInputPatternActivity.class);
-            IntentUtil.setTemplateExtra(upIntent, templateViewModel.getTemplate().getValue());
+            IntentUtil.INSTANCE.setTemplateExtra(upIntent, templateViewModel.getTemplate().getValue());
             navigateUpTo(upIntent);
             return true;
         }

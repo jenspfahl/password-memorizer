@@ -37,7 +37,7 @@ class CredentialIntroFragment : CommonMenuFragmentBase() {
         activity!!.setTitle(R.string.title_credentials)
 
         val textViewLegend : TextView = view.findViewById(R.id.credential_intro_legend)
-        val legend = LegendShower.buildLegend(activity, secureActivity.patternRepresentation, false)
+        val legend = LegendShower.buildLegend(activity!!, secureActivity.patternRepresentation, false)
         textViewLegend.setText(legend)
 
         val textViewPasswd : TextView = view.findViewById(R.id.credential_intro_text_passwd)

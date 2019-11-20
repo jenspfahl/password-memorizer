@@ -52,7 +52,7 @@ public class RestorePreferenceListener implements Preference.OnPreferenceClickLi
             return false;
         }
 
-        PermissionChecker.verifyReadStoragePermissions(activity);
+        PermissionChecker.INSTANCE.verifyReadStoragePermissions(activity);
 
         Intent intent = new Intent()
                 .setType("*/*")

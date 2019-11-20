@@ -44,7 +44,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             Group item = (Group) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, GroupDetailActivity.class);
-            IntentUtil.setGroupExtra(intent, item);
+            IntentUtil.INSTANCE.setGroupExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -65,7 +65,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (groups != null || !groups.isEmpty()) {
             Group group = groups.get(position);
-            holder.nameView.setText(GroupColorizer.getColorizedText(group,
+            holder.nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group,
                     CryptString.toDebugString(group.getName())));
 
             holder.iconView.setTag(group);
@@ -75,7 +75,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     void setGroups(List<Group> groups){
-        this.groups = DataSorter.sortGroupsByName(groups);
+        this.groups = DataSorter.INSTANCE.sortGroupsByName(groups);
         notifyDataSetChanged();
     }
 

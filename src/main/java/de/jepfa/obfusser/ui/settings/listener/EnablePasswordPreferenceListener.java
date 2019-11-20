@@ -160,7 +160,7 @@ public class EnablePasswordPreferenceListener implements Preference.OnPreference
                                     secret.setDigest(null);
                                     removeSavelyStoredKey(key, preference.getPreferenceManager(), activity);
 
-                                    Noogler.resetPrefs(activity);
+                                    Noogler.INSTANCE.resetPrefs(activity);
                                 }
                             }
                         } finally {

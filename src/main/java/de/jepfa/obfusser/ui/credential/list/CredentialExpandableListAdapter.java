@@ -94,7 +94,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
             Credential item = (Credential) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, CredentialDetailActivity.class);
-            IntentUtil.setCredentialExtra(intent, item);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -107,11 +107,11 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
     }
 
     void setGroupsAndCredentials(List<Group> allGroups, List<Credential> credentials) {
-        groups = DataSorter.sortGroupsByName(new ArrayList<Group>(allGroups.size()));
+        groups = DataSorter.INSTANCE.sortGroupsByName(new ArrayList<Group>(allGroups.size()));
         groupIdCredentials = new HashMap<>();
         originGroups = groups;
         originGroupIdCredentials = groupIdCredentials;
-        credentials = DataSorter.sortPatternsByGroupsAndName(groups, credentials);
+        credentials = DataSorter.INSTANCE.sortPatternsByGroupsAndName(groups, credentials);
 
         for (Credential credential : credentials) {
             int groupId;
@@ -214,7 +214,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
                     parent, false);
         }
         TextView nameView = convertView.findViewById(R.id.group_expand_title);
-        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.from(group.getName())));
+        nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group, CryptString.from(group.getName())));
 
         return convertView;
     }
@@ -232,7 +232,7 @@ public class CredentialExpandableListAdapter extends BaseExpandableListAdapter i
         ImageView iconView = convertView.findViewById(R.id.credential_list_menu_popup);
 
         Group group = (Group) getGroup(groupPosition);
-        nameView.setText(GroupColorizer.getColorizedText(group, CryptString.toDebugString(credential.getName())));
+        nameView.setText(GroupColorizer.INSTANCE.getColorizedText(group, CryptString.toDebugString(credential.getName())));
 
         boolean hidePatterns = PreferenceManager
                 .getDefaultSharedPreferences(fragment.getActivity())

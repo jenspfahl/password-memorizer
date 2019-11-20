@@ -74,7 +74,7 @@ public class CredentialDetailActivity extends SecureActivity {
                         @Override
                         public void onChanged(@Nullable Group group) {
                             if (group != null) {
-                                subText.setText(GroupColorizer.getColorizedText(group,
+                                subText.setText(GroupColorizer.INSTANCE.getColorizedText(group,
                                         CryptString.from(group.getName())));
                             }
                         }
@@ -131,22 +131,22 @@ public class CredentialDetailActivity extends SecureActivity {
         Credential credential = credentialViewModel.getCredential().getValue();
         switch (item.getItemId()) {
             case 0:
-                LegendShower.showLegend(this, getPatternRepresentation());
+                LegendShower.INSTANCE.showLegend(this, getPatternRepresentation());
                 return true;
             case R.id.menu_change_credential:
                 Intent intent = new Intent(this, CredentialInputNameActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
+                IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                 startActivity(intent);
                 return true;
 
             case R.id.menu_assign_group_credential:
                 intent = new Intent(this, SelectGroupForCredentialActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
+                IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                 startActivity(intent);
                 return true;
 
             case R.id.menu_delete_credential:
-                DeletionHelper.askAndDelete(credentialViewModel.getRepo(), credential, this, new Runnable() {
+                DeletionHelper.INSTANCE.askAndDelete(credentialViewModel.getRepo(), credential, this, new Runnable() {
                     @Override
                     public void run() {
                         Intent upIntent = new Intent(CredentialDetailActivity.this, NavigationActivity.class);

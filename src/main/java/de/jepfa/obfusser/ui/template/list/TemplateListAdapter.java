@@ -89,7 +89,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
             Template item = (Template) view.getTag();
             Context context = view.getContext();
             Intent intent = new Intent(context, TemplateDetailActivity.class);
-            IntentUtil.setTemplateExtra(intent, item);
+            IntentUtil.INSTANCE.setTemplateExtra(intent, item);
             context.startActivity(intent);
         }
     };
@@ -140,7 +140,7 @@ public class TemplateListAdapter extends RecyclerView.Adapter<TemplateListAdapte
     }
 
     void setTemplates(List<Template> templates){
-        this.templates = DataSorter.sortPatternsByName(templates);
+        this.templates = DataSorter.INSTANCE.sortPatternsByName(templates);
         originTemplates = this.templates;
         notifyDataSetChanged();
     }

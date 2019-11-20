@@ -12,7 +12,7 @@ public class CryptStringConverter {
         if ("".equals(string)) {
             return CryptString.of(string, string);
         }
-        String aesString = DbCrypt.aesDecrypt(string);
+        String aesString = DbCrypt.INSTANCE.aesDecrypt(string);
         if (aesString != null) {
             return CryptString.of(aesString, string);
         }
@@ -26,7 +26,7 @@ public class CryptStringConverter {
                 return cryptString.toString();
             }
             else {
-                String encrypted = DbCrypt.aesEncrypt(CryptString.from(cryptString));
+                String encrypted = DbCrypt.INSTANCE.aesEncrypt(CryptString.from(cryptString));
                 return encrypted;
             }
         }

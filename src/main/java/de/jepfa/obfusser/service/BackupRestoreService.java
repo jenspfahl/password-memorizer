@@ -45,7 +45,7 @@ import de.jepfa.obfusser.ui.common.NotificationHelper;
 import de.jepfa.obfusser.util.FileUtil;
 
 /**
- * Service to backup and restore all {@link Credential}s, {@link Template}s anf {@link de.jepfa.obfusser.model.Group}s.
+ * Service to backup and restore all {@link Credential}s, {@link Template}s and {@link de.jepfa.obfusser.model.Group}s.
  *
  * @author Jens Pfahl
  */
@@ -188,8 +188,8 @@ public class BackupRestoreService extends IntentService {
         root.addProperty(JSON_GROUPS_COUNT, groups.size());
 
 
-        NotificationHelper.createNotificationChannel(this,
-                NotificationHelper.CHANNEL_ID_BACKUP, getString(R.string.notification_channel_backup_title));
+        NotificationHelper.INSTANCE.createNotificationChannel(this,
+                NotificationHelper.INSTANCE.getCHANNEL_ID_BACKUP(), getString(R.string.notification_channel_backup_title));
 
         boolean success = false;
 
@@ -218,7 +218,7 @@ public class BackupRestoreService extends IntentService {
                         Intent.createChooser(intent, getString(R.string.notification_action_backup_done)), 0);
 
 
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.CHANNEL_ID_BACKUP)
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), NotificationHelper.INSTANCE.getCHANNEL_ID_BACKUP())
                         .setSmallIcon(R.drawable.ic_notif_obfusser)
                         .setContentTitle(getString(R.string.notification_backup_title))
                         .setContentText(getString(R.string.notification_backup_message, fileName))
@@ -234,7 +234,7 @@ public class BackupRestoreService extends IntentService {
                     mBuilder.setContentIntent(pIntent);
                 }*/
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_BACKUP_SUCCESS, mBuilder.build());
+                notificationManager.notify(NotificationHelper.INSTANCE.getNOTIFICATION_ID_BACKUP_SUCCESS(), mBuilder.build());
 
                 success = true;
 

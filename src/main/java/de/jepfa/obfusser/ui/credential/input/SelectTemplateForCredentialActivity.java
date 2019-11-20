@@ -68,7 +68,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                             SecureActivity.SecretChecker.isEncWithUUIDEnabled(SelectTemplateForCredentialActivity.this));
                 }
                 Intent intent = new Intent(getBaseContext(), CredentialInputHintsActivity.class);
-                IntentUtil.setCredentialExtra(intent, credential);
+                IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
 
                 startActivity(intent);
             }
@@ -107,7 +107,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
             Credential credential = credentialViewModel.getCredential().getValue();
 
             Intent intent = new Intent(this, CredentialInputPatternActivity.class);
-            IntentUtil.setCredentialExtra(intent, credential);
+            IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
             navigateUpTo(intent);
             return true;
         }
@@ -129,7 +129,7 @@ public class SelectTemplateForCredentialActivity extends SecureActivity {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onChanged(@Nullable final List<Template> templates) {
-                        DataSorter.sortPatternsByName(templates);
+                        DataSorter.INSTANCE.sortPatternsByName(templates);
                         for (Template template : templates) {
                             RadioButton groupRadioButton = new RadioButton(SelectTemplateForCredentialActivity.this);
                             groupRadioButton.setId(template.getId());

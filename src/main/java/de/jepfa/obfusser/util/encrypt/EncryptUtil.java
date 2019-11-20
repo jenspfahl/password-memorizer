@@ -299,7 +299,7 @@ public class EncryptUtil {
                 char c = s.charAt(i);
                 int b = key[(index + i) % key.length]; // ensure legal index
 
-                EncryptedHintChar encryptedHintChar = EncryptedHintChar.ofDecrypted(c);
+                EncryptedHintChar encryptedHintChar = EncryptedHintChar.Companion.ofDecrypted(c);
                 if (LOOP_ENCRYPT_CHARS.applies(encryptedHintChar)) {
 
                     do {
@@ -330,7 +330,7 @@ public class EncryptUtil {
             for (int i = 0; i < s.length() / 2 && i < key.length; i++) {
                 String decHint = s.substring(i * 2, i * 2 + 2);
                 int b = key[(index + i) % key.length]; // ensure legal index
-                EncryptedHintChar decryptedHint = EncryptedHintChar.ofEncrypted(decHint);
+                EncryptedHintChar decryptedHint = EncryptedHintChar.Companion.ofEncrypted(decHint);
 
                 if (LOOP_ENCRYPT_CHARS.applies(decryptedHint)) {
                     int br = b * decryptedHint.getRoundTrips();

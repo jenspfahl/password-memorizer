@@ -111,16 +111,16 @@ public class GroupListFragment extends CommonMenuFragmentBase implements View.On
                 switch (item.getItemId()) {
                     case R.id.menu_change_group:
                         Intent intent = new Intent(v.getContext(), GroupInputNameActivity.class);
-                        IntentUtil.setGroupExtra(intent, group);
+                        IntentUtil.INSTANCE.setGroupExtra(intent, group);
                         startActivity(intent);
                         return true;
                     case R.id.menu_change_color:
                         intent = new Intent(v.getContext(), SelectGroupColorActivity.class);
-                        IntentUtil.setGroupExtra(intent, group);
+                        IntentUtil.INSTANCE.setGroupExtra(intent, group);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_group:
-                        DeletionHelper.askAndDelete(groupListViewModel.getRepo(), group, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(groupListViewModel.getRepo(), group, getActivity(), null);
                         return true;
                     default:
                         return false;

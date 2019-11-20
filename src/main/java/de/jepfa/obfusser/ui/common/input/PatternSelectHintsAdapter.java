@@ -141,8 +141,8 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
         });
 
         if (estimatedSize == null) {
-           estimatedSize = ObfusTextAdjuster.calcTextSizeToScreen(activity, holder.selectHintTextView, patternStringNumbered,
-                   ObfusTextAdjuster.DEFAULT_MARGIN);
+           estimatedSize = ObfusTextAdjuster.INSTANCE.calcTextSizeToScreen(activity, holder.selectHintTextView, patternStringNumbered,
+                   ObfusTextAdjuster.INSTANCE.getDEFAULT_MARGIN());
         }
         holder.selectHintTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, estimatedSize);
 

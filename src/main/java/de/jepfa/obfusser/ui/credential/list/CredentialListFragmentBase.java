@@ -68,7 +68,7 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
 
         getActivity().setTitle(R.string.title_credentials);
 
-        Noogler.noogleEncryptData(getActivity(), view);
+        Noogler.INSTANCE.noogleEncryptData(getActivity(), view);
 
         return view;
     }
@@ -133,16 +133,16 @@ public abstract class CredentialListFragmentBase extends CommonMenuFragmentBase 
                 switch (item.getItemId()) {
                     case R.id.menu_change_credential:
                         Intent intent = new Intent(v.getContext(), CredentialInputNameActivity.class);
-                        IntentUtil.setCredentialExtra(intent, credential);
+                        IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                         startActivity(intent);
                         return true;
                     case R.id.menu_assign_group_credential:
                         intent = new Intent(v.getContext(), SelectGroupForCredentialActivity.class);
-                        IntentUtil.setCredentialExtra(intent, credential);
+                        IntentUtil.INSTANCE.setCredentialExtra(intent, credential);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_credential:
-                        DeletionHelper.askAndDelete(credentialListViewModel.getRepo(), credential, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(credentialListViewModel.getRepo(), credential, getActivity(), null);
                         return true;
                     default:
                         return false;

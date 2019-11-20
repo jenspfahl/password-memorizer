@@ -30,7 +30,7 @@ public class CredentialViewModel extends CredentialViewModelBase {
     public static CredentialViewModel getFromIntent(FragmentActivity activity, Intent intent) {
         CredentialViewModel credentialViewModel = get(activity);
         credentialViewModel.setCredential(
-                IntentUtil.createCredentialFromIntent(intent));
+                IntentUtil.INSTANCE.createCredentialFromIntent(intent));
 
         return credentialViewModel;
     }

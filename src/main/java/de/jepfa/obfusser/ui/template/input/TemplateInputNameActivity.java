@@ -115,7 +115,7 @@ public class TemplateInputNameActivity extends SecureActivity {
             template.setInfo(CryptString.of(infoView.getText().toString()));
 
             Intent intent = new Intent(getBaseContext(), TemplateInputPatternActivity.class);
-            IntentUtil.setTemplateExtra(intent, template);
+            IntentUtil.INSTANCE.setTemplateExtra(intent, template);
             startActivity(intent);
 
         }

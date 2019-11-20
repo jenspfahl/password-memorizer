@@ -82,7 +82,7 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
                     }
                 });
 
-        Noogler.noogleEncryptData(getActivity(), view);
+        Noogler.INSTANCE.noogleEncryptData(getActivity(), view);
 
         return view;
     }
@@ -108,11 +108,11 @@ public class TemplateListFragment extends CommonMenuFragmentBase implements View
                 switch (item.getItemId()) {
                     case R.id.menu_change_template:
                         Intent intent = new Intent(v.getContext(), TemplateInputNameActivity.class);
-                        IntentUtil.setTemplateExtra(intent, template);
+                        IntentUtil.INSTANCE.setTemplateExtra(intent, template);
                         startActivity(intent);
                         return true;
                     case R.id.menu_delete_template:
-                        DeletionHelper.askAndDelete(templateListViewModel.getRepo(), template, getActivity(), null);
+                        DeletionHelper.INSTANCE.askAndDelete(templateListViewModel.getRepo(), template, getActivity(), null);
                         return true;
                     default:
                         return false;

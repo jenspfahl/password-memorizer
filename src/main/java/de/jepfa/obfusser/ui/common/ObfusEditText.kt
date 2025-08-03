@@ -16,7 +16,7 @@ class ObfusEditText(val editText: EditText, private val representation: Represen
 
 
     val pattern: String
-        get() = ObfusString.fromRepresentation(editText.text.toString(), representation).toExchangeFormat()
+        get() = ObfusString.fromRepresentation(editText.text.toString(), representation, null).toExchangeFormat()
 
     private val text: String
         get() = editText.text.toString()
@@ -24,7 +24,7 @@ class ObfusEditText(val editText: EditText, private val representation: Represen
     init {
         this.recreation = isRecreation
 
-        editText.setText(ObfusString.fromExchangeFormat(initialPattern).toRepresentation(representation))
+        editText.setText(ObfusString.fromExchangeFormat(initialPattern, null).toRepresentation(representation))
         editText.setSelection(initialPattern.length)
 
         ObfusTextAdjuster.adjustTextForRepresentation(representation, editText)

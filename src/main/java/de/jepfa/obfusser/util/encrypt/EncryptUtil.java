@@ -59,10 +59,12 @@ public class EncryptUtil {
      * We also add all possible digits and letters.
      */
     static final List<HintChar> CHARACTERS = new ArrayList<>();
+    static final List<HintChar> CHARACTERS_ASCII = new ArrayList<>();
     static {
         // add special chars
         for (Character c : Arrays.asList(KNOWN_SPECIAL_CHARS)) {
             CHARACTERS.add(new HintChar(c, true));
+            CHARACTERS_ASCII.add(new HintChar(c, true));
         }
 
         // add letters and digits
@@ -71,12 +73,16 @@ public class EncryptUtil {
 
             if (Character.isDigit(c)) {
                 CHARACTERS.add(new HintChar(c, false));
+                CHARACTERS_ASCII.add(new HintChar(c, false));
             }
             else if (Character.isLetter(c)) {
                 boolean isCommonLetter =
                         (c >= 'a' && c <= 'z') ||
                         (c >= 'A' && c <= 'Z');
                 CHARACTERS.add(new HintChar(c, !isCommonLetter));
+                if (isCommonLetter) {
+                    CHARACTERS_ASCII.add(new HintChar(c, false));
+                }
             }
         }
     }
@@ -280,7 +286,7 @@ public class EncryptUtil {
                 obfusChars.add(ObfusChar.SPECIAL_CHAR);
             }
         }
-        return new ObfusString(obfusChars);
+        return new ObfusString(obfusChars, null);
     }
 
     /**
@@ -392,8 +398,12 @@ public class EncryptUtil {
     }
 
     public static byte[] generateSalt() {
+        return generateRnd(Constants.KEY_LENGTH);
+    }
+
+    public static byte[] generateRnd(int length) {
         SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[Constants.KEY_LENGTH];
+        byte[] salt = new byte[length];
         random.nextBytes(salt);
         return salt;
     }

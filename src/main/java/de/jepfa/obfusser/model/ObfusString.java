@@ -1,6 +1,7 @@
 package de.jepfa.obfusser.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ import de.jepfa.obfusser.util.encrypt.EncryptUtil;
  */
 public class ObfusString {
 
+    public static final int FIXED_OBFUS_MIN_LENGTH = 8;
+    public static final int FIXED_OBFUS_MAX_LENGTH = 16;
+
     /**
      * Obfuscates the given string.
      *
@@ -30,7 +34,7 @@ public class ObfusString {
             obfusChars.add(ObfusChar.obfuscate(c));
         }
 
-        return new ObfusString(obfusChars);
+        return new ObfusString(obfusChars, null);
     }
 
     /**
@@ -39,7 +43,7 @@ public class ObfusString {
      * @param string
      * @return
      */
-    public static ObfusString fromExchangeFormat(String string) {
+    public static ObfusString fromExchangeFormat(String string, @Nullable Integer obfusLength) {
         if (string == null) {
             return null;
         }
@@ -49,7 +53,7 @@ public class ObfusString {
             obfusChars.add(ObfusChar.fromExchangeFormat(c));
         }
 
-        return new ObfusString(obfusChars);
+        return new ObfusString(obfusChars, obfusLength);
     }
 
     /**
@@ -77,7 +81,8 @@ public class ObfusString {
      * @param  representation the current used {@link Representation}
      * @return
      */
-    public static ObfusString fromRepresentation(String string, Representation representation) {
+    public static ObfusString fromRepresentation(String string, Representation representation
+            , @Nullable Integer obfusLength) {
         if (string == null) {
             return null;
         }
@@ -88,7 +93,7 @@ public class ObfusString {
             obfusChars.add(ObfusChar.fromRepresentation(c, representation));
         }
 
-        return new ObfusString(obfusChars);
+        return new ObfusString(obfusChars, obfusLength);
     }
 
     /**
@@ -112,13 +117,15 @@ public class ObfusString {
 
     private List<ObfusChar> obfusChars;
 
+    private Integer obfusLength;
+
     /**
      * Copy constructor.
      *
      * @param other
      */
     public ObfusString(@NonNull ObfusString other) {
-        this.obfusChars = new ArrayList<>(other.getObfusChars());
+        this(other.getObfusChars(), other.obfusLength);
     }
 
     /**
@@ -127,8 +134,9 @@ public class ObfusString {
      * @param obfusChars
      * @see ObfusChar
      */
-    public ObfusString(@NonNull List<ObfusChar> obfusChars) {
-        this.obfusChars = obfusChars;
+    public ObfusString(@NonNull List<ObfusChar> obfusChars, @Nullable Integer obfusLength) {
+        this.obfusChars = new ArrayList<>(obfusChars);
+        this.obfusLength = obfusLength;
     }
 
     /**
@@ -165,22 +173,45 @@ public class ObfusString {
      * @see ObfusChar#encrypt(byte)
      */
     public ObfusString encrypt(byte[] key) {
+
+        int origLength = obfusChars.size();
+        boolean isLengthObfuscable = origLength >= FIXED_OBFUS_MIN_LENGTH && origLength <= FIXED_OBFUS_MAX_LENGTH;
+
         ObfusString keyObfusString = EncryptUtil.keyToObfusString(key);
         int i = 0;
+        List<ObfusChar> newObfusChars = new ArrayList<>(this.obfusChars);
+        if (isLengthObfuscable) {
+            int missingLength = FIXED_OBFUS_MAX_LENGTH - origLength;
+            ObfusString expandPattern = EncryptUtil.keyToObfusString(EncryptUtil.generateRnd(missingLength));
+            List<ObfusChar> generatedNoise = new ArrayList<>(expandPattern.getObfusChars());
+
+            newObfusChars.addAll(generatedNoise);
+            this.obfusLength = FIXED_OBFUS_MIN_LENGTH + encryptLength(origLength, key);
+        }
+
         for (ObfusChar otherObfusChar : keyObfusString.getObfusChars()) {
-            if (i >= obfusChars.size()) {
+            if (i >= newObfusChars.size()) {
                 break;
             }
-            ObfusChar origin = obfusChars.get(i);
+            ObfusChar origin = newObfusChars.get(i);
 
             if (origin.isEncryptable()) {
-                obfusChars.set(i, origin.encrypt((byte) otherObfusChar.ordinal()));
+                newObfusChars.set(i, origin.encrypt((byte) otherObfusChar.ordinal()));
             }
 
             i++;
         }
+        this.obfusChars = newObfusChars;
 
         return this;
+    }
+
+    private int encryptLength(int length, byte[] key) {
+        return EncryptUtil.encryptIndex(length, FIXED_OBFUS_MAX_LENGTH, key);
+    }
+
+    private int decryptLength(int length, byte[] key) {
+        return EncryptUtil.decryptIndex(length, FIXED_OBFUS_MAX_LENGTH, key);
     }
 
     /**
@@ -191,22 +222,38 @@ public class ObfusString {
      * @see ObfusChar#decrypt(byte)
      */
     public ObfusString decrypt(byte[] key) {
+
         ObfusString keyObfusString = EncryptUtil.keyToObfusString(key);
         int i = 0;
+        int originLength = obfusChars.size();
+        if (isLengthObfuscated()) {
+            originLength = FIXED_OBFUS_MIN_LENGTH + decryptLength(this.obfusLength, key);
+            this.obfusLength = null;
+        }
+        List<ObfusChar> newObfusChars = new ArrayList<>(originLength);
         for (ObfusChar otherObfusChar : keyObfusString.getObfusChars()) {
-            if (i >= obfusChars.size()) {
+            if (i >= originLength || i >= obfusChars.size()) {
                 break;
             }
             ObfusChar origin = obfusChars.get(i);
 
             if (origin.isEncryptable()) {
-                obfusChars.set(i, origin.decrypt((byte) otherObfusChar.ordinal()));
+                newObfusChars.add(i, origin.decrypt((byte) otherObfusChar.ordinal()));
             }
 
             i++;
         }
+        this.obfusChars = newObfusChars;
 
         return this;
+    }
+
+    private boolean isLengthObfuscated() {
+        return this.obfusLength != null;
+    }
+
+    public Integer getObfusLength() {
+        return obfusLength;
     }
 
     @Override
@@ -225,8 +272,19 @@ public class ObfusString {
 
     @Override
     public String toString() {
-        return "ObfusString{" +
-                "obfusChars=" + obfusChars +
-                ", length=" + length() + "}";
+        StringBuilder sb = new StringBuilder();
+
+        for (ObfusChar c: obfusChars) {
+            sb.append(c.toString());
+        }
+        sb.append("-->l:");
+        sb.append(obfusChars.size());
+        if (obfusLength != null) {
+            sb.append("/");
+            sb.append(obfusLength);
+            sb.append("?");
+        }
+
+        return sb.toString();
     }
 }

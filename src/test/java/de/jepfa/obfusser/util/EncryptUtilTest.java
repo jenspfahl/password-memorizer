@@ -1,6 +1,8 @@
-package de.jepfa.obfusser.util.encrypt;
+package de.jepfa.obfusser.util;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -10,9 +12,11 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import de.jepfa.obfusser.model.Credential;
@@ -20,7 +24,6 @@ import de.jepfa.obfusser.model.ObfusChar;
 import de.jepfa.obfusser.model.ObfusString;
 import de.jepfa.obfusser.model.Representation;
 import de.jepfa.obfusser.model.SecurePatternHolder;
-import de.jepfa.obfusser.util.encrypt.hints.HintChar;
 
 public class EncryptUtilTest {
 
@@ -65,7 +68,7 @@ public class EncryptUtilTest {
 
         for (int i = 0; i < 100; i++) {
 
-            ObfusString user = ObfusString.fromExchangeFormat("0!xxxX?0!X0", null);
+            ObfusString user = ObfusString.fromExchangeFormat("0!xxxX?0!X0");
 
             char[] pwd = String.valueOf(i).toCharArray();
             byte[] salt = UUID.randomUUID().toString().getBytes();
@@ -100,23 +103,19 @@ public class EncryptUtilTest {
     @Test
     public void encryptDecryptHints() throws Exception {
 
+        String string = "abcdefghiABCDEFG!§$/138";
         byte[] salt = new SecureRandom().generateSeed(32);
 
-        int i = 0;
-        List<HintChar> characters = EncryptUtil.CHARACTERS;
-        characters.add(0, new HintChar('՜'));
-        for (HintChar hintChar : characters) {
-            String hint = String.valueOf(hintChar.getHint());
+        for (int i = 0; i < 100; i++) {
             char[] pwd = String.valueOf(i).toCharArray();
             byte[] key = EncryptUtil.generateKey(pwd, salt);
 
-            String encrypted = EncryptUtil.encryptHint(hint, 23, key);
+            String encrypted = EncryptUtil.encryptHint(string, 23, key);
             String decrypted = EncryptUtil.decryptHint(encrypted, 23, key);
 
-            System.out.println(i + ") k=" + key[23] + ": " + hint + " --> " + encrypted + " --> " + decrypted);
+            System.out.println(pwd + ": " + string + " --> " + encrypted + " --> " + decrypted);
 
-            Assert.assertEquals(hint, decrypted);
-            i++;
+            Assert.assertEquals(string, decrypted);
         }
     }
 
@@ -178,7 +177,7 @@ public class EncryptUtilTest {
 
             byte[] key = EncryptUtil.generateKey(String.valueOf(i).toCharArray(), salt);
 
-            byte[] indexKey = EncryptUtil.generateUuidKey(key, String.valueOf(i));
+            byte[] indexKey = EncryptUtil.genUUIDKey(key, String.valueOf(i));
             System.out.println("key(" + i + ")=" + Arrays.toString(key));
             System.out.println("ink(" + i + ")=" + Arrays.toString(indexKey));
 
@@ -236,7 +235,7 @@ public class EncryptUtilTest {
     private List<String> getPatterns(List<Credential> credentials, byte[] k) {
         List<String> p = new ArrayList<>(credentials.size());
         for (Credential credential : credentials) {
-            p.add(credential.getPatternAsExchangeFormat(true, k, true));
+            p.add(credential.getPatternAsExchangeFormatHinted(k, true));
         }
         return p;
     }

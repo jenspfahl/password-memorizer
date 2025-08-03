@@ -39,8 +39,8 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-
+    public void onBindViewHolder(final ViewHolder holder, final int unusedPos) {
+        int position = holder.getAdapterPosition();
         byte[] secret = SecureActivity.SecretChecker.getOrAskForSecret(activity);
 
         boolean encWithUuid = SecureActivity.SecretChecker.isEncWithUUIDEnabled(activity);
@@ -53,6 +53,7 @@ public class PatternSelectHintsAdapter extends RecyclerView.Adapter<PatternSelec
                 activity.getPatternRepresentation(),
                 encWithUuid);
 
+        //TODO pos points to encrypted (expanded pattern, but decrypted patter nmay be shorter)
         final boolean hasHint = pattern.hasHint(position, secret, encWithUuid);
 
         if (hasHint) {

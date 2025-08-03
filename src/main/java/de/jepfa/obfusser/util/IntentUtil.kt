@@ -29,6 +29,10 @@ object IntentUtil {
         pattern.setInfo(CryptString.of(intent.getStringExtra(SecurePatternHolder.ATTRIB_INFO)))
         pattern.patternInternal = CryptString.of(intent.getStringExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL))
         pattern.uuid = intent.getStringExtra(SecurePatternHolder.ATTRIB_UUID)
+        val obfusPatternLength = intent.getIntExtra(SecurePatternHolder.ATTRIB_OBFUS_PATTERN_LENGTH, 0)
+        if (obfusPatternLength != 0) {
+            pattern.obfusPatternLength = obfusPatternLength
+        }
 
 
         val groupId = intent.getIntExtra(PatternHolder.ATTRIB_GROUP_ID, 0)
@@ -77,6 +81,7 @@ object IntentUtil {
         intent.putExtra(SecurePatternHolder.ATTRIB_GROUP_ID, pattern.groupId)
         intent.putExtra(SecurePatternHolder.ATTRIB_PATTERN_INTERNAL, CryptString.from(pattern.patternInternal))
         intent.putExtra(SecurePatternHolder.ATTRIB_UUID, pattern.uuid)
+        intent.putExtra(SecurePatternHolder.ATTRIB_OBFUS_PATTERN_LENGTH, pattern.obfusPatternLength)
 
         val hints = convertHintsForTransport(pattern)
         intent.putStringArrayListExtra(Credential.ATTRIB_HINTS, hints)

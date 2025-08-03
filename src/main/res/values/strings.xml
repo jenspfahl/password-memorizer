@@ -151,7 +151,7 @@
     <string name="password_not_equal">Password not equal</string>
     <string name="nothing_revealed">Nothing revealed</string>
     <string name="wrong_password">Wrong password</string>
-    <string name="store_password_hint">Enable password checking</string>
+    <string name="store_password_hint">Enable password checking (strong password recommended)</string>
     <string name="disturb_equal_patterns">Distort equal patterns (strong password recommended)</string>
     <string name="not_supported">This feature is not supported for your Android version.</string>
 

@@ -24,10 +24,19 @@ import de.jepfa.obfusser.util.encrypt.EncryptUtil;
 public abstract class SecurePatternHolder extends PatternHolder {
 
     public static final String ATTRIB_UUID = "uuid";
+    public static final String ATTRIB_OBFUS_PATTERN_LENGTH = "obfus_pattern_length";
 
 
     @Nullable
     private String uuid;
+
+
+    /**
+     * To obfuscate the real pattern length all patterns with a real length in the range of (8--16) have all a length of 16
+     * and an obfuscated real patternLength stored here.
+     */
+    @Nullable
+    private Integer obfusPatternLength;
 
     @Nullable
     public synchronized String getUuid() {
@@ -39,6 +48,15 @@ public abstract class SecurePatternHolder extends PatternHolder {
 
     public synchronized void setUuid(@Nullable String uuid) {
         this.uuid = uuid;
+    }
+
+    @Nullable
+    public Integer getObfusPatternLength() {
+        return obfusPatternLength;
+    }
+
+    public void setObfusPatternLength(@Nullable Integer obfusPatternLength) {
+        this.obfusPatternLength = obfusPatternLength;
     }
 
     /**
@@ -361,7 +379,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
     }
 
     private ObfusString getPattern(byte[] key, boolean encWithUuid) {
-        ObfusString pattern = ObfusString.fromExchangeFormat(CryptString.from(getPatternInternal()));
+        ObfusString pattern = ObfusString.fromExchangeFormat(CryptString.from(getPatternInternal()), obfusPatternLength);
 
         if (pattern != null && key != null) {
             pattern.decrypt(getUUIDKey(key, encWithUuid));
@@ -381,6 +399,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
             tbs.encrypt(getUUIDKey(key, encWithUuid));
         }
         setPatternInternal(CryptString.of(tbs.toExchangeFormat()));
+        setObfusPatternLength(tbs.getObfusLength());
     }
 
     public String getHiddenPatternRepresentation(Representation representation) {
@@ -396,7 +415,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
                         ObfusChar.ANY_CHAR,
                         ObfusChar.ANY_CHAR,
                         ObfusChar.ANY_CHAR
-                })).toRepresentation(representation);
+                }), obfusPatternLength).toRepresentation(representation);
     }
 
     public void copyFrom(SecurePatternHolder other, byte[] key, boolean encWithUuid) {
@@ -436,6 +455,7 @@ public abstract class SecurePatternHolder extends PatternHolder {
     @Override
     public String toString() {
         return super.toString()
-                + ", uuid='" + uuid;
+                + ", uuid='" + uuid
+                + ", obfusPatternLength='" + obfusPatternLength;
     }
 }
